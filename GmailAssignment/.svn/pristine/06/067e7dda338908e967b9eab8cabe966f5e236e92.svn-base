@@ -1,0 +1,839 @@
+package p2M6.Accounting;
+
+import java.awt.AWTException;
+import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Keys;
+import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
+import org.testng.asserts.SoftAssert;
+
+import com.relevantcodes.extentreports.LogStatus;
+
+import common.ApexCommon;
+import objectRepository.IManageBill;
+import p2M6.Accounting.objectRepositry.ACTG_PayBill;
+import p2M6.Accounting.objectRepositry.Admin_PeopleTab;
+
+public class PayBills extends ApexCommon implements ACTG_PayBill, Admin_PeopleTab, IManageBill {
+	
+	static String[] arr;
+
+	@BeforeClass(enabled = true, groups = { "Smoke", "Regression", "Jasmeet" })
+	public void login() throws InterruptedException {
+		// admin_Login(adminEmail, password);
+		login("", adminEmail, password);
+	}
+
+	@BeforeMethod
+	public void refresh() {
+		getDriver().navigate().refresh();
+	}
+
+	@Test(priority = 0, enabled = true, groups = { "Smoke", "Jasmeet" })
+	public void P2M6_001() throws InterruptedException {
+		extentTest = extentReport.startTest(" *H6:P2M6_001",
+				" Accounting - Verify that Pay Bills display as tab next to Receivables.");
+		byId.click(id_Accounting, "clicking on accounting");
+		String getText = byId.getText(id_PayBills, "getting text of pay bills tab");
+		Assert.assertEquals(getText, valueTitle_PayBills);
+		extentTest.log(LogStatus.INFO, "Verified that Pay Bills display as tab next to Receivables.");
+	}
+
+	@Test(priority = 1, enabled = true, groups = { "Smoke", "Jasmeet" })
+	public void P2M6_002() throws InterruptedException {
+		extentTest = extentReport.startTest(" *H6:P2M6_002",
+				" Accounting - Verify that Pay Bills should be clickable and paybills screen should be displayed on clicking");
+		byId.click(id_Accounting, "clicking on accounting");
+		byId.click(id_PayBills, "clicking on paybill");
+		String gotText = byXpath.getText(xpath_PayBillsTitle, "getting text of pay bills page title");
+		Assert.assertEquals(gotText, valueTitle_PayBills);
+		extentTest.log(LogStatus.INFO,
+				"Verified that Pay Bills is clickable and paybills screen displayed on clicking");
+	}
+
+	@Test(priority = 2, enabled = true, groups = { "Smoke", "Jasmeet" })
+	public void P2M6_003() throws InterruptedException {
+		extentTest = extentReport.startTest("P2M6_003",
+				"H6: Accounting - Verify that Pay Bills page displaying all required fields");
+		byId.click(id_Accounting, "clicking on accounting");
+		byId.click(id_PayBills, "clicking on paybill");
+		String getText1 = byClassName.getText(class_PayBillsShowBills, "get text for show bills field");
+		int getVal1 = byId.getSize(id_PayBillsSearch, "get size for search field");
+		int getVal2 = byId.getSize(id_PayBillsVendor, "get size for select vendor field");
+		String getAddress = byXpath.getText(xpath_PayBillsAddressLabel, "get text for address field label");
+		int getGridVal = byId.getSize(id_PayBillsGrid, "get size for grid label");
+		String getDate = byXpath.getText(xpath_PayBillsDate, "get text for address field label");
+		String getBank = byXpath.getText(xpath_PayBillsBank, "get text for bank field label");
+		String getPaymentType = byXpath.getText(xpath_PayBillsPaymentType, "get text for Payment Type label");
+		String getCheckNo = byId.getText(id_PayBillsCheckNo, "get text for Payment Type label");
+		String getAmount = byId.getText(id_PayBillsAmount, "get text for amount label");
+		int getPayBillVal = byId.getSize(id_PayBillsAmount, "get size for pay bills button");
+		int getAddNewVendorVal = byId.getSize(id_PayBillsAddNewVendor, "get size for add vendor button");
+		SoftAssert se = new SoftAssert();
+		se.assertEquals(getText1, valueTitle_PayBillsShowBills);
+		se.assertTrue(getVal1 == 1, "search field is not there");
+		se.assertTrue(getVal2 == 1, "select vendor field is not there");
+		se.assertEquals(getAddress, valueTitle_PayBillsAddress);
+		se.assertTrue(getGridVal == 1, "grid is not there");
+		se.assertEquals(getDate, value_PayBillsDate);
+		se.assertEquals(getBank, value_PayBillsBank);
+		se.assertEquals(getPaymentType, value_PayBillsPaymentType);
+		se.assertEquals(getCheckNo, value_PayBillsCheckNo);
+		se.assertEquals(getAmount, value_PayBillsAmount);
+		se.assertTrue(getPayBillVal == 1, "pay selected bills button is not there");
+		se.assertTrue(getAddNewVendorVal == 1, "add new vendor icon is not there");
+		se.assertAll();
+	}
+
+	@Test(priority = 3, enabled = true, groups = { "Smoke", "Jasmeet" })
+	public void P2M6_004() throws InterruptedException {
+		extentTest = extentReport.startTest("P2M6_004",	"H6: Accounting - Pay "
+				+ "Bills - Show bill - verfiy that it have all required fields");
+		byId.click(id_Accounting, "clicking on accounting");
+		byId.click(id_PayBills, "clicking on paybill");
+		String getText1 = byXpath.getText(xpath_PayBillsShowAllBills,
+				"Show all bills field");
+		String getText2 = byXpath.getText(xpath_PayBillsDueonorbefore,
+				"Due on or before field");
+		SoftAssert se = new SoftAssert();
+		se.assertEquals(getText1, value_PayBillsShowAllBills);
+		se.assertEquals(getText2, value_PayBillsDueonorbefore);
+		se.assertAll();
+	}
+
+	@Test(priority = 4, enabled = true, groups = { "Smoke", "Jasmeet" })
+	public void P2M6_005() throws InterruptedException {
+		extentTest = extentReport.startTest(" *H6:P2M6_005", "Accounting>>Pay Bills>>Show Bills>> Show all Bills");
+		byId.click(id_Accounting, "clicking on accounting");
+		byId.click(id_PayBills, "clicking on paybill");
+		byId.click(id_PayBillsShowAllBillsRadioButton, "clicking on Show All Bills Radio Button");
+		byId.click(id_PayBillsSearch, "clicking on search");
+		int gridSize = getDriver().findElement(By.id(id_PayBillsAllGrid)).findElements(By.tagName("tr")).size();
+		Assert.assertTrue(gridSize > 1, "all records are displaying in the grid");
+		extentTest.log(LogStatus.INFO, "Test P2M6_005 pass ");
+	}
+
+	@Test(priority = 5, enabled = true, groups = { "Smoke", "Jasmeet" })
+	public void P2M6_006() throws InterruptedException {
+		extentTest = extentReport.startTest(" *H6:P2M6_006", "Accounting>>Pay Bills>>Show Bills>> Due on or before");
+		byId.click(id_Accounting, "clicking on accounting");
+		byId.click(id_PayBills, "clicking on paybill");
+		byId.click(id_PayBillsShowAllBillsRadioButton, "clicking on Show All Bills Radio Button");
+		byId.click(id_PayBillsSearch, "clicking on search");
+		int gridSize = getDriver().findElement(By.id(id_PayBillsAllGrid)).findElements(By.tagName("tr")).size();
+		Assert.assertTrue(gridSize > 1, "all records are displaying in the grid");
+		extentTest.log(LogStatus.INFO, "Test P2M6_006 pass ");
+	}
+
+	@Test(priority = 6, enabled = true, groups = { "Smoke", "Jasmeet" })
+	public void P2M6_007() throws InterruptedException {
+		extentTest = extentReport.startTest(" *H6:P2M6_007",
+				"Accounting>>Pay Bills>>Select Vendor>> Clicking this field vendor listing should display");
+		byId.click(id_PeopleTab, "clicking on people");
+		byId.click(id_PeopleVendorsTab, "clicking on vendors");
+		int gridSize = getDriver().findElement(By.xpath(xpath_PeopleVendorsGrid)).findElements(By.tagName("tr")).size();
+		if (gridSize > 1) {
+			byId.click(id_Accounting, "clicking on accounting");
+			byId.click(id_PayBills, "clicking on paybill");
+			byId.click(id_PayBillsVendor, "clicking on vendor");
+			Thread.sleep(3000);
+			getDriver().findElement(By.id(id_PayBillsVendor)).sendKeys(Keys.ARROW_DOWN);
+			getDriver().findElement(By.id(id_PayBillsVendor)).sendKeys(Keys.ENTER);
+			String nameVendor = byId.getAttribute(id_PayBillsVendor, "value", "getting selected vendor name");
+			Assert.assertTrue(nameVendor != "", "selected vendor not displaying there");
+		}
+		extentTest.log(LogStatus.INFO, "Test P2M6_007 pass ");
+	}
+
+	@Test(priority = 7, enabled = true, groups = { "Smoke", "Jasmeet" })
+	public void P2M6_008() throws InterruptedException {
+		extentTest = extentReport.startTest("P2M6_008", "H6: Accounting >>"
+				+ " Pay Bills >> Select Vendor");
+		byId.click(id_PeopleTab, "clicking on people");
+		byId.click(id_PeopleVendorsTab, "clicking on vendors");
+		int gridSize = getDriver().findElement(By.xpath(xpath_PeopleVendorsGrid)).
+				findElements(By.tagName("tr")).size();
+		SoftAssert se = new SoftAssert();
+		if (gridSize > 1) {
+			byId.click(id_Accounting, "Accounting");
+			byId.click(id_PayBills, "Paybill");
+			byId.click(id_PayBillsVendor, "Vendor");
+			Thread.sleep(3000);
+			getDriver().findElement(By.id(id_PayBillsVendor)).sendKeys(Keys.ARROW_DOWN);
+			getDriver().findElement(By.id(id_PayBillsVendor)).sendKeys(Keys.ENTER);
+			String nameVendor = byId.getAttribute(id_PayBillsVendor,
+					"value", "Selected vendor name");
+			String textAddress = byId.getAttribute(id_PayBillsAddress,
+					"value", "Vendor address");
+			se.assertTrue(nameVendor != "", "selected vendor not displaying there");
+			se.assertTrue(textAddress != "", "selected vendor's address not displaying there");
+
+		} else {
+			ApexCommon.newVendor("test", "user", "", "testuser" +
+		utility.getCurrentDateTime("ddMMYYYYss") + "@yopmail.com", "8888888888",
+			"", "", "", "", "", "", "",	"");
+      byId.click(id_Accounting, "clicking on accounting");
+			byId.click(id_PayBills, "clicking on paybill");
+			byId.click(id_PayBillsVendor, "clicking on vendor");
+			Thread.sleep(3000);
+			getDriver().findElement(By.id(id_PayBillsVendor)).sendKeys(Keys.ARROW_DOWN);
+			getDriver().findElement(By.id(id_PayBillsVendor)).sendKeys(Keys.ENTER);
+			String nameVendor = byId.getAttribute(id_PayBillsVendor,
+					"value", "Selected vendor name");
+			String textAddress = byId.getAttribute(id_PayBillsAddress,
+					"value", "Vendor address");
+			
+			se.assertTrue(nameVendor != "", "selected vendor not displaying there");
+			se.assertTrue(textAddress != "", "selected vendor's address not displaying there");			
+		}
+		se.assertAll();
+	}
+
+	@Test(priority = 8, enabled = true, groups = { "Smoke", "Jasmeet" })
+	public void P2M6_009() throws InterruptedException {
+		extentTest = extentReport.startTest("P2M6_009", "H6: Accounting "
+				+ ">> Pay Bills >> Select Vendor - " + " sign");
+		byId.click(id_Accounting, "Accounting");
+		byId.click(id_PayBills, "Paybill");
+		byId.click(id_PayBillsAddNewVendor, "Add vendor '+' icon");
+		String alertText = byXpath.getText(xpath_PaybillAddNewVendorAlertText, "Alert text");
+		String alertOption1 = byClassName.getAttribute(class_PaybillAddNewVendorAlertYesOption,
+				"value", "getting option Yes text");
+		String alertOption2 = byXpath.getAttribute(xpath_PaybillAddNewVendorAlertNoOption,
+				"value", "getting option No text");
+		SoftAssert se = new SoftAssert();
+		se.assertEquals(alertText, value_PaybillAddNewVendorAlertText);
+		se.assertEquals(alertOption1, value_PaybillAddNewVendorAlertYesOption);
+		se.assertEquals(alertOption2, value_PaybillAddNewVendorAlertNoOption);
+		se.assertAll();
+	}
+
+	@Test(priority = 9, enabled = true, groups = { "Smoke", "Jasmeet" })
+	public void P2M6_010() throws InterruptedException {
+		extentTest = extentReport.startTest("P2M6_010",	"H6: Accounting >> "
+				+ "Pay Bills>>Select Vendor - " + " sign -- Yes");
+		byId.click(id_Accounting, "clicking on accounting");
+		byId.click(id_PayBills, "clicking on paybill");
+		byId.click(id_PayBillsAddNewVendor, "clicking on add vendor '+' icon");
+		byClassName.click(class_PaybillAddNewVendorAlertYesOption, "Yes option");
+		String textField1 = byXpath.getText(xpath_PaybillNewVendorField1, "Field 1 label");
+		String textField2 = byXpath.getText(xpath_PaybillNewVendorField2, "Field 2 label");
+		String textField3 = byXpath.getText(xpath_PaybillNewVendorField3, "Field 3 label");
+		String textField4 = byXpath.getText(xpath_PaybillNewVendorField4, "Field 4 label");
+		String textField5 = byXpath.getText(xpath_PaybillNewVendorField5, "Field 5 label");
+		String textField6 = byXpath.getText(xpath_PaybillNewVendorField6, "Field 6 label");
+		String textField7 = byXpath.getText(xpath_PaybillNewVendorField7, "Field 7 label");
+		String textField8 = byXpath.getText(xpath_PaybillNewVendorField8, "Field 8 label");
+		String textField9 = byXpath.getText(xpath_PaybillNewVendorField9, "Field 9 label");
+		String textField10 = byXpath.getText(xpath_PaybillNewVendorField10, "Field 10 label");
+		String textField11 = byXpath.getText(xpath_PaybillNewVendorField11, "Field 11 label");
+		String textField12 = byXpath.getText(xpath_PaybillNewVendorField12, "Field 12 label");
+		String textField13 = byXpath.getText(xpath_PaybillNewVendorField13, "Field 13 label");
+		String textField14 = byXpath.getText(xpath_PaybillNewVendorField14, "Field 14 label");
+		String textField15 = byXpath.getText(xpath_PaybillNewVendorField15, "Field 15 label");
+		String textField16 = byXpath.getText(xpath_PaybillNewVendorField16, "Field 16 label");
+		String textField17 = byXpath.getText(xpath_PaybillNewVendorField17, "Field 17 label");
+		String textField18 = byXpath.getText(xpath_PaybillNewVendorField18, "Field 18 label");
+		String textField19 = byXpath.getText(xpath_PaybillNewVendorField19, "Field 19 label");
+		String textField20 = byId.getAttribute(id_PayBillNewVendorButtonSave,
+				"value", "Field 20 label");
+		String textField21 = byId.getAttribute(id_NewVendorButtonCancel,
+				"value", "Field 21 label");
+		SoftAssert se = new SoftAssert();
+		se.assertEquals(textField1, value_PaybillNewVendorField1);
+		se.assertEquals(textField2, value_PaybillNewVendorField2);
+		se.assertEquals(textField3, value_PaybillNewVendorField3);
+		se.assertEquals(textField4, value_PaybillNewVendorField4);
+		se.assertEquals(textField5, value_PaybillNewVendorField5);
+		se.assertEquals(textField6, value_PaybillNewVendorField6);
+		se.assertEquals(textField7, value_PaybillNewVendorField7);
+		se.assertEquals(textField8, value_PaybillNewVendorField8);
+		se.assertEquals(textField9, value_PaybillNewVendorField9);
+		se.assertEquals(textField10, value_PaybillNewVendorField10);
+		se.assertEquals(textField11, value_PaybillNewVendorField11);
+		se.assertEquals(textField12, value_PaybillNewVendorField12);
+		se.assertEquals(textField13, value_PaybillNewVendorField13);
+		se.assertEquals(textField14, value_PaybillNewVendorField14);
+		se.assertEquals(textField15, value_PaybillNewVendorField15);
+		se.assertEquals(textField16, value_PaybillNewVendorField16);
+		se.assertEquals(textField17, value_PaybillNewVendorField17);
+		se.assertEquals(textField18, value_PaybillNewVendorField18);
+		se.assertEquals(textField19, value_PaybillNewVendorField19);
+		se.assertEquals(textField20, value_PaybillNewVendorField20);
+		se.assertEquals(textField21, value_PaybillNewVendorField21);
+		se.assertAll();
+	}
+
+	@Test(priority = 10, enabled = true, groups = { "Smoke", "Jasmeet" })
+	public void P2M6_011() throws InterruptedException {
+		extentTest = extentReport.startTest(" *H6:P2M6_011",
+				"Accounting>>Pay Bills>>New Vendor>> Vendor ID should be autogenerated.");
+		byId.click(id_Accounting, "clicking on accounting");
+		byId.click(id_PayBills, "clicking on paybill");
+		byId.click(id_PayBillsAddNewVendor, "clicking on add vendor '+' icon");
+		byClassName.click(class_PaybillAddNewVendorAlertYesOption, "clicking yes option");
+		String valVendorId = byId.getAttribute(id_PayBillNewVendorVendorID, "value",
+				"getting autogenerated vendor id value");
+		Assert.assertTrue(valVendorId != "", "vendor id is not getting autogenerated");
+
+		extentTest.log(LogStatus.INFO, "Test P2M6_011 pass ");
+	}
+
+	@Test(priority = 11, enabled = true, groups = { "Smoke", "Jasmeet" })
+	public void P2M6_012() throws InterruptedException {
+		extentTest = extentReport.startTest(" *H6:P2M6_012",
+				"Accounting>>Pay Bills>>Select Vendor - " + " sign - Yes >>Vendor Information - Save");
+		byId.click(id_Accounting, "clicking on accounting");
+		byId.click(id_PayBills, "clicking on paybill");
+		byId.click(id_PayBillsAddNewVendor, "clicking on add vendor '+' icon");
+		byClassName.click(class_PaybillAddNewVendorAlertYesOption, "clicking yes option");
+		String firstName = utility.uniqueString().concat("vendor");
+
+		byId.setText(id_PayBillNewVendorFirstName, firstName, "entering first name");
+		byId.setText(id_PayBillNewVendorLastName, value_PayBillNewVendorLastName, "entering last name");
+		byId.click(id_PayBillNewVendorSaveButton, "clicking on save button");
+		String txtMsg = byXpath.getText(xpath_PayBillNewVendorSaveConfirmationMsg, "getting confirmation alert");
+		Assert.assertEquals(txtMsg, value_PayBillNewVendorSaveConfirmationMsg);
+		extentTest.log(LogStatus.INFO, "Test P2M6_012 pass ");
+	}
+
+	@Test(priority = 12, enabled = true, groups = { "Smoke", "Jasmeet" })
+	public void P2M6_013() throws InterruptedException {
+		extentTest = extentReport.startTest("P2M6_013",	"H6: Accounting >> Pay Bills >> "
+				+ "Select Vendor - " + " sign - Yes >> Vendor Information - Cancel");
+		byId.click(id_Accounting, "Accounting");
+		byId.click(id_PayBills, "Paybill");
+		byId.click(id_PayBillsAddNewVendor, "Add vendor '+' icon");
+		byClassName.click(class_PaybillAddNewVendorAlertYesOption, "'Yes' option");
+		String firstName = utility.uniqueString().concat("vendor");
+		byId.setText(id_PayBillNewVendorFirstName, firstName, "First name");
+		byId.setText(id_PayBillNewVendorLastName, value_PayBillNewVendorLastName, "Last name");
+		byId.click(id_NewVendorButtonCancel, "Cancel button");
+		byXpath.click(xpath_PaybillAddNewVendorAlertNoOption, "'No' option");
+		String textField1 = byXpath.getText(xpath_PaybillNewVendorField1, "Field 1 label");
+		SoftAssert se = new SoftAssert();
+		se.assertEquals(textField1, value_PaybillNewVendorField1);
+		byId.click(id_NewVendorButtonCancel, "again on cancel button");
+		byClassName.click(class_PaybillAddNewVendorAlertYesOption, "'Yes' option");
+		int getVal1 = byId.getSize(id_PayBillsSearch, "Search field");
+		se.assertTrue(getVal1 == 1, "search field is not there");
+		se.assertAll();
+	}
+
+	@Test(priority = 13, enabled = true, groups = { "Smoke", "Jasmeet" })
+	public void P2M6_014() throws InterruptedException {
+		extentTest = extentReport.startTest(" *H6:P2M6_014", "Accounting>>Pay Bills>>Select Vendor - " + " sign - NO");
+		byId.click(id_Accounting, "clicking on accounting");
+		byId.click(id_PayBills, "clicking on paybill");
+		byId.click(id_PayBillsAddNewVendor, "clicking on add vendor '+' icon");
+		byXpath.click(xpath_PaybillAddNewVendorAlertNoOption, "clicking no option");
+		int getVal1 = byId.getSize(id_PayBillsSearch, "get size for search field");
+		Assert.assertTrue(getVal1 == 1, "search field is not there");
+		extentTest.log(LogStatus.INFO, "Test P2M6_014 pass ");
+	}
+
+	@Test(priority = 14, enabled = true, groups = { "Smoke", "Jasmeet" })
+	public void P2M6_015() throws InterruptedException {
+		extentTest = extentReport.startTest("P2M6_015",
+				"H6: Accounting >> Pay Bills >> Address");
+		byId.click(id_PeopleTab, "People Tab");
+		byId.click(id_PeopleVendorsTab, "Vendors Tab");
+		SoftAssert se = new SoftAssert();
+		int gridSize = getDriver().findElement(By.xpath(xpath_PeopleVendorsGrid)).
+				findElements(By.tagName("tr")).size();
+		if (gridSize > 1) {
+			byId.click(id_Accounting, "Accounting Tab");
+			byId.click(id_PayBills, "Paybill Tab");
+			byId.click(id_PayBillsVendor, "Vendor Tab");
+			Thread.sleep(3000);
+			getDriver().findElement(By.id(id_PayBillsVendor)).sendKeys(Keys.ARROW_DOWN);
+			getDriver().findElement(By.id(id_PayBillsVendor)).sendKeys(Keys.ENTER);
+			String textAddress = byId.getAttribute(id_PayBillsAddress,
+					"value", "Vendor address");
+			se.assertTrue(textAddress != "", "selected vendor's address not displaying there");			
+		} else {
+			ApexCommon.newVendor("test", "user", "", "testuser" +
+					utility.getCurrentDateTime("ddMMYYYYss") + "@yopmail.com", "8888888888",
+						"", "", "", "", "", "", "",	"");
+			byId.click(id_Accounting, "Accounting Tab");
+			byId.click(id_PayBills, "Paybill Tab");
+			byId.click(id_PayBillsVendor, "Vendor Tab");
+			Thread.sleep(3000);
+			getDriver().findElement(By.id(id_PayBillsVendor)).sendKeys(Keys.ARROW_DOWN);
+			getDriver().findElement(By.id(id_PayBillsVendor)).sendKeys(Keys.ENTER);
+			String textAddress = byId.getAttribute(id_PayBillsAddress,
+					"value", "Vendor address");
+			se.assertTrue(textAddress != "", "selected vendor's address not displaying there");			
+		}
+		se.assertAll();
+	}
+
+	@Test(priority = 15, enabled = true, groups = { "Smoke", "Jasmeet" })
+	public void P2M6_016() throws InterruptedException {
+		extentTest = extentReport.startTest("P2M6_016", "H6: Accounting>>Pay Bills>>Grid");
+		byId.click(id_Accounting, "clicking on accounting");
+		byId.click(id_PayBills, "clicking on paybill");
+		String txtCol1 = byXpath.getText(xpath_PayBillGridCol1, "1st col label");
+		String txtCol2 = byXpath.getText(xpath_PayBillGridCol2, "2nd col label");
+		String txtCol3 = byXpath.getText(xpath_PayBillGridCol3, "3rd col label");
+		String txtCol4 = byXpath.getText(xpath_PayBillGridCol4, "4th col label");
+		String txtCol5 = byXpath.getText(xpath_PayBillGridCol5, "5th col label");
+		String txtCol6 = byXpath.getText(xpath_PayBillGridCol6, "6th col label");
+		String txtCol7 = byXpath.getText(xpath_PayBillGridCol7, "7th col label");
+		String txtCol8 = byXpath.getText(xpath_PayBillGridCol8, "8th col label");
+		SoftAssert se = new SoftAssert();
+		se.assertEquals(txtCol1, value_PayBillGridCol1);
+		se.assertEquals(txtCol2, value_PayBillGridCol2);
+		se.assertEquals(txtCol3, value_PayBillGridCol3);
+		se.assertEquals(txtCol4, value_PayBillGridCol4);
+		se.assertEquals(txtCol5, value_PayBillGridCol5);
+		se.assertEquals(txtCol6, value_PayBillGridCol6);
+		se.assertEquals(txtCol7, value_PayBillGridCol7);
+		se.assertEquals(txtCol8, value_PayBillGridCol8);
+		se.assertAll();
+	}
+
+	@Test(priority = 16, enabled = true, groups = { "Smoke", "Jasmeet" })
+	public void P2M6_017() throws InterruptedException {
+		extentTest = extentReport.startTest("*H6:P2M6_017", "Accounting>>Pay Bills>>Grid");
+		byId.click(id_Accounting, "clicking on accounting");
+		byId.click(id_PayBills, "clicking on paybill");
+		int rowSize = getDriver().findElement(By.id(id_PayBillsAllGrid)).findElements(By.tagName("tr")).size();
+		if (rowSize > 1) {
+			byXpath.click(xpath_PayBillGridRow1Checkbox, "clicking on checkbox");
+			Boolean valChk = byXpath.isSelected(xpath_PayBillGridRow1Checkbox, "verifying if checkbox is selected");
+			Assert.assertTrue(valChk == true, "checkbox is not getting selected");
+			extentTest.log(LogStatus.INFO, "Test P2M6_017 pass");
+
+		} else {
+			byId.click(id_Accounting, "clicking on accounting");
+			byId.click("arrow", "clicking on side bar");
+			byClassName.click("clsNewBill", "clicking on new bill");
+			Thread.sleep(2000);
+
+			byId.click(id_NewBillVendorName, "clicking on vendor textbox");
+			Thread.sleep(2000);
+			getDriver().findElement(By.id(id_NewBillVendorName)).sendKeys(Keys.ARROW_DOWN);
+			getDriver().findElement(By.id(id_NewBillVendorName)).sendKeys(Keys.ENTER);
+
+			byId.setText(id_NewBillAmount, value_NewBillAmount, "entering amount");
+			byId.click(id_AddItemsSectionBuildingDDL, "clicking on building ddl");
+			getDriver().findElement(By.id(id_AddItemsSectionBuildingDDL)).sendKeys(Keys.ARROW_DOWN);
+			getDriver().findElement(By.id(id_AddItemsSectionBuildingDDL)).sendKeys(Keys.ENTER);
+			byId.click(id_NewBillAddItemsUnit, "clicking on unit ddl");
+			getDriver().findElement(By.id(id_NewBillAddItemsUnit)).sendKeys(Keys.ARROW_DOWN);
+			getDriver().findElement(By.id(id_NewBillAddItemsUnit)).sendKeys(Keys.ENTER);
+			byId.click(id_NewBillAddItemsAccount, "clicking on account ddl");
+			getDriver().findElement(By.id(id_NewBillAddItemsAccount)).sendKeys(Keys.ARROW_DOWN);
+			getDriver().findElement(By.id(id_NewBillAddItemsAccount)).sendKeys(Keys.ENTER);
+
+			byId.setText(id_NewBillAddItemsAmount, value_NewBillAmount, "entering amount 2");
+			byId.click("btnSaveInvoice", "clicking on save button");
+			byId.click(id_Accounting, "clicking on accounting");
+			byId.click(id_PayBills, "clicking on paybill");
+			byXpath.click(xpath_PayBillGridRow1Checkbox, "clicking on checkbox");
+			Boolean valChk = byXpath.isSelected(xpath_PayBillGridRow1Checkbox, "verifying if checkbox is selected");
+			Assert.assertTrue(valChk == true, "checkbox is not getting selected");
+		}
+	}
+	
+	@Test(priority = 17, enabled = true, groups = { "Smoke", "Jasmeet" })
+	public void P2M6_018() throws InterruptedException, AWTException, IOException {
+		extentTest = extentReport.startTest("P2M6_018", "H6: Accounting>>Pay Bills>>Grid");
+		String portfolioName;
+		portfolioName = addPortfolio("H");
+		setLogs.info("Add Bank and attach portolio to it");
+		String getUniqueNumber = utility.getCurrentDateTime("ddMMYYYYss");
+		ApexCommon.addBank(portfolioName, value_BankName, getUniqueNumber, getUniqueNumber,
+				getUniqueNumber, value_BankIntialAmount, getUniqueNumber, "Active", "");
+		setLogs.info("Add Property");
+		byId.click(id_PropertiesTab, "Properties Tab");
+		byId.click(id_NewPropertyBTN, "'New Property' button");
+		arr = addProperty(value_PropertyName, portfolioName, "", "", "", "1", "1");
+		byName.click(class_PopupYesButton, "Click on 'Yes' button on Popup");
+		addBuilding("", "", "Mohali 8 Phase");
+		byName.click(class_PopupYesButton, "Click on 'Yes' button on Popup");
+		addUnit("", "", "1", "AutoUnit", "1", "", "", "", "", "", "100", "100", "", "");
+		Thread.sleep(2000);
+
+		String namevendor = ApexCommon.newVendor("test", "user", "", "testuser"+
+		getUniqueNumber+"@yopmail.com", "8888888888", "", "", "", "", "", "", "", "");
+
+		System.out.println("vendor name is =" + namevendor);
+		byId.click(id_Accounting, "AAccounting");
+		byId.click("arrow", "Side bar");
+		byClassName.click("clsNewBill", "New bill");
+		byId.setText(id_NewBillVendorName, namevendor, "Vendor name");
+		Thread.sleep(2000);
+		getDriver().findElement(By.id(id_NewBillVendorName)).sendKeys(Keys.ARROW_DOWN);
+		getDriver().findElement(By.id(id_NewBillVendorName)).sendKeys(Keys.ENTER);
+		byId.setText(id_NewBillAmount, value_NewBillAmount, "entering amount");
+		byId.selectByVisibleText("ddlNewBillPortfolio", portfolioName, "Selecting portfolio");
+		Thread.sleep(2000);
+		byId.click(id_AddItemsSectionBuildingDDL, "clicking on building ddl");
+		getDriver().findElement(By.id(id_AddItemsSectionBuildingDDL)).sendKeys(Keys.ARROW_DOWN);
+		getDriver().findElement(By.id(id_AddItemsSectionBuildingDDL)).sendKeys(Keys.ENTER);
+		byId.click(id_NewBillAddItemsUnit, "clicking on unit ddl");
+		getDriver().findElement(By.id(id_NewBillAddItemsUnit)).sendKeys(Keys.ARROW_DOWN);
+		getDriver().findElement(By.id(id_NewBillAddItemsUnit)).sendKeys(Keys.ENTER);
+		byId.click(id_NewBillAddItemsAccount, "clicking on account ddl");
+		getDriver().findElement(By.id(id_NewBillAddItemsAccount)).sendKeys(Keys.ARROW_DOWN);
+		getDriver().findElement(By.id(id_NewBillAddItemsAccount)).sendKeys(Keys.ENTER);
+		byId.setText(id_NewBillAddItemsAmount, value_NewBillAmount, "entering amount 2");
+		byId.click("btnSaveInvoice", "clicking on save button");
+
+	    byId.click("arrow", "clicking on side bar");
+		byClassName.click("clsNewBill", "clicking on new bill");
+		byId.setText(id_NewBillVendorName, namevendor, "entering vendor name");
+		Thread.sleep(2000);
+		getDriver().findElement(By.id(id_NewBillVendorName)).sendKeys(Keys.ARROW_DOWN);
+		getDriver().findElement(By.id(id_NewBillVendorName)).sendKeys(Keys.ENTER);
+		byId.setText(id_NewBillAmount, value_NewBillAmount, "entering amount");
+		byId.selectByVisibleText("ddlNewBillPortfolio", portfolioName, "selecting portfolio");
+		Thread.sleep(2000);
+		byId.click(id_AddItemsSectionBuildingDDL, "clicking on building ddl");
+		getDriver().findElement(By.id(id_AddItemsSectionBuildingDDL)).sendKeys(Keys.ARROW_DOWN);
+		getDriver().findElement(By.id(id_AddItemsSectionBuildingDDL)).sendKeys(Keys.ENTER);
+		byId.click(id_NewBillAddItemsUnit, "clicking on unit ddl");
+		getDriver().findElement(By.id(id_NewBillAddItemsUnit)).sendKeys(Keys.ARROW_DOWN);
+		getDriver().findElement(By.id(id_NewBillAddItemsUnit)).sendKeys(Keys.ENTER);
+		byId.click(id_NewBillAddItemsAccount, "clicking on account ddl");
+		getDriver().findElement(By.id(id_NewBillAddItemsAccount)).sendKeys(Keys.ARROW_DOWN);
+		getDriver().findElement(By.id(id_NewBillAddItemsAccount)).sendKeys(Keys.ENTER);
+		byId.setText(id_NewBillAddItemsAmount, value_NewBillAmount, "entering amount 2");
+		byId.click("btnSaveInvoice", "Save button");
+
+		byId.click(id_Accounting, "clicking on accounting");
+		byId.click(id_PayBills, "clicking on paybill");
+		byXpath.click(xpath_PayBillGridRow1Checkbox, "clicking on checkbox 1");
+		byXpath.click(xpath_PayBillGridRow2Checkbox, "clicking on checkbox 2");
+		Boolean valChk1 = byXpath.isSelected(xpath_PayBillGridRow1Checkbox,
+				"verifying if checkbox is selected");
+		Boolean valChk2 = byXpath.isSelected(xpath_PayBillGridRow2Checkbox,
+				"verifying if checkbox is selected");
+		SoftAssert se = new SoftAssert();
+		se.assertTrue(valChk1 == true, "checkbox 1 is not getting selected");
+		se.assertTrue(valChk2 == true, "checkbox 2 is not getting selected");
+		se.assertAll();
+	}
+	
+	@Test(priority = 18, enabled = true, groups = { "Smoke", "Jasmeet" })
+	public void P2M6_019() throws InterruptedException, IOException, AWTException {
+		extentTest = extentReport.startTest("P2M6_019", "H6: Accounting>>Pay Bills>>Grid");
+		String portfolioName2;
+		new ArrayList<>();
+		portfolioName2 = addPortfolio("H");
+		setLogs.info("Add Bank and attach portolio to it");
+		String getUniqueNumber2 = utility.getCurrentDateTime("ddMMYYYYss");
+		ApexCommon.addBank(portfolioName2, value_BankName, getUniqueNumber2, getUniqueNumber2, getUniqueNumber2,
+				value_BankIntialAmount, getUniqueNumber2, "Active", "");
+		setLogs.info("Add Property");
+		byId.click(id_PropertiesTab, "Click on Properties Tab");
+		byId.click(id_NewPropertyBTN, "Click on 'New Property' button");
+		arr = addProperty(value_PropertyName, portfolioName2, "", "", "", "1", "1");
+		byName.click(class_PopupYesButton, "Click on 'Yes' button on Popup");
+		addBuilding(value_PropertyName, "1", value_Address);
+		byName.click(class_PopupYesButton, "Click on 'Yes' button on Popup");
+		addUnit("", "", "1", "A", "1", "", "", "", "", "",
+				value_RentAmount, value_RentAmount, "", "");
+		Thread.sleep(2000);
+
+		String namevendor2 = ApexCommon.newVendor("atoo", "user", "", "testuser" +
+		getUniqueNumber2+"@yopmail.com", "8888888888", "", "", "", "", "", "", "", "");
+
+		String finalVendorName = namevendor2 + "User";
+
+		System.out.println("vendor name is =" + finalVendorName);
+		byId.click(id_Accounting, "clicking on accounting");
+		byId.click("arrow", "clicking on side bar");
+		byClassName.click("clsNewBill", "clicking on new bill");
+		byId.setText(id_NewBillVendorName, namevendor2, "entering vendor name");
+		Thread.sleep(2000);
+		// getDriver().findElement(By.id(id_NewBillVendorName)).sendKeys(Keys.ARROW_DOWN);
+		getDriver().findElement(By.id(id_NewBillVendorName)).sendKeys(Keys.ENTER);
+		byId.setText(id_NewBillAmount, value_NewBillAmount, "entering amount");
+		byId.selectByVisibleText("ddlNewBillPortfolio", portfolioName2, "selecting portfolio");
+		Thread.sleep(2000);
+		byId.click(id_AddItemsSectionBuildingDDL, "clicking on building ddl");
+		getDriver().findElement(By.id(id_AddItemsSectionBuildingDDL)).sendKeys(Keys.ARROW_DOWN);
+		getDriver().findElement(By.id(id_AddItemsSectionBuildingDDL)).sendKeys(Keys.ENTER);
+		byId.click(id_NewBillAddItemsUnit, "clicking on unit ddl");
+		getDriver().findElement(By.id(id_NewBillAddItemsUnit)).sendKeys(Keys.ARROW_DOWN);
+		getDriver().findElement(By.id(id_NewBillAddItemsUnit)).sendKeys(Keys.ENTER);
+		byId.click(id_NewBillAddItemsAccount, "clicking on account ddl");
+		getDriver().findElement(By.id(id_NewBillAddItemsAccount)).sendKeys(Keys.ARROW_DOWN);
+		getDriver().findElement(By.id(id_NewBillAddItemsAccount)).sendKeys(Keys.ENTER);
+		byId.setText(id_NewBillAddItemsAmount, value_NewBillAmount, "entering amount 2");
+		byId.click("btnSaveInvoice", "clicking on save button");
+
+		String portfolioName;
+		portfolioName = addPortfolio("H");
+		setLogs.info("Add Bank and attach portolio to it");
+		String getUniqueNumber = utility.getCurrentDateTime("ddMMYYYYss");
+		ApexCommon.addBank(portfolioName, value_BankName, getUniqueNumber, getUniqueNumber, getUniqueNumber,
+				value_BankIntialAmount, getUniqueNumber, "Active", "");
+		setLogs.info("Add Property");
+		byId.click(id_PropertiesTab, "Click on Properties Tab");
+		byId.click(id_NewPropertyBTN, "Click on 'New Property' button");
+		arr = addProperty(value_PropertyName, portfolioName, "", "", "", "1", "1");
+		byName.click(class_PopupYesButton, "Click on 'Yes' button on Popup");
+		addBuilding(value_PropertyName, "1", value_Address);
+		byName.click(class_PopupYesButton, "Click on 'Yes' button on Popup");
+		addUnit("", "", "1", "A", "1", "", "", "", "", "",
+				value_RentAmount, value_RentAmount, "", "");
+		Thread.sleep(2000);
+
+		String namevendor = ApexCommon.newVendor("ato", "user", "", "testuser"
+				+ getUniqueNumber+"@yopmail.com", "8888888888", "", "", "",
+				"", "", "", "", "");
+
+		System.out.println("vendor name is =" + namevendor);
+		byId.click(id_Accounting, "clicking on accounting");
+		byId.click("arrow", "clicking on side bar");
+		byClassName.click("clsNewBill", "clicking on new bill");
+		byId.setText(id_NewBillVendorName, namevendor, "entering vendor name");
+		Thread.sleep(2000);
+		// getDriver().findElement(By.id(id_NewBillVendorName)).sendKeys(Keys.ARROW_DOWN);
+		getDriver().findElement(By.id(id_NewBillVendorName)).sendKeys(Keys.ENTER);
+		byId.setText(id_NewBillAmount, value_NewBillAmount, "entering amount");
+		byId.selectByVisibleText("ddlNewBillPortfolio", portfolioName, "selecting portfolio");
+		Thread.sleep(2000);
+		byId.click(id_AddItemsSectionBuildingDDL, "clicking on building ddl");
+		getDriver().findElement(By.id(id_AddItemsSectionBuildingDDL)).sendKeys(Keys.ARROW_DOWN);
+		getDriver().findElement(By.id(id_AddItemsSectionBuildingDDL)).sendKeys(Keys.ENTER);
+		byId.click(id_NewBillAddItemsUnit, "clicking on unit ddl");
+		getDriver().findElement(By.id(id_NewBillAddItemsUnit)).sendKeys(Keys.ARROW_DOWN);
+		getDriver().findElement(By.id(id_NewBillAddItemsUnit)).sendKeys(Keys.ENTER);
+		byId.click(id_NewBillAddItemsAccount, "clicking on account ddl");
+		getDriver().findElement(By.id(id_NewBillAddItemsAccount)).sendKeys(Keys.ARROW_DOWN);
+		getDriver().findElement(By.id(id_NewBillAddItemsAccount)).sendKeys(Keys.ENTER);
+		byId.setText(id_NewBillAddItemsAmount, value_NewBillAmount, "entering amount 2");
+		byId.click("btnSaveInvoice", "clicking on save button");
+
+		byId.click(id_Accounting, "clicking on accounting");
+		byId.click(id_PayBills, "clicking on paybill");
+		byXpath.click(xpath_PayBillGridRow1Checkbox, "clicking on checkbox 1");
+		byXpath.click(xpath_PayBillGridRow2Checkbox, "clicking on checkbox 2");
+		String alertText = null;
+		try {
+			getDriver().findElement(By.xpath(xpath_PayBillGridRow2Checkbox)).click();
+			alertText = getDriver().findElement(By.xpath(xpath_PayBillNewVendorSaveConfirmationMsg)).getText();
+		} catch (Exception e) {
+			Assert.assertEquals(false, true);
+
+		}
+		Assert.assertEquals(alertText, value_MsgText);
+	}
+
+	@Test(priority = 19, enabled = true, groups = { "Smoke", "Jasmeet" })
+	public void P2M6_020() throws InterruptedException {
+		extentTest = extentReport.startTest("P2M6_020", "H6: Accounting>>Pay Bills>>Grid");
+
+		byId.click(id_Accounting, "clicking on accounting");
+		byId.click(id_PayBills, "clicking on paybill");
+		int rowSize = getDriver().findElement(By.id(id_PayBillsAllGrid)).
+				findElements(By.tagName("tr")).size();
+		if (rowSize > 1) {
+			byXpath.click(xpath_PayBillGridRow1Checkbox, "clicking on checkbox 1");
+			String getAmt = byId.getAttribute(id_PayBillAmountTextbox,
+					"value", "getting amount value");
+			Assert.assertNotEquals(getAmt, "0.00");
+		} else {
+			extentTest.log(LogStatus.INFO, "there is not any record in paybill grid");
+			Assert.fail("there is not any record in paybill grid");
+		}
+
+	}
+
+	@Test(priority = 20, enabled = true, groups = { "Smoke", "Jasmeet" })
+	public void P2M6_021() throws InterruptedException {
+		extentTest = extentReport.startTest("P2M6_021", "H6: Accounting >> Pay Bills >> Date");
+		byId.click(id_Accounting, "clicking on accounting");
+		byId.click(id_PayBills, "clicking on paybill");
+		Date now = new Date();
+		String currentDateValue = new SimpleDateFormat("MM.dd.yyyy").format(now);
+		System.out.println("current date is =" + currentDateValue);
+		String getDate = byId.getAttribute(id_PayBillDateTextbox, "value", "getting amount value");
+		System.out.println("got date is =" + getDate);
+		SoftAssert se = new SoftAssert();
+		se.assertTrue(getDate.contains(currentDateValue), "User could enter curent Date");
+		//se.assertEquals(getDate, currentDateValue);
+
+		String currentDayValue = new SimpleDateFormat("dd").format(now);
+		int currentDayNumber = Integer.parseInt(currentDayValue);
+		int nextDay = currentDayNumber + 1;
+		DecimalFormat formatter = new DecimalFormat("00");
+		String nextDayFormatted = formatter.format(nextDay);
+		System.out.println("next day is =" + nextDayFormatted);
+		int previousDay = currentDayNumber - 1;
+		String previousDayFormatted = formatter.format(previousDay);
+
+		String currentMonthValue = new SimpleDateFormat("MM").format(now);
+		int currentMonthNumber = Integer.parseInt(currentMonthValue);
+		String currentMonthFormatted = formatter.format(currentMonthNumber);
+
+		String currentYear = new SimpleDateFormat("yyyy").format(now);
+		int currentyearNumber = Integer.parseInt(currentYear);
+		DecimalFormat formatter1 = new DecimalFormat("0000");
+		String currentYearFormatted = formatter1.format(currentyearNumber);
+		String nextDate = "" + currentMonthFormatted + "/" + 
+				nextDayFormatted + "/" + currentYearFormatted + "";
+		String previousDate = "" + currentMonthFormatted + "/" +
+				previousDayFormatted + "/" + currentYearFormatted + "";
+		System.out.println("nect day's date is" + nextDate);
+		JavascriptExecutor js = (JavascriptExecutor) getDriver();
+		js.executeScript("document.getElementById('txtVendorPayableDate').value='" + 
+		currentMonthFormatted + "/"+ nextDayFormatted + "/" + currentYearFormatted + "'");
+		String getNextDate = byId.getAttribute(id_PayBillDateTextbox,
+				"value", "getting amount value");
+		System.out.println("next date is =" + getNextDate);
+		se.assertTrue(getNextDate.contains(nextDate), "User could enter Future Date");
+		se.assertEquals(getNextDate, nextDate);
+
+		js.executeScript("document.getElementById('txtVendorPayableDate').value='" +
+		currentMonthFormatted + "/"	+ previousDayFormatted + "/" + currentYearFormatted + "'");
+		String getPreviousDate = byId.getAttribute(id_PayBillDateTextbox,
+				"value", "getting amount value");
+		System.out.println("next date is =" + getNextDate);
+		se.assertEquals(getPreviousDate, previousDate);
+		se.assertAll();
+	}
+
+	@Test(priority = 21, enabled = true, groups = { "Smoke", "Jasmeet" })
+	public void P2M6_022() throws InterruptedException {
+		extentTest = extentReport.startTest("P2M6_022", "H6: Accounting >> Pay Bills >> Bank ddl");
+		byId.click(id_Accounting, "clicking on accounting");
+		byId.click(id_PayBills, "clicking on paybill");
+		String getBank = byXpath.getText(xpath_PayBillsBank, "Bank field label");
+		SoftAssert se = new SoftAssert();
+		se.assertEquals(getBank, value_PayBillsBank);
+		List<String> getOptions = byId.getOptions(id_PayBillBankDDl, "getting options of bank ddl");
+		se.assertNotEquals(getOptions, "");
+		se.assertAll();
+	}
+
+	@Test(priority = 22, enabled = true, groups = { "Smoke", "Jasmeet" })
+	public void P2M6_023() throws InterruptedException {
+		extentTest = extentReport.startTest("*H6:P2M6_023", "Accounting>>Pay Bills>>Payment Type");
+		byId.click(id_Accounting, "clicking on accounting");
+		byId.click(id_PayBills, "clicking on paybill");
+		List<String> getOptions = byId.getOptions(id_PayBillPaymentType, "getting options list");
+		List<String> list = new ArrayList<String>();
+		list.add("Select");
+		list.add("Check");
+		list.add("ACH");
+		list.add("Credit/Debit Card");
+		Assert.assertEquals(getOptions, list);
+	}
+
+	@Test(priority = 23, enabled = true, groups = { "Smoke", "Jasmeet" })
+	public void P2M6_024() throws InterruptedException {
+		extentTest = extentReport.startTest("*H6:P2M6_024", "Accounting>>Pay Bills>>Check No.");
+		byId.click(id_Accounting, "clicking on accounting");
+		byId.click(id_PayBills, "clicking on paybill");
+		String optionSelected1 = byId.getFirstSelectedOption(id_PayBillBankDDl,
+				"get selected bank option");
+		System.out.println(optionSelected1);
+		if (optionSelected1.equals("Select")) {
+			String checkNo = byId.getAttribute(id_PayBillCheckNo, "value", "get check no");
+			Assert.assertEquals(checkNo, "");
+		} else {
+			String checkNo = byId.getAttribute(id_PayBillCheckNo, "value", "get check no");
+			Assert.assertNotEquals(checkNo, "");
+		}
+	}
+
+	@Test(priority = 24, enabled = true, groups = { "Smoke", "Jasmeet" })
+	public void P2M6_025() throws InterruptedException {
+		extentTest = extentReport.startTest("*H6:P2M6_025", "Accounting>>Pay Bills>>Amount");
+		byId.click(id_Accounting, "clicking on accounting");
+		byId.click(id_PayBills, "clicking on paybill");
+		int rowSize = getDriver().findElement(By.id(id_PayBillsAllGrid)).
+				findElements(By.tagName("tr")).size();
+		if (rowSize > 1) {
+			byXpath.click(xpath_PayBillGridRow1Checkbox, "clicking on checkbox 1");
+			String getAmt = byId.getAttribute(id_PayBillAmountTextbox, "value", "getting amount value");
+			Assert.assertNotEquals(getAmt, "0.00");
+		} else {
+			extentTest.log(LogStatus.INFO, "there is not any record in paybill grid");
+			Assert.fail("there is not any record in paybill grid");
+		}
+
+	}
+
+	@Test(priority = 25, enabled = true, groups = { "Smoke", "Jasmeet" })
+	public void P2M6_026() throws InterruptedException, IOException, AWTException {
+		extentTest = extentReport.startTest("P2M6_026", "H6: Accounting >>"
+				+ " Pay Bills >> Pay Selected Bills");
+		String portfolioName;
+		new ArrayList<>();
+		portfolioName = addPortfolio("H");
+		setLogs.info("Add Bank and attach portolio to it");
+		String getUniqueNumber = utility.getCurrentDateTime("ddMMYYYYss");
+		ApexCommon.addBank(portfolioName, value_BankName, getUniqueNumber,
+				getUniqueNumber, getUniqueNumber,
+				value_BankIntialAmount, getUniqueNumber, "Active", "");
+		setLogs.info("Add Property");
+		byId.click(id_PropertiesTab, "Click on Properties Tab");
+		byId.click(id_NewPropertyBTN, "Click on 'New Property' button");
+		
+		arr = addProperty(value_PropertyName, portfolioName, "", "", "", "1", "1");
+		byName.click(class_PopupYesButton, "Click on 'Yes' button on Popup");
+		addBuilding("", "", "Mohali 8 Phase");
+		byName.click(class_PopupYesButton, "Click on 'Yes' button on Popup");
+		addUnit("", "", "1", "AutoUnit", "1", "", "", "", "", "", "100", "100", "", "");
+		Thread.sleep(2000);
+
+		String namevendor = ApexCommon.newVendor("test", "user", "", "testuser"+
+		getUniqueNumber+"@yopmail.com", "8888888888", "", "", "", "", "", "", "", "");
+
+		System.out.println("vendor name is =" + namevendor);
+		byId.click(id_Accounting, "clicking on accounting");
+		byId.click("arrow", "clicking on side bar");
+		byClassName.click("clsNewBill", "clicking on new bill");
+		byId.setText(id_NewBillVendorName, namevendor, "entering vendor name");
+		Thread.sleep(3000);
+	//	getDriver().findElement(By.id(id_NewBillVendorName)).sendKeys(Keys.ARROW_DOWN);
+		getDriver().findElement(By.id(id_NewBillVendorName)).sendKeys(Keys.ENTER);
+		byId.setText(id_NewBillAmount, value_NewBillAmount, "entering amount");
+		byId.selectByVisibleText("ddlNewBillPortfolio", portfolioName, "selecting portfolio");
+		Thread.sleep(2000);
+		byId.click(id_AddItemsSectionBuildingDDL, "clicking on building ddl");
+		getDriver().findElement(By.id(id_AddItemsSectionBuildingDDL)).sendKeys(Keys.ARROW_DOWN);
+		getDriver().findElement(By.id(id_AddItemsSectionBuildingDDL)).sendKeys(Keys.ENTER);
+		byId.click(id_NewBillAddItemsUnit, "clicking on unit ddl");
+		getDriver().findElement(By.id(id_NewBillAddItemsUnit)).sendKeys(Keys.ARROW_DOWN);
+		getDriver().findElement(By.id(id_NewBillAddItemsUnit)).sendKeys(Keys.ENTER);
+		byId.click(id_NewBillAddItemsAccount, "clicking on account ddl");
+		getDriver().findElement(By.id(id_NewBillAddItemsAccount)).sendKeys(Keys.ARROW_DOWN);
+		getDriver().findElement(By.id(id_NewBillAddItemsAccount)).sendKeys(Keys.ENTER);
+		byId.setText(id_NewBillAddItemsAmount, value_NewBillAmount, "entering amount 2");
+		byId.click("btnSaveInvoice", "clicking on save button");
+
+		byId.click(id_AccountingTab, "Click on Accounting tab");
+		byId.click(id_PayablesSubTab, "Click on Payables Sub tab");
+		byId.clearThenSetText(id_SelectVendorDDLList, namevendor,
+				"Enter Vendor Name in Select Vendor");
+
+		Thread.sleep(2000);
+		getDriver().findElement(By.id(id_SelectVendorDDLList)).sendKeys(Keys.ARROW_DOWN);
+		getDriver().findElement(By.id(id_SelectVendorDDLList)).sendKeys(Keys.ENTER);
+		byXpath.click(xpath_PayBillGridRow1Checkbox, "clicking on checkbox 1");
+		byId.selectByIndex(id_PayablesBankDDL, 1, "Select Bank");
+		byId.selectByVisibleText(id_PayablesPaymentTypeDDL, "Check", "Select Payment Type");
+		byId.click(id_SaveVendorPayableButton, "Click on 'Pay Selected Bill'");
+		String txtMsg = byXpath.getText(xpath_PayBillNewVendorSaveConfirmationMsg,
+				"Confirmation alert");
+		Assert.assertEquals(txtMsg, value_PayBillNewVendorSaveConfirmationMsg);
+	}
+}

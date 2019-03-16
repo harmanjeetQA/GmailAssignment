@@ -1,0 +1,54 @@
+package p2M6.Accounting.objectRepositry;import common.ApexCommon;
+
+public interface IRecurringBill {
+	String id_recurringBillTab = "tablinkRecurringTransactions";
+	String id_newRecurringBillBtn = "ancCreateNewRecurringBills";
+	String id_VendorNameNewRecurringBill = "txtWorkOrderVendor";
+	String id_BillDatenewRecurringBill = "txtBillDate";
+	String id_AddressNewRecurringBill = "txtAddress";
+	String id_AmountNewRecurringBill = "txtAmount";
+	String id_ReferenceRecurringBill = "txtReference";
+	String id_TenantNewRecurringBillChkbox = "chkChargeTenant";
+	String id_OtherNewRecurringBillChkbox = "chkChargeOther";
+	String id_DueDateNewRecurringBill = "txtDueDate";
+	String id_SelectTermNewRecurringBill = "ddlVendorInvoiceTerms";
+	String id_PortfolioNewRecurringBill = "ddlNewBillPortfolio";
+	String id_PropertyNewRecurringBill = "ddlProperty";
+	String id_BuildingNewRecurringBill = "ddlBuilding1";
+	String id_UnitNewRecurringBill = "txtNewInvoiceUnit1";
+	String id_MemoNewRecurringBill = "txtMemo";
+	String id_AddProductNewRecurringBillDiv = "divAddProduct";
+	String id_AddProductNewRecurringBillBtn = "btnAddProduct";
+	String id_NotesNewRecurringBillDiv = "divVendorNotes";
+	String id_NewRecurringBillDiv = "dvNewRecurringbills";
+	String id_SaveNewewRecurringBillBtn = "btnSaveInvoice";
+	String id_CancelNewRecurringBillBtn = "btnCancelInvoice";
+	String id_EditAddressNewRecurringBill = "ancChangeNewBillVendorAddress";
+	String id_ListVendorNameHeaderNewRecurringBillDiv = "cg-divHeader";
+	String id_EditVendorAddressNewRecurringBillDiv = "dvVendorAdressChange";
+	String id_ZipPCEditVendorAddressPopUp = "ZipAdress";
+	String id_CountryEditVendorAddressPopUp = "CountryNameAdress";
+	String id_StateEditVendorAddressPopUp = "StateNameAdress";
+	String id_CityEditVendorAddressPopUp = "CityNameAdress	";
+	String id_Address1EditVendorAddressPopUp = "txtchngAddress1";
+	String id_Address2EditVendorAddressPopUp = "txtchngAddress2";
+	String id_Address3EditVendorAddressPopUp = "txtchngAddress3";
+	String id_UpdateEditVendorAddressPopUp = "btnUpdateVendorAddress";
+	String id_CancelEditVendorAddressPopUp = "btnCancelAddress";
+	String id_AmountNewRecurringBillLbl = "lblChangeNewBillAmountCurrency";
+	String id_TenantNameNewRecurringBill = "txtChargeToTenantName";
+	String id_OtherChargeToNewRecurringBillTxt = "txtChargeToOther";
+	
+	String class_AddNotesNewRecurringBill = "clsNotes";
+	String class_YearDDL = "ui-datepicker-year";
+	String class_MonthDDL = "ui-datepicker-month";
+	String class_DateTable = "ui-datepicker-calendar";
+	
+	String xpath_ListVendorNamesNewRecurringBill = "//div[@class='cg-DivItem'][2]";
+	String xpath_ListVendorAddressNewRecurringBill = "//div[@class='cg-DivItem'][3]";
+	String xpath_ReferenceNewRecurringBillLBL = "//label[contains(.,'Reference')]";
+	
+	String []columnTenantListNewRecurringBill = {"Tenant Name", "Email",
+			"Property", "Building", "Unit"};
+	
+}

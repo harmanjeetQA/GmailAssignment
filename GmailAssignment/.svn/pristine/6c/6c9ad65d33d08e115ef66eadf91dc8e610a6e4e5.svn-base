@@ -1,0 +1,1013 @@
+package common;
+
+import java.awt.AWTException;
+import java.awt.Robot;
+import java.awt.event.KeyEvent;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Keys;
+import org.openqa.selenium.WebElement;
+import org.testng.Assert;
+
+import com.relevantcodes.extentreports.LogStatus;
+
+import frameworkGlobals.BrowserSelection;
+import interfaces.ClassObject;
+import interfaces.GlobalComponents;
+import objectRepository.ApexLinkGlobalComponents;
+import p2M6.Accounting.objectRepositry.ACTG_Invoice;
+import p2M6.Accounting.objectRepositry.ACTG_PayBill;
+import p2M6.Accounting.objectRepositry.Admin_AccountingTab;
+import p2M6.Accounting.objectRepositry.Admin_PeopleTab;
+import p2M7.Ip2M7;
+import utilities.Utility;
+
+public class ApexCommon extends BrowserSelection implements
+ApexLinkGlobalComponents, ACTG_PayBill , ClassObject, GlobalComponents,
+Admin_AccountingTab, Admin_PeopleTab, ACTG_Invoice, Ip2M7{
+	
+	/**
+	 * @author singhjasmeet
+	 * @param URL
+	 *            It is the sub-URL. Function will automatically concat with
+	 *            domain URL and do login. If URL is null even then function
+	 *            will login user to vendor portal
+	 * @param email
+	 *            Email of the user with whom it needs to login
+	 * @param Password
+	 *            Password required for the login
+	 * @throws InterruptedException
+	 */
+	public static void login(String URL, String email, String Password) throws 
+	InterruptedException {
+
+		extentTest.log(LogStatus.INFO, "login() function is logging in using " + email + " email id.");
+		if (getDriver().getPageSource().contains("ancSessionExpired")) {
+			byId.click("ancSessionExpired", " Click on 'Click here' link on Session Timeout page.");
+			if ((URL == null) || (URL == URL_VendorLogin))
+				utility.goTo(URL_VendorLogin, "Opending vendor portal login page.");
+			else
+			utility.goTo(URL, "Opending Admin portal login page.");
+			
+			byId.clearThenSetText(id_vendorLoginPageEmailIdTextBox, email, "Enter email id");
+			byId.clearThenSetText(id_vendorLoginPagePasswordTextBox, Password, "Enter password");
+			/*byId.setText(id_vendorLoginPageEmailIdTextBox, email, "Enter email id");
+			byId.setText(id_vendorLoginPagePasswordTextBox, Password, "Enter password");*/
+			Thread.sleep(1000);
+			byId.click(id_vendorLoginPageLoginButton, "Click on login button");
+			Thread.sleep(2000);
+		} else {
+			if ((URL == null) || (URL == URL_VendorLogin))
+				utility.goTo(URL_VendorLogin, "Opending vendor portal login page.");
+			else
+				utility.goTo(URL, "Opending Admin portal login page.");
+			byId.clearThenSetText(id_vendorLoginPageEmailIdTextBox, email, "Enter email id");
+			byId.clearThenSetText(id_vendorLoginPagePasswordTextBox, Password, "Enter password");
+			Thread.sleep(1000);
+			byId.click(id_vendorLoginPageLoginButton, "Click on login button");
+			Thread.sleep(2000);
+		}
+	}
+
+	/**
+	 * @author singhjasmeet
+	 * @param propertyName
+	 *            Name of the property to be entered. Any String can be passed
+	 * @param portfolioName
+	 *            Portfolio name that should be selected. In case of empty or
+	 *            null function will create new portfolio at run time.
+	 * @param zipCode
+	 *            Zipcode which is to be entered. Can be empty or null.
+	 * @param managerName
+	 *            ManagerName which is to be Selected. Can be empty or null.
+	 * @param attachedGroup
+	 *            Attached Group which is to be Selected. Can be empty or null.
+	 * @param numberOfBuildings
+	 *            Count of Building. Mandatory
+	 * @param numberOfUnites
+	 *            Count of units. Mandatory
+	 * @return Property Name and Portfolio Name in an array of length two.
+	 *         Property name is at index '0'. Portfolio name is at index '1'.
+	 * @throws AWTException
+	 */
+
+	public static String[] addProperty(String propertyName, String portfolioName,
+			String zipCode, String managerName,
+			String attachedGroup, String numberOfBuildings, String numberOfUnites) throws AWTException {
+		System.out.println("ApexCommon.addProperty() starts");
+		extentTest.log(LogStatus.INFO, "ApexCommon.addProperty() starts");
+		String[] propertyPortfolio = new String[2];
+		Robot robot = new Robot();
+		// WebDriverWait wait = new WebDriverWait(getDriver(), 30);
+		propertyPortfolio[0] = propertyName + utility.uniqueNo();
+		System.out.println("Proerty name: " + propertyPortfolio[0]);
+		try {
+			utility.goTo(URL_AddProperty, ": Add property Page");
+			getDriver().navigate().refresh();
+			Thread.sleep(2000);
+			byId.setText(id_PropertyNameAddProperty, propertyPortfolio[0], ": Enter property name");
+
+			if (!((portfolioName == "") || (portfolioName == null))) {
+				byId.clearThenSetText(id_PortfolioAddProperty, portfolioName, ": Enter portfolio name");
+				Thread.sleep(1000);
+				robot.keyPress(java.awt.event.KeyEvent.VK_DOWN);
+				robot.keyRelease(java.awt.event.KeyEvent.VK_DOWN);
+				robot.keyPress(java.awt.event.KeyEvent.VK_ENTER);
+				robot.keyRelease(java.awt.event.KeyEvent.VK_ENTER);
+				propertyPortfolio[1] = portfolioName;
+			} else {
+				propertyPortfolio[1] = byId.getText(id_PortfolioAddProperty, ": Enter portfolio name");
+				if (!(propertyPortfolio[1].length() >= 2)) {
+					byId.click(id_AddPorfolioBTNAddProperty, ": Add New Portfolio Btn");
+					byId.clearThenSetText(id_PortfolioNameAddPorfolio, utility.uniqueString(), "Add unique portfoloio");
+					byId.click(id_SavePortfolioBTNAddPorfolio, ": Save Portfolio Btn");
+				}
+			}
+			if (!((zipCode == "") || (zipCode == null))) {
+				byId.clearThenSetText("Zip", zipCode, ": Enter Zip-Code");
+			}
+
+			if (!((managerName == "") || (managerName == null))) {
+				byClassName.click(class_ManagerNameDDLAddProperty, ": Manager name ddl");
+				byXpath.click("//label[contains(.,'" + managerName + "')]", ": Manager name option");
+
+			}
+			if (!((attachedGroup == "") || (attachedGroup == null))) {
+				byXpath.click("//*[@id='ddlPropertyGroups']//following-sibling::div//button",
+						": Attch Group Button on New Property Form");
+				byXpath.click("/label[contains(.,'" + attachedGroup + "')]", ": Attached group ddl option");
+			}
+			byId.setText(id_PropertyYearAddProperty, "2014", ": Selecting property year");
+			byId.clearThenSetText(id_MaxBuildingsAddProperty, numberOfBuildings, ": Count of buildings");
+			byId.clearThenSetText(id_MaxUnitsAddProperty, numberOfUnites, ": Count of Units");
+			byId.setMultipleText(null, id_ArrayPropertyMenuNewProperty, value_ArrayPropertyMenuNewProperty,
+					": Set text in Address Fields");
+			/*byId.selectByVisibleText("ddlKeyAccessCodeProperty", "Alarm Code",
+					"Select any option in 'Key/Access Code info.' DDL");
+			byId.clearThenSetText("txtValKeyAccessCode", "2231", "Enter 'Key Access code'");*/
+			byId.click(id_SaveBTNAddProperty, ": Save Btn ");
+			System.out.println("ApexCommon.addProperty() ends");
+			extentTest.log(LogStatus.INFO, "ApexCommon.addProperty() ends");
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return propertyPortfolio;
+	}
+
+	/**
+	 * @author singhjasmeet
+	 * @param buildingName
+	 *            It could be null or empty.
+	 * @param noOfUnits
+	 *            It could be null or empty.
+	 * @param buildingAddress
+	 *            It is mandatory and must be passed.
+	 * @return it will return List of 4 elements . 1St- Building name. 2nd- is
+	 *         static parameter "-". 3rd- is Buildingid. 4th- is Toast message
+	 */
+
+	public static List<String> addBuilding(String buildingName, String noOfUnits,
+			String buildingAddress) {
+
+		System.out.println("PropertiesCommon.addBuilding() starts");
+		extentTest.log(LogStatus.INFO, "ApexCommon.addBuilding() starts");
+		List<String> buildingDataList = new ArrayList<>();
+
+		if (!((buildingName == "") || (buildingName == null))) {
+			String uniqueBuildingName = buildingName + utility.uniqueNo();
+			byId.clearThenSetText(id_BuildingNameAddBuilding, uniqueBuildingName, ": Building name");
+			buildingDataList.add(uniqueBuildingName);
+		} else
+			buildingDataList.add(byId.getAttribute(id_BuildingNameAddBuilding, "value", ": Get Building name"));
+
+		if (!((noOfUnits == "") || (noOfUnits == null)))
+			byId.clearThenSetText(id_MaxUnitsAddBuilding, noOfUnits, ": No of units");
+
+		byId.clearThenSetText(id_BuildingAddressAddBuilding, buildingAddress, ": Building Address");
+
+		String buildingId = byId.getAttribute(id_BuildingIdAddBuilding, "value", ": Building id");
+		/*byId.selectByVisibleText("ddlKeyAccessCodeBuilding", "Alarm Code",
+				"Select any option in 'Key/Access Code info.' DDL");
+		byId.clearThenSetText("txtValKeyAccessCodeBldng", "2231", "Enter 'Key Access code'");*/
+		byId.click(id_SaveBTNAddBuilding, ": Save bttton");
+		String actualMessage = byClassName.getText(class_AlertMessage, "gettting alert message");
+
+		buildingDataList.add("-");
+		buildingDataList.add(buildingId);
+		buildingDataList.add(actualMessage);
+		System.out.println("PropertiesCommon.addBuilding() ends");
+		extentTest.log(LogStatus.INFO, "ApexCommon.addBuilding() ends");
+		return buildingDataList;
+	}
+
+	/**
+	 * @author singhjasmeet
+	 * @param addUnitAs
+	 *            It could be group or Individual. If it is not group, by
+	 *            default function will consider it as individual
+	 * @param selectBuilding
+	 *            It is building name that user want to select. It could be null
+	 *            or empty.
+	 * @param grpFloors_indiFloorNo
+	 *            Value to be enter as Floor no like 1,2,3 etc. It must be
+	 *            filled.
+	 * @param unitPrefix
+	 *            Name of unit should be start with. Could be any String.
+	 * @param grpFrom_indiUnitNumber
+	 *            Value to be entered in From(Unit no.) in Group selection. This
+	 *            is filled in 'Unit No.' in Individual selection
+	 * @param groupTo
+	 *            Value to be entered in To(Unit no.) in Group selection. Could
+	 *            be empty or null in case of Individual.
+	 * @param selectUnitType
+	 *            Unit Type(Bedroom, Duplex etc). In case of null or empty
+	 *            Select default value.
+	 * @param sqFt
+	 *            Value to be enter in Sq.ft(Eg: 200.00). Not mandatory.
+	 * @param noOfBedrooms
+	 *            No.of bedrooms value(Eg: 1,2 etc). In case of null or empty
+	 *            Select default value.
+	 * @param noOfBathrooms
+	 *            No.of bathrooms value(Eg: 1,2 etc). In case of null or empty
+	 *            Select default value.
+	 * @param baseRent
+	 *            Value to be enter in Base Rent(Eg: 200.00). Mandatory.
+	 * @param marketRent
+	 *            Value to be enter in Market Rent(Eg: 200.00). Mandatory.
+	 * @param securityDeposit
+	 *            Value to be enter in Security deposit(Eg: 200.00). Not
+	 *            mandatory.
+	 * @param status
+	 *            Value to be entered in Status(Eg. Vacant Available, Unrentable
+	 *            etc). Not mandatory
+	 * @return Unique Unit Name
+	 */
+	public static String addUnit(String addUnitAs, String selectBuilding,
+			String grpFloors_indiFloorNo, String unitPrefix, String grpFrom_indiUnitNumber,
+			String groupTo, String selectUnitType, String sqFt,	String noOfBedrooms,
+			String noOfBathrooms, String baseRent, String marketRent, String securityDeposit,
+			String status) {
+		System.out.println("PropertiesCommon.addUnit() starts");
+		extentTest.log(LogStatus.INFO, "ApexCommon.addUnit() starts");
+		String uniqueUnitPrefix = unitPrefix + utility.uniqueNo();
+		try {
+			if (addUnitAs.equalsIgnoreCase("Group")) {
+				byId.click(id_GroupIndividualRadioBTNAddUnit, "Group radio button");
+				if (!((selectBuilding == "") || (selectBuilding == null)))
+					byId.selectByVisibleText(id_GrpSelectBuildingDDLAddUnit, selectBuilding, "Selecting building");
+				Thread.sleep(2000);
+				System.out.println("Default building will be selected if there is only one building in the list");
+
+				byId.clearThenSetText(id_GrpFloorNoAddUnit, grpFloors_indiFloorNo, ": Floors");
+				byId.clearThenSetText(id_GrpUnitPrefixAddUnit, uniqueUnitPrefix, ": Unit Prefix");
+				byId.clearThenSetText(id_GrpFromAddUnit, grpFrom_indiUnitNumber, ": From");
+				byId.clearThenSetText(id_GrpToAddUnit, groupTo, ": To");
+
+			} else {
+				getDriver().navigate().refresh();
+				byId.click(id_IndividualRadioBTNAddUnit, "Individual radio button");
+				if (!((selectBuilding == "") || (selectBuilding == null)))
+					byId.selectByVisibleText("ddlBuildings", selectBuilding, "Selecting building");
+				Thread.sleep(2000);
+				System.out.println("Default building will be selected if there is only one building in the list");
+				byId.clearThenSetText(id_IndiFloorNoAddUnit, grpFloors_indiFloorNo, ": Floors");
+				byId.clearThenSetText(id_IndiUnitPrefixAddUnit, uniqueUnitPrefix, ": Unit Prefix");
+				byId.clearThenSetText(id_IndiUnitNoAddUnit, grpFrom_indiUnitNumber, ": Unit No.");
+			}
+			if (!((selectUnitType == "") || (selectUnitType == null)))
+				byId.selectByVisibleText(id_UnitTypeDDLAddUnit, selectUnitType, "Selecting Unit Type");
+
+			if (!((sqFt == "") || (sqFt == null)))
+				byId.clearThenSetText(id_SqFtAddUnit, sqFt, ": Sq. Ft.");
+
+			if (!((noOfBedrooms == "") || (noOfBedrooms == null)))
+				byId.selectByVisibleText(id_BedroomDDLAddUnit, noOfBedrooms, "No of bedrooms");
+			if (!((noOfBathrooms == "") || (noOfBathrooms == null)))
+				byId.selectByVisibleText(id_BathRoomDDLAddUnit, noOfBathrooms, "No of bathrooms");
+
+			byId.clearThenSetText(id_BaseRentAddUnit, baseRent, ": Base rent");
+			byId.clearThenSetText(id_MarketRentAddUnit, marketRent, ": Market rent");
+			if (!((securityDeposit == "") || (securityDeposit == null)))
+				byId.clearThenSetText(id_SecurityDepositAddUnit, securityDeposit, ": Security deposit");
+
+			if (!((status == "") || (status == null)))
+				byId.selectByVisibleText(id_StatusDDLAddUnit, status, "Status");
+			/*byId.selectByVisibleText("ddlKeyAccessCodeUnit", "Alarm Code",
+					"Select any option in 'Key/Access Code info.' DDL");
+			byId.clearThenSetText("txtValKeyAccessCodeUnit", "2231", "Enter 'Key Access code'");*/
+			byId.click(id_SaveBTNAddUnit, "Save button");
+			System.out.println("PropertiesCommon.addUnit() ends");
+			extentTest.log(LogStatus.INFO, "ApexCommon.addUnit() ends");
+
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		return uniqueUnitPrefix;
+	}
+
+	/**
+	 * 
+	 * This function will Create Property with single building and Unit.
+	 * 
+	 * @return Property Name and Portfolio Name in an array of length two.
+	 *         Property name is at index '0'. Portfolio name is at index '1'.
+	 * @author singhjasmeet
+	 */
+	public static String[] addProperty() {
+		String[] propertyPortfolio = new String[2];
+		System.out.println("ApexCommon.addProperty() starts(Single Building/Unit)");
+		extentTest.log(LogStatus.INFO, "ApexCommon.addProperty() starts(Single Building/Unit)");
+		// WebDriverWait wait = new WebDriverWait(getDriver(), 30);
+		propertyPortfolio[0] = "Property" + utility.uniqueNo();
+		utility.goTo(URL_AddProperty, ": Add property Page");
+		getDriver().navigate().refresh();
+		byId.setText(id_PropertyNameAddProperty, propertyPortfolio[0], ": Enter property name");
+
+		propertyPortfolio[1] = byId.getText(id_PortfolioAddProperty, ": Get portfolio name");
+		if (!(propertyPortfolio[1].length() >= 2)) {
+			byId.click(id_AddPorfolioBTNAddProperty, ": Add New Portfolio Btn");
+			byId.clearThenSetText(id_PortfolioNameAddPorfolio, utility.uniqueString(), "Add unique portfoloio");
+			byId.click(id_SavePortfolioBTNAddPorfolio, ": Save Portfolio Btn");
+			propertyPortfolio[1] = byId.getText(id_PortfolioAddProperty, ": Fetch portfolio name");
+		}
+
+		byId.click(id_NoBuildingUnitChkBoxAddProperty, "Property With No Building/Unit CheckBox");
+		byId.selectByVisibleText("ddlUnitType", "Bed Room", "Select Unit Type as Bed Room");
+		byId.clearThenSetText(id_BaseRentAddUnit, "100", "Base Rent");
+		byId.clearThenSetText(id_MarketRentAddUnit, "200", "Market Rent");
+
+		/*byId.selectByVisibleText("ddlKeyAccessCodeProperty", "Alarm Code",
+				"Select any option in 'Key/Access Code info.' DDL");
+		byId.clearThenSetText("txtValKeyAccessCode", "2231", "Enter 'Key Access code'");*/
+
+		byId.click(id_SaveBTNAddProperty, ": Save Btn");
+		System.out.println("ApexCommon.addProperty() ends(Single Building/Unit)");
+		extentTest.log(LogStatus.INFO, "ApexCommon.addProperty() ends(Single Building/Unit)");
+		return propertyPortfolio;
+	}
+
+	/**
+	 * @author singhjasmeet
+	 * @param propertyName
+	 *            Property Against which Work Order to be created. Should be
+	 *            Unique.
+	 * @param radioBtn
+	 *            Can be 'Onetime' or 'Recurring' only. Spellings should be
+	 *            correct. By default it will use 'Onetime'.
+	 * @param Frequency
+	 *            Value of FrequencyDDl in Recurring Work Order. If 'Recurring'
+	 *            is passing as <B>radioBtn</b> only then it should be needed.
+	 *            It can be null or Empty. Then it select default value.
+	 * @param vendorEmail
+	 *            Email of vendor with which Work Order should be Linked.
+	 * @param status
+	 *            Status of workOrder. Can be 'Open', 'Closed' or 'InProgress'.
+	 *            Also it can be null or Empty.
+	 * @return Work Order Unique no.
+	 * @throws InterruptedException
+	 * @throws IOException
+	 * @throws AWTException
+	 */
+	public String addWorkOrder(String propertyName, String radioBtn, String Frequency,
+			String vendorEmail,	String status) throws InterruptedException,
+	IOException, AWTException {
+		extentTest.log(LogStatus.INFO, "ApexCommon.addWorkOrder() starts(Single Building/Unit)");
+		utility.goTo(URL_AddWorkOrder, "Add New Work Order");
+		String workOrderNo = byId.getAttribute(id_WorkOrderNoNewWorkOrder, "value", "WorkOrder No.");
+		if (radioBtn.equalsIgnoreCase("Recurring")) {
+			if (!byId.isSelected(id_RecurringRadioBTNNewWorkOrder, "Reoccuring Radio Btn")) {
+				byId.click(id_RecurringRadioBTNNewWorkOrder, "Reoccuring Radio Btn");
+			}
+			if (!((Frequency == "") || (Frequency == null)))
+				byId.selectByVisibleText(id_ListingFrequencyDDLNewWorkOrder, Frequency,
+						Frequency + " Reoccuring Frequency slected");
+		} else if (!byId.isSelected(id_OneTimeRadioBTNNewWorkOrder, "One Time Radio Btn")) {
+			byId.click(id_OneTimeRadioBTNNewWorkOrder, "One Time Radio Btn");
+		}
+
+		byId.clearThenSetText(id_PropertyNameNewWorkOrder, propertyName, "Property Name");
+		Thread.sleep(1000);
+		Robot robot = new Robot();
+		robot.keyPress(java.awt.event.KeyEvent.VK_DOWN);
+		robot.keyRelease(java.awt.event.KeyEvent.VK_DOWN);
+		robot.keyPress(java.awt.event.KeyEvent.VK_ENTER);
+		robot.keyRelease(java.awt.event.KeyEvent.VK_ENTER);
+
+		Thread.sleep(1000);
+		// Select Normal Priority
+		byId.selectByVisibleText(id_PriorityDDLNewWorkOrder, "Normal", "Normal Priority selected");
+
+		// Check 'Check This Box If You Want To Use Requested By For This Order'
+		// CheckBox
+		if (!byId.isSelected(id_RequestedByCheckBoxNewWorkOrder, "One Time Radio Btn")) {
+			byId.click(id_RequestedByCheckBoxNewWorkOrder, "One Time Radio Btn");
+		}
+		byId.selectByVisibleText(id_RequestedByDDLNewWorkOrder, "Vendor", "'Vendor' RequestedBy");
+
+		// Estimated Cost is Entered
+		byId.clearThenSetText(id_EstimatedCostNewWorkOrder, "10", "EstimatedCost is 10");
+
+		if (!((status == "") || (status == null))) {
+			byId.selectByVisibleText(id_StatusDDLNewWorkOrder, status, status + " Selected as Status DDL");
+		}
+
+		if (!((vendorEmail == "") || (vendorEmail == null))) {
+			if (!byId.isSelected(id_VendorPortalChkBoxNewWorkOrder, "Publish to Vendor Portal")) {
+				byId.click(id_VendorPortalChkBoxNewWorkOrder, "Publish to Vendor Portal");
+			}
+			byId.click("rdVendorPreferredAll", "All Vendor radio button");
+			byId.setText(id_VendorNameNewWorkOrder, " ", "Vendor Name");
+			byId.click(id_VendorNameNewWorkOrder, "Vendor Name");
+			List<WebElement> li = byXpath.getElements(xpath_EmailColumnnVendorList, "Get Emails of Vendors");
+			for (WebElement webElement : li) {
+				System.out.println("=====+++++"+webElement.getText());
+				if (webElement.getText().contains(vendorEmail)) {
+					webElement.click();
+					break;
+				}
+			}
+		}
+		Thread.sleep(10000);
+		byId.click(id_SaveBTNNewWorkOrder, "Save Btn");
+		Thread.sleep(1000);
+		extentTest.log(LogStatus.INFO, "ApexCommon.addWorkOrder() ends");
+		return workOrderNo;
+	}
+
+	/**
+	 * 
+	 * @author Harinder
+	 * @param vendorName
+	 *            Search all the bills linked to the Vendor, this field is
+	 *            mandatory.
+	 * @param reference
+	 *            Select the bill according to the provided reference no of bill
+	 *            from list of bills It can be null or blank but it is mandatory
+	 *            to pass either reference no parameter or SelectAll as 'Yes'
+	 *            Parameter.
+	 * @param selectAll
+	 *            will Check the 'SelectAll' CheckBox, to Check this Checkbox
+	 *            pass 'Yes' value as parameter It can be null or blank but it
+	 *            is mandatory to pass either reference no or SelectAll as
+	 *            Parameter.
+	 * @param Bank
+	 *            if you pass value as parameter then it will select the same
+	 *            bank, if you send Blank or null as parameter then it will
+	 *            select First bank in the list. it is Mandatory Field
+	 * @param paymentType
+	 *            if you pass value as parameter then it will select the same
+	 *            Payment Type, if you send Blank or null as parameter then it
+	 *            will select First Payment type in the list. it is Mandatory
+	 *            Field
+	 * @param paymentReferenceNo
+	 *            if you pass any 'Payment Type' except 'Check' then You can
+	 *            pass any reference no to pay the vendor bill. It is not a
+	 *            mandatory Field.
+	 * @throws InterruptedException
+	 * 
+	 **/
+	public static List<Object> PayVendorBill(String vendorName, String reference, String selectAll,
+			String Bank, String paymentType, String paymentReferenceNo)
+					throws InterruptedException {
+		List<Object> list = new ArrayList<>();
+		String getCheckNo;
+		extentTest.log(LogStatus.INFO, "ApexCommon.PayVendorBill() starts");
+		byId.click(id_AccountingTab, "Click on Accounting tab");
+		byId.click(id_PayablesSubTab, "Click on Payables Sub tab");
+		byId.clearThenSetText(id_SelectVendorDDLList, vendorName, "Enter Vendor Name in Select Vendor");
+		Thread.sleep(4000);
+		//byXpath.click("//*[@id='ui-active-menuitem']//div[contains(.,'" + vendorName + "')]", "Select Vendor");
+
+		getDriver().findElement(By.id("ui-active-menuitem")).sendKeys(Keys.ENTER);
+		if (!reference.equals("") && !reference.equals(null)) {
+			byXpath.click("//*[@id='" + id_TableofBills + "']//tr//td[contains(.,'" + reference
+					+ "')]/preceding-sibling::td/input", "Check On CheckBox against '" + reference + "' bill");
+		} else if (!selectAll.equals("") && !selectAll.equals(null) && selectAll.endsWith("Yes")) {
+			byId.click(id_TableofBillsSelectAllCheckBox, "Check 'Select All' Checkbox");
+		}
+		JavascriptExecutor jse = (JavascriptExecutor) getDriver();
+		jse.executeScript("arguments[0].scrollIntoView(true);", getDriver().findElement(By.id(id_PayablesDateField)));
+		// Actions act = new Actions(getDriver());
+
+		String getDate = byId.getAttribute(id_PayablesDateField, "value", "Get Date from 'Date' field");
+		list.add(getDate);
+		if (!Bank.equals("") && !Bank.equals(null)) {
+			byId.selectByVisibleText(id_PayablesBankDDL, Bank, "Select Bank '" + Bank + "'");
+		} else {
+			byId.selectByIndex(id_PayablesBankDDL, 1, "Select Bank");
+		}
+		String getSelectedBank = byId.getFirstSelectedOption(id_PayablesBankDDL, "Get Selected bank");
+		list.add(getSelectedBank);
+		if (!paymentType.equals("") && !paymentType.equals(null) && paymentType.equals("Check")) {
+			byId.selectByVisibleText(id_PayablesPaymentTypeDDL, paymentType,
+					"Select '" + paymentType + "' Payment Type");
+		} else if (!paymentType.equals("") && !paymentType.equals(null)) {
+			byId.selectByVisibleText(id_PayablesPaymentTypeDDL, paymentType, "Select Payment Type");
+			byId.clearThenSetText(id_PayablesReferenceNoTB, paymentReferenceNo, "Enter Reference No");
+		} else {
+			byId.selectByIndex(id_PayablesPaymentTypeDDL, 1, "Select Payment Type");
+		}
+		String getPaymentType = byId.getFirstSelectedOption(id_PayablesPaymentTypeDDL, "Get selected Payment type");
+		list.add(getPaymentType);
+		getCheckNo = byId.getAttribute(id_PayablesReferenceNoTB, "value", "Get Check No");
+		list.add(getCheckNo);
+		String getAmount = byId.getAttribute(id_PayablesAmountField, "value", "Get Amount from amount field");
+		list.add(getAmount);
+		byId.click(id_SaveVendorPayableButton, "Click on 'Pay Selected Bill'");
+		extentTest.log(LogStatus.INFO, "ApexCommon.PayVendorBill() ends");
+		return list;
+	}
+
+	/**
+	 * @author singhjasmeet
+	 * @return New Unique Portfolio Name
+	 * @throws IOException
+	 */
+	public static String addPortfolio(String portfolioName) throws IOException {
+		String uniquePortfolioName = portfolioName + utility.uniqueString();
+		extentTest.log(LogStatus.INFO, "ApexCommon.addPortfolio() starts");
+		utility.goTo(URL_AddPortfolio, "Go to on Add Portfolio Page.");
+		byId.click(id_PortfolioButtonAddPotfolio, " Click on Add Portfolio Button");
+		byId.clearThenSetText(id_PortfolioTBPotfolioName, uniquePortfolioName, "Enter PortFolio name");
+		if (getDriver().getPageSource().contains(id_PortfolioCustomField)) {
+			byId.clearThenSetText(id_PortfolioCustomField, appURL, " Enter Website");
+		}
+		byId.click(id_PortfolioButtonSave, " Click on Save Button");
+		extentTest.log(LogStatus.INFO, "ApexCommon.addPortfolio() ends");
+		return uniquePortfolioName;
+	}
+
+	/**
+	 * @author Harinder
+	 * @return New Unique Bank Name
+	 * @throws IOException
+	 */
+	public static String addBank(String portfolioName, String bankName, String bankAccountNo,
+			String FDI_No, String branchCode, String initialAmount, String lastUsedCheckNo,
+			String status, String setDefault_YesNo)	throws IOException {
+		String uniqueBankName = bankName + utility.uniqueString();
+		extentTest.log(LogStatus.INFO, "ApexCommon.addPortfolio() starts");
+		utility.goTo(URL_MasterSetupBankAccount, "Go to on Bank Account Page.");
+		byId.click(id_MasterSetupAddBankAccountBtn, " Click on Add Bank Account Button");
+		byId.selectByVisibleText(id_BankAccountPortfolio, portfolioName, "Select Portfolio");
+		byId.clearThenSetText(id_BankAccountBankName, uniqueBankName, "Enter Bank Name");
+		byId.clearThenSetText(id_BankAccountBankAccountNo, bankAccountNo, "Enter Bank Account No");
+		byId.clearThenSetText(id_BankAccountFDINo, FDI_No, "Enter FDI No");
+		byId.clearThenSetText(id_BankAccountBranchCode, branchCode, "Enter Branch Code");
+		byId.clearThenSetText(id_BankAccountInitialAmount, initialAmount, "Enter Initial Amount");
+		byId.clearThenSetText(id_BankAccountLastUsedCheckNo, lastUsedCheckNo, "Enter 'Last Used Check Number'");
+		byId.selectByVisibleText(id_BankAccountStatus, status, "Enter Status");
+		if (setDefault_YesNo.equals("Yes") && !setDefault_YesNo.equals("") && !setDefault_YesNo.equals(null))
+			byId.click(id_BankAccountSetDefaultCheckBox, "Check 'IsDefaultBankAccount' checkBox");
+		byId.click(id_BankAccountSaveBtn, "Click on Save button");
+		return uniqueBankName;
+	}
+
+	public static String newVendor(String firstName, String lastName, String address1,
+			String email, String phoneNo_B,	String companyName_B, String nameOnCheck_B,
+			String vendorType_B, String consolidateChecks_B, String defaultGLExpenseAccount_B,
+			String orderLimit_B, String notes_B, String files_B) {
+
+
+		try {
+			getDriver().get(appURL + URL_AddVendor);
+			byId.setText(id_PeopleAddVendorFirstName, firstName, "entering first name");
+			byId.setText(id_PeopleAddVendorLastName, lastName, "entering last name");
+			byId.setText(id_PeopleAddVendorAddress1, address1, "entering address 1");
+			byId.setText(id_NewVendorTBEmail, email, "entering email");
+			byId.selectByVisibleText(id_NewVendorDDLPhoneType, value_NewVendorDDLPhoneType, "Select Phone Type");
+			byId.selectByVisibleText(id_NewVendorDDLCarrier, value_NewVendorDDLCarrier, "Select Carrier");
+			byId.setText(id_NewVendorTBPhoneNum, phoneNo_B, "entering Phone Number");
+
+			// byId.selectByIndex("ddlVendorAccountNickName", 1, "selecting
+			// bank");
+
+			byId.click("ddlVendorAccountNickName", "clicking account ddl");
+			getDriver().findElement(By.id("ddlVendorAccountNickName")).sendKeys(Keys.ARROW_DOWN);
+			getDriver().findElement(By.id("ddlVendorAccountNickName")).sendKeys(Keys.ARROW_DOWN);
+			getDriver().findElement(By.id("ddlVendorAccountNickName")).sendKeys(Keys.ENTER);
+
+			if (!companyName_B.equals("")) {
+				byId.isSelected(id_NewVendorCBCompanyNameOnCheck, "Check 'Company Name on Check' Checkbox");
+				byId.setText(id_NewVendorTBCompanyName, companyName_B, "entering Company Name");
+				byId.setText(id_NewVendorTBNameOnCheck, nameOnCheck_B, "entering Name pon Check");
+			}
+			if (!vendorType_B.equals(""))
+				byId.selectByVisibleText(id_NewVendorDDLVendorType, vendorType_B, "Select Vendor Type");
+
+			if (!consolidateChecks_B.equals(""))
+				byId.selectByVisibleText(id_NewVendorDDLConsolidateChecks, consolidateChecks_B,
+						"Select Consolidate Checks");
+
+			if (!defaultGLExpenseAccount_B.equals(""))
+				byId.selectByVisibleText(id_NewVendorDDLDefaultGLExpenseAccount, defaultGLExpenseAccount_B,
+						"Select Default GL Expense Account");
+			byId.setText(id_NewVendorTBOrderLimit, orderLimit_B, "entering Order Limit");
+			byId.setText(id_NewVendorNotes, notes_B, "entering Notes");
+
+			if (!files_B.equals(""))
+				byXpath.click(xpath_NewVendorButtonAddFiles, "AddFiles BTN click");
+			Utility.uploadFiles(System.getProperty("user.dir") + files_B);
+			byId.click(id_NewVendorButtonSave, "Click on Save Button");
+
+		}
+		// ddlVendorAccountNickName
+		catch (Exception e) {
+			// TODO: handle exception
+			Assert.assertEquals(false, true);
+		}
+		return firstName;
+	}
+	
+	public static List<String> newTenant_SelectPropertyTab(String propertyName,
+			String tenant_FirstName, String tenant_LastName, String emailId_B,
+			String phoneNum_B) throws IOException, InterruptedException {
+		Short i = 1;
+		String getBuildingName;
+		String getUnitName;
+
+		List<String> li = new ArrayList<>();
+		byId.click("btnNewTenant", "New tenant button");
+		byId.clearThenSetText("PropertyId", propertyName, "Selecting property name");
+		byId.getElement("PropertyId", "Property name").sendKeys(Keys.ARROW_DOWN);
+		byId.getElement("PropertyId", "Property name").sendKeys(Keys.ENTER);
+		byId.click("BuildingId", "Select Building DDL");
+		byXpath.click("//*[@id='ui-id-1']//li" + "[" + i + "]//a", "Buildind");
+		
+		getBuildingName = byId.getAttribute("BuildingId", "title",
+				" Selected value from Select Building DDL");				
+		if (getBuildingName.contains("Select")) {
+			i = (short) (i + 1);
+			byId.click("BuildingId", "Select Building DDL");
+			byXpath.click("//*[@id='ui-id-1']//li" + "[" + i + "]//a", " Select Buildind");
+			getBuildingName = byId.getAttribute("BuildingId", "title",
+					" Selected value from Select Building DDL");
+		}
+		
+		getUnitName = byId.getAttribute("UnitId", "title",
+				"Selected value from Select Unit DDL");
+		if (getUnitName.contains("Select")) {
+			i = (short) (i + 1);
+			byId.click("UnitId", "Select Unit DDL");
+			byXpath.click("//*[@id='ui-id-2']//li" + "[" + i + "]//a", " Select Unit");
+			getUnitName = byId.getAttribute("UnitId", "value",
+					" Selected value from Select Unit DDL");
+		}
+		
+		li.add(getBuildingName);
+		li.add(getUnitName);
+		
+		byId.clearThenSetText("FirstName", tenant_FirstName, " First name");
+		byId.clearThenSetText("LastName", tenant_LastName, " Last Name");
+		byId.clearThenSetText("EmailID_1", emailId_B, " Email ID");
+		byId.clearThenSetText("PhoneNumber_1", phoneNum_B, " Phone number");
+		
+		// Written by deepak
+		
+		byId.clearThenSetText(id_SSNSINIDTextField, "TestSSIN", "Enter SSIN no.");
+		byId.selectByVisibleText(id_EthnicityDDLField, "Native Hawaiian / Pacific Islander", "Select text from DDl");
+		byId.selectByVisibleText(id_MaritalStatusDDLField, value_MartialOption, "Select text from DDL");
+		byXpath.click(xpath_HobbiesDDLField1, "Click on hobbies ");
+		
+		byXpath.click(".//*[@id='txtHobbies1']//following-sibling::div/div/ul/bii[2]//input", "Click on first option");
+		
+		//byXpath.click("//*[@id='txtHobbies1']/option[text()='123123']", "Select option from DDL");
+		byId.selectByVisibleText(id_VeteranStatusDDLField, VeteranHardCodedValues[1], "Select from DDL");
+		
+		//------------- End -----------------------------------
+		
+		
+		
+		
+		byId.click("btlSelectPropertyNextTab", "Next button");
+		
+		return li;
+		/*ByID.Click_Using_ID(
+				ReadDataFromPropertiesFile.testReadDataFromPropertiesFile_People("btnNewTenant"),
+				"clicking on new tenant button");
+		ByID.SendKeys_After_Clearing_Previous_data_Using_ID(ReadDataFromPropertiesFile
+				.testReadDataFromPropertiesFile_People("PropertyId"),
+				"selecting property name", propertyName);
+		driver.findElement(By.id(ReadDataFromPropertiesFile
+				.testReadDataFromPropertiesFile_People("PropertyId")))
+				.sendKeys(Keys.ARROW_DOWN);
+		driver.findElement(By.id(ReadDataFromPropertiesFile
+				.testReadDataFromPropertiesFile_People("PropertyId")))
+				.sendKeys(Keys.ENTER);
+		ByID.Click_Using_ID(ReadDataFromPropertiesFile.testReadDataFromPropertiesFile_People(
+				"BuildingId"), " Click on Select Building DDL");
+
+		ByXpath.Click_Using_Xpath(
+				ReadDataFromPropertiesFile.testReadDataFromPropertiesFile_People("//*[@id='ui-id-1']//li")
+						+ "[" + i + "]//a",
+				" Select Buildind ");
+
+		getBuildingName = ByID.GetText_Of_Db_Value_Using_ID(
+				ReadDataFromPropertiesFile
+						.testReadDataFromPropertiesFile_People("BuildingId"),
+				" get selected value from Select Building DDL", "title");
+				
+				
+				i = (short) (i + 1);
+		ByID.Click_Using_ID(ReadDataFromPropertiesFile.testReadDataFromPropertiesFile_People(
+				"BuildingId"), " Click on Select Building DDL");
+		ByXpath.Click_Using_Xpath(ReadDataFromPropertiesFile
+				.testReadDataFromPropertiesFile_People("//*[@id='ui-id-1']//li") + "[" + i + "]//a",
+				" Select Buildind ");
+		getBuildingName = ByID.GetText_Of_Db_Value_Using_ID(
+				ReadDataFromPropertiesFile
+						.testReadDataFromPropertiesFile_People("BuildingId"),
+				" get selected value from Select Building DDL", "title");
+				
+				
+			getUnitName = ByID
+				.GetText_Of_Db_Value_Using_ID(
+						ReadDataFromPropertiesFile
+								.testReadDataFromPropertiesFile_People("UnitId"),
+						" get selected value from Select Unit DDL", "title");
+
+		if (getUnitName.equals("Select")) {
+			i = (short) (i + 1);
+			ByID.Click_Using_ID(ReadDataFromPropertiesFile.testReadDataFromPropertiesFile_People(
+					"UnitId"), " Click on Select Unit DDL");
+			System.out.println(ReadDataFromPropertiesFile.testReadDataFromPropertiesFile_People("//*[@id='ui-id-2']//li")
+							+ "["+ i +"]//a");
+			ByXpath.Click_Using_Xpath(
+					ReadDataFromPropertiesFile.testReadDataFromPropertiesFile_People("//*[@id='ui-id-2']//li")
+							+ "["+ i +"]//a",
+					" Select Unit ");
+			getUnitName = ByID.GetText_Of_Db_Value_Using_ID(
+					ReadDataFromPropertiesFile
+							.testReadDataFromPropertiesFile_People("UnitId"),
+					" get selected value from Select Unit DDL", "value");
+		}
+		li.add(getBuildingName);
+		li.add(getUnitName);
+
+		ByID.SendKeys_After_Clearing_Previous_data_Using_ID(ReadDataFromPropertiesFile
+				.testReadDataFromPropertiesFile_People("FirstName"),
+				"entering first name", tenant_FirstName);
+		ByID.SendKeys_After_Clearing_Previous_data_Using_ID(ReadDataFromPropertiesFile
+				.testReadDataFromPropertiesFile_People("LastName"),
+				"entering last name", tenant_LastName);
+		ByID.SendKeys_After_Clearing_Previous_data_Using_ID(ReadDataFromPropertiesFile
+				.testReadDataFromPropertiesFile_People("EmailID_1"), "entering email id",
+				emailId_B);
+		ByID.SendKeys_After_Clearing_Previous_data_Using_ID(ReadDataFromPropertiesFile
+				.testReadDataFromPropertiesFile_People("PhoneNumber_1"),
+				"entering phone number", phoneNum_B);
+		ByID.Click_Using_ID(ReadDataFromPropertiesFile.testReadDataFromPropertiesFile_People(
+				"btlSelectPropertyNextTab"), "Clicking on Next button");*/
+		
+	}
+	
+	public static List<String> newTenant_LeaseDetailsTab(String leaseTerm_B,
+			String monthYears_B, String noticePeriod_B,	String rentAmount_B,
+			String camAmount_B, String securityDeposit_B)
+			throws IOException, InterruptedException {
+		
+		List<String> li = new ArrayList<>();
+		li.add(byId.getAttribute("txtMoveInDate", "value", "Move In date TextBox"));
+		byId.click("txtLeaseStartDate", "Lease Start Date TextBox");
+		byXpath.click("//*[@id='ui-datepicker-div']//table/tbody/tr/td/a", "Lease Start date");
+		li.add(byId.getAttribute("txtLeaseStartDate", "value", "Lease Start date TextBox"));
+		
+		if (!leaseTerm_B.equals(""))
+			byId.clearThenSetText("ddlLeaseTerm", leaseTerm_B, "Lease Terms");		
+		li.add(byId.getAttribute("ddlLeaseTerm", "value", "Term Value"));
+		
+		if (!monthYears_B.equals(""))
+			byId.selectByVisibleText("ddlLeaseYearMonth", monthYears_B,
+					"Select Duration");
+		li.add(byId.getFirstSelectedOption("ddlLeaseYearMonth", "get Value"));
+		
+		/*moveInDate = ByID.GetText_Of_Db_Value_Using_ID(ReadDataFromPropertiesFile.testReadDataFromPropertiesFile_People(
+				"txtMoveInDate"), " Get value of Move In date TextBox", "value");
+		li.add(moveInDate);
+		ByID.Click_Using_ID(ReadDataFromPropertiesFile.testReadDataFromPropertiesFile_People(
+				"txtLeaseStartDate"), " Click on Lease Start Date TextBox");
+		ByXpath.Click_Using_Xpath(ReadDataFromPropertiesFile.testReadDataFromPropertiesFile_People(
+				"//*[@id='ui-datepicker-div']//table/tbody/tr/td/a"), " Select Lease Start date");
+		leaseStartDate = ByID.GetText_Of_Db_Value_Using_ID(
+				ReadDataFromPropertiesFile
+						.testReadDataFromPropertiesFile_People("txtLeaseStartDate"),
+				" Get value of Lease Start date TextBox", "value");
+		li.add(leaseStartDate);
+		
+			ByID.SendKeys_After_Clearing_Previous_data_Using_ID(ReadDataFromPropertiesFile
+					.testReadDataFromPropertiesFile_People("ddlLeaseTerm"),
+					" Enter Lease Terms", leaseTerm_B);
+		leaseTerm = ByID.GetText_Of_Db_Value_Using_ID(ReadDataFromPropertiesFile.testReadDataFromPropertiesFile_People(
+				"ddlLeaseTerm"), " get Lease Term Value", "value");
+		li.add(leaseTerm);
+		if (!monthYears_B.equals(""))
+			ByID.Dropdown_Select_Using_ID(ReadDataFromPropertiesFile.testReadDataFromPropertiesFile_People(
+					"ddlLeaseYearMonth"), " Select Duration", monthYears_B);
+		period = ByID.getDropdownSelectedValue(ReadDataFromPropertiesFile
+				.testReadDataFromPropertiesFile_People("ddlLeaseYearMonth"), " get Value");
+		li.add(period);
+		leaseEndDate = ByID.GetText_Of_Db_Value_Using_ID(
+				ReadDataFromPropertiesFile
+						.testReadDataFromPropertiesFile_People("txtLeaseEndDate"),
+				" Get value of Lease end date TextBox", "value");
+		li.add(leaseEndDate);
+		ByID.Dropdown_Select_Using_ID(ReadDataFromPropertiesFile.
+		testReadDataFromPropertiesFile_People(
+					"ddlNoticePeriod"), " Select Notice Period", noticePeriod_B);
+					leasePeriod = ByID.getDropdownSelectedValue(ReadDataFromPropertiesFile.testReadDataFromPropertiesFile_People(
+				"ddlNoticePeriod"), " get Notice Period selected Value");
+		li.add(leasePeriod);
+		noticeDate = ByID.GetText_Of_Db_Value_Using_ID(ReadDataFromPropertiesFile.testReadDataFromPropertiesFile_People(
+				"txtNoticeDate"), " Get value of Notice Date TextBox", "value");
+		li.add(noticeDate);
+		ByID.SendKeys_After_Clearing_Previous_data_Using_ID(ReadDataFromPropertiesFile
+					.testReadDataFromPropertiesFile_People("txtRentAmount"), "",
+					rentAmount_B);
+					rntAmt = ByID.GetText_Of_Db_Value_Using_ID(ReadDataFromPropertiesFile.testReadDataFromPropertiesFile_People(
+				"txtRentAmount"), " get Rent Amount value", "value");
+		li.add(rntAmt);
+		
+		ByID.SendKeys_After_Clearing_Previous_data_Using_ID(ReadDataFromPropertiesFile
+					.testReadDataFromPropertiesFile_People("txtCAMAmount"), "",
+					camAmount_B);
+					ByID.SendKeys_After_Clearing_Previous_data_Using_ID(ReadDataFromPropertiesFile
+					.testReadDataFromPropertiesFile_People("txtSecurityDeposit"), "",
+					securityDeposit_B);
+						
+		securityDeposit = ByID
+				.GetText_Of_Db_Value_Using_ID(
+						ReadDataFromPropertiesFile.testReadDataFromPropertiesFile_People(
+								"txtSecurityDeposit"),
+						" get Security deposit value", "value");
+		li.add(securityDeposit);
+		Thread.sleep(5000);
+		ByID.Click_Using_ID(
+				ReadDataFromPropertiesFile
+						.testReadDataFromPropertiesFile_People("btnSaveLeaseDetail"),
+				" Click on Next Button in Lease Details Tab");
+		*/
+		li.add(byId.getAttribute("txtLeaseEndDate", "value", "Lease end date TextBox"));
+		if (!noticePeriod_B.equals(""))
+			byId.selectByVisibleText("ddlNoticePeriod", noticePeriod_B, "Notice Period");
+		li.add(byId.getFirstSelectedOption("ddlNoticePeriod", "Notice Period Selected Value"));
+		
+		li.add(byId.getAttribute("txtNoticeDate", "value", "Notice Date TextBox"));
+		
+		if (!rentAmount_B.equals(""))
+			byId.clearThenSetText("txtRentAmount", "rentAmount_B", "Rent Amount");
+		li.add(byId.getAttribute("txtRentAmount", "value", "Rent Amount value"));	
+		
+		if (!camAmount_B.equals(""))
+			byId.clearThenSetText("txtCAMAmount", "camAmount_B", "CAM Amount");
+		// li.add(leaseTerm);
+		if (!securityDeposit_B.equals(""))
+			byId.clearThenSetText("txtSecurityDeposit",
+					"securityDeposit_B", "Security Deposit");
+		li.add(byId.getAttribute("txtSecurityDeposit", "value", "Security deposit value"));
+		
+		Thread.sleep(5000);
+		getDriver().findElement(By.id("btnSaveLeaseDetail")).click();
+		/*new WebDriverWait(getDriver(), 10).until(ExpectedConditions.
+				elementToBeClickable(byId.getElement("btnSaveLeaseDetail",
+						"Next Button in Lease Details Tab")));*/
+		return li;		
+	}
+	
+	public static void addInvoice(String name, String chargeCode_B, String amount)
+ throws InterruptedException
+	{
+		byId.click(id_InvoiceNewInvoice, "clicking on new invoice");
+		byId.click(id_InvoiceInvoiceToTenatRadioButton, "clicking on radio button to select tenant");
+		byId.click(id_NewInvoiceTenatTextbox, "clicking on tenant textbox");
+		Thread.sleep(3000);
+		byId.clearThenSetText(id_NewInvoiceTenatTextbox, name, "Enter Tenant Name");
+		Thread.sleep(3000);
+		getDriver().findElement(By.id(id_NewInvoiceTenatTextbox)).sendKeys(Keys.ENTER);
+		byId.click(id_NewInvoiceNoLateFeeForThisInvoiceCheckbox, "Check 'No Late Fee for this invoice' checkbox");
+		if(chargeCode_B.equals("") || chargeCode_B.equals(null))
+		{
+			byId.selectByIndex(id_NewInvoiceChargeCodeDDL+"1", 1, "Select Charge code");
+		}
+		else {
+			byId.selectByVisibleText(id_NewInvoiceChargeCodeDDL+1, chargeCode_B, "Select Charge Code");
+		}
+		byId.clearThenSetText(id_NewInvoiceAmount+"1", amount, "Enter value in 'Amount' field in table on New Invoice form");
+		byId.click(id_NewInvoiceSaveButton, "Click on Save button on new invoice form");
+		}
+	
+	public static void newTenant_ChargesAndMoveInTabWithoutParams()
+			throws IOException, InterruptedException, AWTException {
+		byId.click("btnNextCharges", "Save Charges Button");
+		byId.click("btnGenerateLeaseDetail", "Generate leases button");
+		Thread.sleep(5000);
+		getDriver().findElement(By.xpath("//html/body//input[@id='btnOKLeasePopUp']")).click();
+		/*new WebDriverWait(getDriver(), 15).until(ExpectedConditions.
+				elementToBeClickable(byXpath.
+						getElement("//html/body//input[@id='btnOKLeasePopUp']",
+								"Ok Button")));*/
+		Thread.sleep(5000);
+		Robot robot = new Robot();
+		// robot.keyPress(KeyEvent.VK_ENTER);
+		// robot.keyRelease(KeyEvent.VK_ENTER);
+		robot.keyPress(java.awt.event.KeyEvent.VK_ESCAPE);
+		robot.keyRelease(java.awt.event.KeyEvent.VK_ESCAPE);
+		Thread.sleep(5000);
+		robot.keyPress(KeyEvent.VK_ALT);
+		robot.keyPress(KeyEvent.VK_SPACE);
+		robot.keyPress(KeyEvent.VK_C);
+		robot.keyRelease(KeyEvent.VK_ALT);
+		robot.keyRelease(KeyEvent.VK_SPACE);
+		robot.keyRelease(KeyEvent.VK_C);
+		Thread.sleep(5000);
+		robot.keyPress(KeyEvent.VK_ENTER);
+		robot.keyRelease(KeyEvent.VK_ENTER);
+		
+		byXpath.click("//*[@class='msgButton']", "Yes of Move In message");
+		byId.click("btnNext", "Move In Button");
+		
+		/*ByID.Click_Using_ID(ReadDataFromPropertiesFile.testReadDataFromPropertiesFile_People(
+				"btnNextCharges"), "Clicking on save charges button");
+		LogClass.info("User navigated to Generate leases tab");
+
+		// Go to Generate leases
+		ByID.Click_Using_ID(
+				ReadDataFromPropertiesFile.testReadDataFromPropertiesFile_People(
+						"btnGenerateLeaseDetail"),
+				"Clicking on generate leases button");
+		Thread.sleep(5000);
+		// ByID.Click_Using_ID(ReadDataFromPropertiesFile.testReadDataFromPropertiesFile_People("btnOKLeasePopUp"),
+		// "Clicking on Ok of generate lease cofnfirmation message");
+		ByXpath.Click_Using_Xpath("//html/body//input[@id='btnOKLeasePopUp']", " Click on 'Ok' Button");
+*/
+		/*
+		 * Thread.sleep(6000); ByID.Click_Using_ID(
+		 * ReadDataFromPropertiesFile.testReadDataFromPropertiesFile_People(
+		 * "btnOKLeasePopUp"
+		 * ), "Clicking on yes of generate lease cofnfirmation message");
+		 */
+
+		
+		// Move In
+		/*ByXpath.Click_Using_Xpath(
+				ReadDataFromPropertiesFile.testReadDataFromPropertiesFile_People(
+						"//*[@class='msgButton']"),
+				"Clicking on yes of Move In cofnfirmation message");
+		ByID.Click_Using_ID(ReadDataFromPropertiesFile.testReadDataFromPropertiesFile_People(
+				"btnNext"), "Clicking on Move In Button");*/
+
+	}	
+	
+	public static void addTenant(String propertyName, String tenant_FirstName, 
+			String tenant_LastName,	String emailId_B, String phoneNum_B) 
+					throws IOException, InterruptedException, AWTException{
+		byId.click("lnk0People", "People menu");
+		newTenant_SelectPropertyTab(propertyName, tenant_FirstName,
+				tenant_LastName, emailId_B, phoneNum_B);
+		newTenant_LeaseDetailsTab("", "", "", "", "", "");
+		
+
+		newTenant_ChargesAndMoveInTabWithoutParams();
+		/*ByID.Click_Using_ID(ReadDataFromPropertiesFile.testReadDataFromPropertiesFile_People(""),
+				"clicking on people menu");
+		//Fill Select Property Tab
+					list = PeopleCommon.newTenant_SelectPropertyTab(propertyName,
+					ReadDataFromPropertiesFile.testReadDataFromPropertiesFile_People("valueTenantFirstName"),
+					ReadDataFromPropertiesFile.testReadDataFromPropertiesFile_People("valueTenantLastName"),
+					email, ReadDataFromPropertiesFile.testReadDataFromPropertiesFile_People("valueTenantPhoneNum"));
+
+					
+
+			
+			list2 = PeopleCommon.newTenant_LeaseDetailsTab("", "", "", "", "", "");
+			
+
+
+			unitName=list.get(1);	
+		Units.add(unitName);*/
+	}
+	
+	public static void ChangesDefaultDate(String defaultDateFormat, String dateFormat)
+	{
+		utility.goTo(URL_SettingDefaultSetting, "Go to on Default Setting Page.");
+		byId.click(id_DefaultSettingsDefaultDateAndClockSettings, "Click on Deafult Date and Clock Settings tab.");
+		byId.selectByVisibleText(id_DefaultDateAndClockSettingsTabDeafultDateFormatDDL, defaultDateFormat, "Select '"+defaultDateFormat+"' option");
+		byId.selectByVisibleText(id_DefaultDateAndClockSettingsTabDateFormatDDL, dateFormat, "Select '"+dateFormat+"' option");
+		byId.click(id_DefaultDateAndClockSettingsTabSaveButton, "Click on Save button on Deafult Date and Clock Settings tab.");
+		byName.click("Yes", "Click on Yes Button to logout and Save changes on Deafult Date and Clock Settings tab.");
+	}
+	
+	public static void ChangesDefaultCurrency(String defaultCurrency)
+	{
+		utility.goTo(URL_SettingDefaultSetting, "Go to on Default Setting Page.");
+		byId.click(id_DefaultSettingsDefaultDateAndClockSettings, "Click on Deafult Date and Clock Settings tab.");
+		byId.selectByVisibleText(id_DefaultSettingsCurrencyDDL, defaultCurrency, "Select '"+defaultCurrency+"' from Default Currency DDL");
+		byId.click(id_DefaultDateAndClockSettingsTabSaveButton, "Click on Save button on Deafult Date and Clock Settings tab.");
+		byName.click("Yes", "Click on Yes Button to logout and Save changes on Deafult Date and Clock Settings tab.");
+	}
+	
+}

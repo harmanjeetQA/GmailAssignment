@@ -1,0 +1,110 @@
+package p2M6.Accounting.objectRepositry;
+
+public interface ACTG_PayBill {
+	// ----------- Login
+
+	public String id_Accounting = "lnk0Accounting";
+	public String id_PayBills ="tablinkPayable";
+	public String id_PayBillsSearch ="btnSearchPayBill";
+	public String id_PayBillsVendor="txtWorkOrderVendor";
+	public String id_PayBillsAddress="txtAddress";
+	public String id_PayBillsGrid="tabPayable";
+	public String id_PayBillsCheckNo="spncheckno";
+	public String id_PayBillsPaySelectedBills="btnSaveVendorPayable";
+	public String id_PayBillsAmount="lblPayableAmt";
+	public String id_PayBillsAddNewVendor="AddNewVendor";
+	public String id_PayBillsShowAllBillsRadioButton="chkVendorPayableAllBills";
+	public String id_PayBillsDueonorbeforeRadioButton="chkVendorPayableSearch";
+	public String id_PayBillsAllGrid ="tblPayableBody";
+	public String id_NewBillVendorName ="txtWorkOrderVendor";
+	public String id_PayBillAmountTextbox ="txtVendorPayableTotalAmount";
+	public String id_PayBillDateTextbox =	"txtVendorPayableDate";
+	public String id_PayBillBankDDl ="ddlBankAccount";
+	public String id_PayBillPaymentType ="ddlPaymentType";
+	public String id_PayBillCheckNo="ddlBankAccount";
+
+
+	
+	// -----------XPATH----------------------
+	public String xpath_PayBillsTitle ="//*[@id='tabPayable']/div[2]/div[1]";
+	public String xpath_PayBillsAddressLabel="//*[@id='tabPayable']/div[2]/div[2]/div[3]/div/label";
+	public String xpath_PayBillsDate="//*[@id='tabPayable']/div[2]/div[2]/div[5]/div[1]/label";
+	public String xpath_PayBillsBank="//*[@id='tabPayable']/div[2]/div[2]/div[5]/div[2]/label";
+	public String xpath_PayBillsPaymentType="//*[@id='tabPayable']/div[2]/div[2]/div[5]/div[3]/label";
+	public String xpath_PayBillsShowAllBills="//*[@class='show-bill-col2']/div[1]";
+	public String xpath_PayBillsDueonorbefore="//*[@class='show-bill-col2']/div[2]";
+	public String xpath_PayBillGridCol1="//*[@id='tabPayable']/div[2]/div[2]/div[4]/div/table/tbody[1]/tr/th[2]";
+	public String xpath_PayBillGridCol2="//*[@id='tabPayable']/div[2]/div[2]/div[4]/div/table/tbody[1]/tr/th[3]";
+	public String xpath_PayBillGridCol3="//*[@id='tabPayable']/div[2]/div[2]/div[4]/div/table/tbody[1]/tr/th[4]";
+	public String xpath_PayBillGridCol4="//*[@id='tabPayable']/div[2]/div[2]/div[4]/div/table/tbody[1]/tr/th[5]";
+	public String xpath_PayBillGridCol5="//*[@id='tabPayable']/div[2]/div[2]/div[4]/div/table/tbody[1]/tr/th[6]";
+	public String xpath_PayBillGridCol6="//*[@id='tabPayable']/div[2]/div[2]/div[4]/div/table/tbody[1]/tr/th[7]";
+	public String xpath_PayBillGridCol7="//*[@id='tabPayable']/div[2]/div[2]/div[4]/div/table/tbody[1]/tr/th[8]";
+	public String xpath_PayBillGridCol8="//*[@id='tabPayable']/div[2]/div[2]/div[4]/div/table/tbody[1]/tr/th[9]";
+	public String xpath_PayBillGridRow1Checkbox ="//*[@id='trPayBillGrid1 ']/td[1]/input";
+	public String xpath_PayBillGridRow2Checkbox ="//*[@id='trPayBillGrid2 ']/td[1]/input";
+
+	
+
+	
+	// -----------CLASSNAME----------------------
+	public String class_PayBillsShowAll ="radio-outer";
+	public String class_PayBillsShowBills="show-bill-col1";
+	public String class_PaybillAddNewVendorAlertYesOption="msgButton";
+	public String class_PaybillAddNewVendorAlertNoOption="msgButton inverse";
+	
+	
+	// -----------VALUES----------------------
+     public String valueTitle_PayBills ="Pay Bills";
+     public String valueTitle_PayBillsShowBills ="Show Bills";
+     public String valueTitle_PayBillsAddress="Address";
+     public String value_PayBillsDate="Date";
+     public String value_PayBillsBank="Bank*";
+     public String value_PayBillsPaymentType="Payment Type*";
+     public String value_PayBillsCheckNo= "Check No.";
+     public String value_PayBillsAmount="Amount(US$)";
+     public String value_PayBillsShowAllBills="Show all Bills";
+		public String value_PayBillsDueonorbefore="Due on or before";
+		public String value_NewVendorDDLPhoneType="Mobile";
+		public String value_NewVendorDDLCarrier="Bell Mobility";
+		public String value_PaybillAddNewVendorAlertText="Do you want to add a New Vendor?";
+		public String value_PaybillAddNewVendorAlertYesOption="Yes";
+		public String value_PaybillAddNewVendorAlertNoOption="No";
+		public String value_PaybillNewVendorField1="Vendor ID*";
+		public String value_PaybillNewVendorField2="Salutation";
+		public String value_PaybillNewVendorField3="First Name*";
+		public String value_PaybillNewVendorField4="Middle Name";
+		public String value_PaybillNewVendorField5="Last Name*";
+		public String value_PaybillNewVendorField6="Gender";
+		public String value_PaybillNewVendorField7="Entity/Company Name";
+		public String value_PaybillNewVendorField8="Phone";
+		public String value_PaybillNewVendorField9="Zip / Postal Code";
+		public String value_PaybillNewVendorField10="Country";
+		public String value_PaybillNewVendorField11="State / Province";
+		public String value_PaybillNewVendorField12="City";
+		public String value_PaybillNewVendorField13="Address 1";
+		public String value_PaybillNewVendorField14="Address 2";
+		public String value_PaybillNewVendorField15="Address 3";
+		public String value_PaybillNewVendorField16="Email";
+		public String value_PaybillNewVendorField17="Vendor Type";
+		public String value_PaybillNewVendorField18="Vendor Rate(US$)";
+		public String value_PaybillNewVendorField19="Referral Source";
+		public String value_PaybillNewVendorField20="Save";
+		public String value_PaybillNewVendorField21="Cancel";
+	public String value_PayBillNewVendorLastName="test";
+	public String value_PayBillNewVendorSaveConfirmationMsg="This record saved successfully.";
+	public String value_PayBillGridCol1="Vendor Name";
+	public String value_PayBillGridCol2="Due Date";
+	public String value_PayBillGridCol3="Ref. No.";
+	public String value_PayBillGridCol4="Original Amount (US$)";
+	public String value_PayBillGridCol5="Discounted Amount (US$)";
+	public String value_PayBillGridCol6="Terms";
+	public String value_PayBillGridCol7="Amount Due after Discount (US$)";
+	public String value_PayBillGridCol8="Status";
+	public String value_MsgText="You cannot pay multiple bills for single vendor from multiple banks. Make sure the vendor and bank would be same…";
+	public String value_PaymentType="[Select, Check, ACH, Credit/Debit Card]";
+
+
+
+}
+ 

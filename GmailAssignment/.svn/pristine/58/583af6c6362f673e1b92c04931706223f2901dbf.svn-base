@@ -1,0 +1,2345 @@
+package p2M6.Accounting;
+
+import java.awt.AWTException;
+import java.awt.Robot;
+import java.awt.event.KeyEvent;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.openqa.selenium.Alert;
+import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Keys;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
+import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
+import org.testng.asserts.SoftAssert;
+
+import com.ibm.icu.text.DecimalFormat;
+import com.relevantcodes.extentreports.LogStatus;
+
+import common.ApexCommon;
+import interfaces.GlobalComponents;
+import objectRepository.ApexLinkGlobalComponents;
+import objectRepository.IManageBill;
+import p2M5.vendorPortal.VendorPortalCommons;
+import p2M6.Accounting.objectRepositry.Admin_AccountingTab;
+import p2M6.Accounting.objectRepositry.Admin_MasterSetup;
+import p2M6.Accounting.objectRepositry.Admin_PeopleTab;
+
+
+public class Admin_NewBill extends ApexCommon implements GlobalComponents, Admin_AccountingTab, ApexLinkGlobalComponents, IManageBill, Admin_PeopleTab, Admin_MasterSetup
+	{
+	SoftAssert softAssert = new SoftAssert();
+	//String vendorName;
+	String getSystemDate = utility.getCurrentDate("MM/dd/YYYY");
+	String getSystemDay = utility.getCurrentDate("("+"EEE"+".)");
+	String tenantName;
+	List<Object> values = new ArrayList<>();
+	List<String> building;
+	String[] arr;
+	String unitName;
+	String refNo;
+	String portfolioName;
+	String vendorFirstName;
+	
+	@BeforeClass(alwaysRun = true, enabled = true, groups = { "Smoke", "Regression", "Harinder"})
+	public void Login() throws InterruptedException, IOException, AWTException {
+	login("", adminEmail, password);
+	ChangesDefaultDate(value_DefaultDateFormat, value_DateFormat);
+	login("", adminEmail, password);
+	ChangesDefaultCurrency(value_DefaultCurrency);
+	login("", adminEmail, password);
+	setLogs.info("Add Vendor");
+	vendorFirstName = "Aa".concat(utility.uniqueString());
+	ApexCommon.newVendor(vendorFirstName, valueNewVendorTBLastName, valueNewVendorTBAddress1, vendorFirstName+value_DomainName, valueNewVendorTBPhoneNum, "", "", "", "", "", "", "", "");
+	setLogs.info("Add Portfolio");
+	portfolioName = addPortfolio("H");
+	setLogs.info("Add Bank and attach portolio to it");
+	String getUniqueNumber = utility.getCurrentDateTime("ddMMYYYYss");
+	ApexCommon.addBank(portfolioName, value_BankName+portfolioName, getUniqueNumber, getUniqueNumber, getUniqueNumber, value_BankIntialAmount, getUniqueNumber, "Active", "");
+	setLogs.info("Add Property");
+	byId.click(id_PropertiesTab, "Click on Properties Tab");
+	byId.click(id_NewPropertyBTN, "Click on 'New Property' button");
+	arr = addProperty(value_PropertyName, portfolioName, "", "", "", "1", "1");
+	byName.click(class_PopupYesButton, "Click on 'Yes' button on Popup");
+	building = addBuilding(value_PropertyName, "1", value_Address);
+	byName.click(class_PopupYesButton, "Click on 'Yes' button on Popup");
+	unitName = addUnit("", "", "1", "A", value_UnitNoStart, "", "", "", "", "", value_RentAmount, value_RentAmount, "", "");
+	byId.click(id_AdminPortalPeopleTab, "Click on People Tab");
+	tenantName = value_TenantFirstName+utility.uniqueString();
+	VendorPortalCommons.newTenant_SelectPropertyTab(arr[0], building.get(0),"", tenantName, value_TenantLastName,tenantName+value_DomainName , value_PhoneNumber);
+	VendorPortalCommons.newTenant_LeaseDetailsTab("", "", "", "", "", "");
+	VendorPortalCommons.newTenant_ChargesAndMoveInTabWithoutParams();
+	}
+	
+	@BeforeMethod(alwaysRun = true, enabled = true, groups = { "Smoke", "Regression", "Harinder"})
+	public static void defaultPage() throws IOException, Throwable {
+		Thread.sleep(3000);
+		getDriver().navigate().refresh();
+		//driverFlag = true;
+		byClassName.click("logo", "Click on Company Logo in Admin Portal");
+		byId.click(id_AccountingTab, "Click on Accounting tab");
+	}
+	
+	@Test(priority = 1, enabled = true, groups = {"Harinder"})
+	public void P2M6_027() throws InterruptedException {
+		//driverFlag = true;
+		extentTest = extentReport.startTest("P2M6_027", "*H7 : Verify that 'New Bill' page should be displayed");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		String newBillHeaderName = byId.getText(id_NewBillFormHeader, "Get Header Name for 'New Bill' form");
+		Assert.assertEquals(newBillHeaderName, "New Bill" , "'New Bill' form is not opened");
+		extentTest.log(LogStatus.INFO,	"*H7 : Verified, that 'New Bill' page should be displayed");
+	}
+	
+	@Test(priority = 2, enabled = false, groups = { "Harinder"})
+	public void P2M6_028() throws InterruptedException {
+		extentTest = extentReport.startTest("P2M6_028", "*H7 : Verify that New Bill screen is open with the fields");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		String[] eleIdsList = ids_NewBillAllElements.split(",");
+		List<Object> listWebEle = VendorPortalCommons.getWebElementsByIds(eleIdsList);
+		int getListSize = listWebEle.size();
+		Assert.assertTrue(getListSize == 20, "Some filds are not present on 'New Bill' page.");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that New Bill screen is open with the fields");
+	}
+	
+	@Test(priority = 3, enabled = false, groups = { "Harinder"})
+	public void P2M6_029_1() throws InterruptedException {
+		extentTest = extentReport.startTest("P2M6_029_1", "*H7 : Verify that user is able to click in the Vendor Name field on New Bill Form");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		byId.click(id_NewBillFormVendorName, "Click on Vendor Name field on New Bill form");
+		byId.clearThenSetText(id_NewBillFormVendorName, vendorFirstName+" ","Click on Vendor Name field on New Bill form");
+		Thread.sleep(2000);
+		int getSize = byXpath.getSize(xpath_NewBillFormVendorNameListHeaderNameVendorName, "get Size of 'vendor name' header from list");
+		Assert.assertTrue(getSize == 1, "Vendor list is not displaying");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that user is able to click in the Vendor Name field on New Bill Form");
+	}
+	
+	@Test(priority = 4, enabled = false, groups = { "Harinder"})
+	public void P2M6_029_2() throws InterruptedException {
+		extentTest = extentReport.startTest("P2M6_029_2", "*H7 : Verify that Place holder 'Type Vendor's Name' should be displayed in this field");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		String getPlaceHolder = byId.getAttribute(id_NewBillFormVendorName, "placeholder", "Click on Vendor Name field on New Bill form");
+		Assert.assertEquals(getPlaceHolder,"Type Vendor’s Name", "Place holder is missing");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that user is able to click in the Vendor Name field on New Bill Form");
+	}
+	
+	@Test(priority = 5, enabled = false, groups = { "Harinder"})
+	public void P2M6_029_3() throws InterruptedException {
+		extentTest = extentReport.startTest("P2M6_029_3", "*H7 : Verify that 'Vendor's Name' should be a mandatory field");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		Thread.sleep(2000);
+		String getAsterikSign = byXpath.getText("//*[@id='"+id_NewBillFormVendorName+"']//parent::span//preceding-sibling::label//span", "Get Asterik Sign for 'Vendor Name' field on New Bill form");
+		Assert.assertEquals(getAsterikSign,"*", "Asterik Sign is missing for Vendor Name field");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that 'Vendor's Name' is a mandatory field");
+	}
+	
+	@Test(priority = 6, enabled = false, groups = { "Harinder"})
+	public void P2M6_030() throws IOException, Throwable {
+		extentTest = extentReport.startTest("P2M6_030", "*H7 : Verify that user is able to select vendor from that list.");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		byId.clearThenSetText(id_NewBillFormVendorName, vendorFirstName+" ", "Enter Vendor Name in 'Vendor Name' field on New Bill form");
+		Thread.sleep(2000);
+		getDriver().findElement(By.id(id_NewBillFormVendorName)).sendKeys(Keys.ENTER);
+		Thread.sleep(2000);
+		String getSelectedVendorName = byId.getAttribute(id_NewBillFormVendorName, "value", "Get Entered vendor Name from 'Vendor Name' field on New Bill form");
+		Thread.sleep(2000);
+		System.out.println("Vendor Name==" +getSelectedVendorName +"               "+vendorFirstName);
+		Assert.assertTrue(getSelectedVendorName.contains(vendorFirstName), "Vendor is not exists in vendor list/Unable to select Vendor from vendor list for 'Vendor Name' field");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that user is able to select vendor from that list.");
+	}
+	
+	@Test(priority = 7, enabled = false, groups = { "Harinder"})
+	public void P2M6_031() throws IOException, Throwable {
+		extentTest = extentReport.startTest("P2M6_031", "*H7 : Verify that user is able to enter alphabets and no validation messgae should be displayed");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		byId.clearThenSetText(id_NewBillFormVendorName, id_NewBillFormVendorNameListHeaderNameVendorName, "Enter alphabets in 'Vendor Name' field on New Bill form");
+		int getErrorMgsSize = byXpath.getSize("//*[@id='"+id_NewBillFormVendorName+"']//following-sibling::div", "Get Error message size for 'Vendor Name' field on New Bill form");
+		Assert.assertEquals(getErrorMgsSize, 0, "'Vendor Name' field is not allowing to enter Alphabets");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that user is able to enter alphabets and no validation messgae should be displayed");
+	}
+	
+	@Test(priority = 8, enabled = false, groups = { "Harinder"})
+	public void P2M6_032() throws IOException, Throwable {
+		extentTest = extentReport.startTest("P2M6_032", "*H7 : Verify that user is able to enter numerics and no validation messgae should be displayed");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		byId.clearThenSetText(id_NewBillFormVendorName, value_ZipCode, "Enter numerics in'Vendor Name' field on New Bill form");
+		int getErrorMgsSize = byXpath.getSize("//*[@id='"+id_NewBillFormVendorName+"']//following-sibling::div", "Get Error message size for 'Vendor Name' field on New Bill form");
+		Assert.assertEquals(getErrorMgsSize, 0, "'Vendor Name' field is not allowing to enter numerics");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that user is able to enter numerics and no validation messgae should be displayed");
+	}
+	
+	@Test(priority = 9, enabled = false, groups = { "Harinder"})
+	public void P2M6_033() throws IOException, Throwable {
+		extentTest = extentReport.startTest("P2M6_033", "*H7 : Verify that user is able to enter special characters and no validation messgae should be displayed");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		byId.clearThenSetText(id_NewBillFormVendorName, value_SpecialCharcters, "Enter special characters in'Vendor Name' field on New Bill form");
+		int getErrorMgsSize = byXpath.getSize("//*[@id='"+id_NewBillFormVendorName+"']//following-sibling::div", "Get Error message size for 'Vendor Name' field on New Bill form");
+		Assert.assertEquals(getErrorMgsSize, 0, "'Vendor Name' field is not allowing to enter special characters");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that user is able to enter special characters and no validation messgae should be displayed");
+	}
+	
+	@Test(priority = 10, enabled = false, groups = { "Harinder"})
+	public void P2M6_034() throws IOException, Throwable {
+		extentTest = extentReport.startTest("P2M6_034", "*H7 : Verify that user is able to enter combination of special characters, numerals and alphabets and no validation messgae should be displayed");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		byId.clearThenSetText(id_NewBillFormVendorName, value_SpecialCharcters+" "+value_ZipCode+id_NewBillFormHeader, "Enter combination of special characters, numerals and alphabets in'Vendor Name' field on New Bill form");
+		int getErrorMgsSize = byXpath.getSize("//*[@id='"+id_NewBillFormVendorName+"']//following-sibling::div", "Get Error message size for 'Vendor Name' field on New Bill form");
+		Assert.assertEquals(getErrorMgsSize, 0, "'Vendor Name' field is not allowing to enter combination of special characters, numerals and alphabets");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that user is able to entercombination of special characters, numerals and alphabets and no validation messgae should be displayed");
+	}
+	
+	@Test(priority = 11, enabled = false, groups = { "Harinder"})
+	public void P2M6_035() throws IOException, Throwable {
+		extentTest = extentReport.startTest("P2M6_035", "*H7 : Verify that when vendor name enter in the field the Address of that vendor should be autopopulate in the Address field");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		byId.clearThenSetText(id_NewBillFormVendorName, vendorFirstName+" ", "Enter Vendor Name in'Vendor Name' field on New Bill form");
+		Thread.sleep(2000);
+		JavascriptExecutor jse = (JavascriptExecutor) getDriver();
+		jse.executeScript("arguments[0].click();", getDriver().findElement(By.xpath("//*[contains(@class,'cg-DivItem')][2]")));
+		//getDriver().findElement(By.id(id_NewBillFormVendorName)).sendKeys(Keys.ENTER);
+		Thread.sleep(2000);
+		String getAddress = byId.getAttribute(id_NewBillAddress, "value", "Get Address corressponding to selected Vendor");
+		Assert.assertTrue(getAddress.contains(valueNewVendorTBAddress1), "Addess Associated to Selected Vendor is not Reflecting in 'Address' field.");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that when vendor name enter in the field the Address of that vendor should be autopopulate in the Address field");
+	}
+	
+	@Test(priority = 12, enabled = false, groups = { "Harinder"})
+	public void P2M6_037() throws IOException, Throwable {
+		extentTest = extentReport.startTest("P2M6_037", "*H7 : Verify that user should not able to click in the Address field ");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		String getAttribute = byId.getAttribute(id_NewBillAddress, "disabled", "Get 'disabled' Attribute of 'Address' field");
+		Assert.assertEquals(getAttribute, "true", "Address field is editable, it should be uneditable");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that user should not able to click in the Address field ");
+	}
+	
+	@Test(priority = 13, enabled = false, groups = { "Harinder"})
+	public void P2M6_038() throws IOException, Throwable {
+		extentTest = extentReport.startTest("P2M6_038", "*H7 : Verify that Vendor Address popup shoud be displayed clicking on 'Edit Address' link below Address field");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		byId.clearThenSetText(id_NewBillFormVendorName, vendorFirstName+" ", "Enter Vendor Name in'Vendor Name' field on New Bill form");
+		Thread.sleep(2000);
+		getDriver().findElement(By.id(id_NewBillFormVendorName)).sendKeys(Keys.ENTER);
+		Thread.sleep(2000);
+		byId.click(id_NewBillEditAddressLink, "Click on 'Edit Address' link");
+		int getPopupSize = byId.getSize(id_NewBillVendorAddressPopup, "Get Size of 'Vendor Address' popup if displayed");
+		getDriver().navigate().refresh();
+		Assert.assertEquals(getPopupSize, 1, "'Vendor Address' popup is not Displaying");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that Vendor Address popup shoud be displayed clicking on 'Edit Address' link below Address field");
+	}
+	
+	@Test(priority = 14, enabled = false, groups = { "Harinder"})
+	public void P2M6_039() throws IOException, Throwable {
+		extentTest = extentReport.startTest("P2M6_039", "*H7 : Verify that following fields should be displayed in the Vendor Address popup");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		byId.clearThenSetText(id_NewBillFormVendorName, vendorFirstName+" ", "Enter Vendor Name in'Vendor Name' field on New Bill form");
+		Thread.sleep(2000);
+		getDriver().findElement(By.id(id_NewBillFormVendorName)).sendKeys(Keys.ENTER);
+		Thread.sleep(2000);
+		byId.click(id_NewBillEditAddressLink, "Click on 'Edit Address' link");
+		List<String> getElments = VendorPortalCommons.AddMultipleValuesInList(ids_NewBillVendorAddressPopupElements);
+		int listSize = getElments.size();
+		Assert.assertEquals(listSize, 9, "Elements may be added or deleted from 'Vendor Address' popup.");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that following fields should be displayed in the Vendor Address popup");
+	}
+	
+	@Test(priority = 15, enabled = false, groups = { "Harinder"})
+	public void P2M6_040() throws IOException, Throwable {
+		extentTest = extentReport.startTest("P2M6_040", "*H7 : Verify that user is able to edit the Zip/Postal code");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		byId.clearThenSetText(id_NewBillFormVendorName, vendorFirstName+" ", "Enter Vendor Name in'Vendor Name' field on New Bill form");
+		Thread.sleep(2000);
+		getDriver().findElement(By.id(id_NewBillFormVendorName)).sendKeys(Keys.ENTER);
+		Thread.sleep(2000);
+		byId.click(id_NewBillEditAddressLink, "Click on 'Edit Address' link");
+		byId.clearThenSetText(id_VendorAddressPopupZipCode, value_ZipCode, "Enter Zipcode in Zipcode Field.");
+		String getEnteredZipCode = byId.getAttribute(id_VendorAddressPopupZipCode, "value", "get Entered Zipcode");
+		Assert.assertEquals(getEnteredZipCode, value_ZipCode, "Zipcode is not the same as entered");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that user is able to edit the Zip/Postal code");
+	}
+	
+	/*@Test(priority = 16, enabled = false, groups = { "Harinder"})
+	public void P2M6_041() throws IOException, Throwable {
+		extentTest = extentReport.startTest("P2M6_041", "*H7 : Verify that no validation should be displayed Entering numerics upto 8 characters in the Zip/Postal code");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		byId.clearThenSetText(id_NewBillFormVendorName, vendorFirstName, "Enter Vendor Name in'Vendor Name' field on New Bill form");
+		Thread.sleep(2000);
+		getDriver().findElement(By.id(id_NewBillFormVendorName)).sendKeys(Keys.ENTER);
+		Thread.sleep(2000);
+		byId.click(id_NewBillEditAddressLink, "Click on 'Edit Address' link");
+		byId.clearThenSetText(id_VendorAddressPopupZipCode, value_ZipCode, "Enter Zipcode in Zipcode Field.");
+		
+		Assert.assertEquals(getCoStCi, getElementValues, "Country, State and City field are not getting reflected assiciate to the entered ZipCode");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that no validation should be displayed Entering numerics upto 8 characters in the Zip/Postal code");
+	}*/
+	
+	@Test(priority = 17, enabled = false, groups = { "Harinder"})
+	public void P2M6_043() throws IOException, Throwable {
+		extentTest = extentReport.startTest("P2M6_043", "*H7 : Verify that Country, State/Province and city should be autopopulate according to the entered Zip/Postal code");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		byId.clearThenSetText(id_NewBillFormVendorName, vendorFirstName+" ", "Enter Vendor Name in'Vendor Name' field on New Bill form");
+		Thread.sleep(2000);
+		getDriver().findElement(By.id(id_NewBillFormVendorName)).sendKeys(Keys.ENTER);
+		Thread.sleep(2000);
+		byId.click(id_NewBillEditAddressLink, "Click on 'Edit Address' link");
+		byId.clearThenSetText(id_VendorAddressPopupZipCode, value_ZipCode, "Enter Zipcode in Zipcode Field.");
+		List<String> getElementValues = VendorPortalCommons.getValuesByIds(ids_NewBillVendorAddressPopupElements.split(","));
+		List<String> getCoStCi = new ArrayList<>();
+		getCoStCi.add(getElementValues.get(1));
+		getCoStCi.add(getElementValues.get(2));
+		getCoStCi.add(getElementValues.get(3));
+		System.out.println("CountryStateCity = " +getCoStCi);
+		getElementValues.clear();
+		getElementValues = VendorPortalCommons.AddMultipleValuesInList(value_CoStCi);
+		Assert.assertEquals(getCoStCi, getElementValues, "Country, State and City field are not getting reflected assiciate to the entered ZipCode");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that Country, State/Province and city should be autopopulate according to the entered Zip/Postal code");
+	}
+	
+	@Test(priority = 18, enabled = false, groups = { "Harinder"})
+	public void P2M6_044() throws IOException, Throwable {
+		extentTest = extentReport.startTest("P2M6_044", "*H7 : Verify that placeholder 'Eg: Street Address1' should be displayed on Vendor Address Popup");
+		setLogs.info("Add Vendor without Street Address");
+		vendorFirstName = "aa".concat(utility.uniqueString());
+		ApexCommon.newVendor(vendorFirstName, valueNewVendorTBLastName, "", vendorFirstName+value_DomainName, valueNewVendorTBPhoneNum, "", "", "", "", "", "", "", "");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		byId.clearThenSetText(id_NewBillFormVendorName, vendorFirstName+" ", "Enter Vendor Name in'Vendor Name' field on New Bill form");
+		Thread.sleep(2000);
+		getDriver().findElement(By.id(id_NewBillFormVendorName)).sendKeys(Keys.ENTER);
+		Thread.sleep(2000);
+		byId.click(id_NewBillEditAddressLink, "Click on 'Edit Address' link");
+		List<String> getElementValues = VendorPortalCommons.AddMultipleValuesInList(ids_NewBillVendorAddressPopupElements);
+		String getPlaceHolder = byId.getAttribute(getElementValues.get(4), "placeholder", "Get placeholder for 'Address1' field");
+		Assert.assertEquals(getPlaceHolder, value_VendorAddressPopupPlaceHolderAdd1, "Place Holder is not the same as 'Eg: Street Address1'");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that placeholder 'Eg: Street Address1' should be displayed on Vendor Address Popup");
+	}
+	
+	@Test(priority = 19, enabled = false, groups = { "Harinder"})
+	public void P2M6_045_1() throws IOException, Throwable {
+		extentTest = extentReport.startTest("P2M6_045_1", "*H7 : Verify that Clicking on Address1 field placeholder should be disappear");
+		setLogs.info("Add Vendor without Street Address");
+		vendorFirstName = "aa".concat(utility.uniqueString());
+		ApexCommon.newVendor(vendorFirstName, valueNewVendorTBLastName, "", vendorFirstName+value_DomainName, valueNewVendorTBPhoneNum, "", "", "", "", "", "", "", "");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		byId.clearThenSetText(id_NewBillFormVendorName, vendorFirstName+" ", "Enter Vendor Name in'Vendor Name' field on New Bill form");
+		Thread.sleep(2000);
+		getDriver().findElement(By.id(id_NewBillFormVendorName)).sendKeys(Keys.ENTER);
+		Thread.sleep(2000);
+		byId.click(id_NewBillEditAddressLink, "Click on 'Edit Address' link");
+		List<String> getElementValues = VendorPortalCommons.AddMultipleValuesInList(ids_NewBillVendorAddressPopupElements);
+		byId.clearThenSetText(getElementValues.get(4), "A", "Click on 'Address1' field");
+		String getText = byId.getAttribute(getElementValues.get(4), "value", "Get placeholder for 'Address1' field");
+		Assert.assertEquals(getText, "A", "Place Holder is not the same as 'Eg: Street Address1'");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that Clicking on Address1 field placeholder should be disappear");
+	}
+	
+	@Test(priority = 20, enabled = false, groups = { "Harinder"})
+	public void P2M6_046() throws IOException, Throwable 
+	{
+		extentTest = extentReport.startTest("P2M6_046", "*H7 : Verify that no validation should be displayed and user is able to enter numerics in Address1 field on Vendor address Popup");
+		setLogs.info("Add Vendor without Street Address");
+		vendorFirstName = "aa".concat(utility.uniqueString());
+		ApexCommon.newVendor(vendorFirstName, valueNewVendorTBLastName, "", vendorFirstName+value_DomainName, valueNewVendorTBPhoneNum, "", "", "", "", "", "", "", "");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		byId.clearThenSetText(id_NewBillFormVendorName, vendorFirstName+" ", "Enter Vendor Name in'Vendor Name' field on New Bill form");
+		Thread.sleep(2000);
+		getDriver().findElement(By.id(id_NewBillFormVendorName)).sendKeys(Keys.ENTER);
+		Thread.sleep(2000);
+		byId.click(id_NewBillEditAddressLink, "Click on 'Edit Address' link");
+		List<String> getElementValues = VendorPortalCommons.AddMultipleValuesInList(ids_NewBillVendorAddressPopupElements);
+		byId.clearThenSetText(getElementValues.get(4), value_ZipCode, "Enter numerics 'Address1' field");
+		String getInnerHTML = byXpath.getAttribute("//*[@id='"+id_NewBillVendorAddressPopup+"']//label[contains(.,'Address 1')]//parent::div", "innerHTML", "Get html of Address 1 element");
+		Assert.assertEquals(getInnerHTML.contains("error"), false, "Address 1 field on Vendor address field is not allowing to enter Numeric data");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that no validation should be displayed and user is able to enter numerics in Address1 field on Vendor address Popup");
+	}
+	
+	@Test(priority = 21, enabled = false, groups = { "Harinder"})
+	public void P2M6_047() throws IOException, Throwable 
+	{
+		extentTest = extentReport.startTest("P2M6_047", "*H7 : Verify that no validation should be displayed and user is able to enter Alphabets in Address1 field on Vendor address Popup");
+		setLogs.info("Add Vendor without Street Address");
+		vendorFirstName = "aa".concat(utility.uniqueString());
+		ApexCommon.newVendor(vendorFirstName, valueNewVendorTBLastName, "", vendorFirstName+value_DomainName, valueNewVendorTBPhoneNum, "", "", "", "", "", "", "", "");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		byId.clearThenSetText(id_NewBillFormVendorName, vendorFirstName+" ", "Enter Vendor Name in'Vendor Name' field on New Bill form");
+		Thread.sleep(2000);
+		getDriver().findElement(By.id(id_NewBillFormVendorName)).sendKeys(Keys.ENTER);
+		Thread.sleep(2000);
+		byId.click(id_NewBillEditAddressLink, "Click on 'Edit Address' link");
+		List<String> getElementValues = VendorPortalCommons.AddMultipleValuesInList(ids_NewBillVendorAddressPopupElements);
+		byId.clearThenSetText(getElementValues.get(4), id_NewBillFormHeader, "Enter Alphabets 'Address1' field");
+		String getInnerHTML = byXpath.getAttribute("//*[@id='"+id_NewBillVendorAddressPopup+"']//label[contains(.,'Address 1')]//parent::div", "innerHTML", "Get html of Address 1 element");
+		Assert.assertEquals(getInnerHTML.contains("error"), false, "Address 1 field on Vendor address field is not allowing to enter Alphabets data");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that no validation should be displayed and user is able to enter Alphabets in Address1 field on Vendor address Popup");
+	}
+	
+	@Test(priority = 22, enabled = false, groups = { "Harinder"})
+	public void P2M6_048() throws IOException, Throwable 
+	{
+		extentTest = extentReport.startTest("P2M6_048", "*H7 : Verify that no validation should be displayed and user is able to enter special characters in Address1 field on Vendor address Popup");
+		setLogs.info("Add Vendor without Street Address");
+		vendorFirstName = "aa".concat(utility.uniqueString());
+		ApexCommon.newVendor(vendorFirstName, valueNewVendorTBLastName, "", vendorFirstName+value_DomainName, valueNewVendorTBPhoneNum, "", "", "", "", "", "", "", "");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		byId.clearThenSetText(id_NewBillFormVendorName, vendorFirstName+" ", "Enter Vendor Name in'Vendor Name' field on New Bill form");
+		Thread.sleep(2000);
+		getDriver().findElement(By.id(id_NewBillFormVendorName)).sendKeys(Keys.ENTER);
+		Thread.sleep(2000);
+		byId.click(id_NewBillEditAddressLink, "Click on 'Edit Address' link");
+		List<String> getElementValues = VendorPortalCommons.AddMultipleValuesInList(ids_NewBillVendorAddressPopupElements);
+		byId.clearThenSetText(getElementValues.get(4), value_SpecialCharcters, "Enter special characters 'Address1' field");
+		String getInnerHTML = byXpath.getAttribute("//*[@id='"+id_NewBillVendorAddressPopup+"']//label[contains(.,'Address 1')]//parent::div", "innerHTML", "Get html of Address 1 element");
+		Assert.assertEquals(getInnerHTML.contains("error"), false, "Address 1 field on Vendor address field is not allowing to enter special characters data");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that no validation should be displayed and user is able to enter special characters in Address1 field on Vendor address Popup");
+	}
+	
+	@Test(priority = 23, enabled = false, groups = { "Harinder"})
+	public void P2M6_049() throws IOException, Throwable 
+	{
+		extentTest = extentReport.startTest("P2M6_049", "*H7 : Verify that no validation should be displayed and user is able to enter combination of special characters, numerics and alphabets in Address1 field on Vendor address Popup");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		byId.clearThenSetText(id_NewBillFormVendorName, vendorFirstName+" ", "Enter Vendor Name in'Vendor Name' field on New Bill form");
+		Thread.sleep(2000);
+		getDriver().findElement(By.id(id_NewBillFormVendorName)).sendKeys(Keys.ENTER);
+		Thread.sleep(2000);
+		byId.click(id_NewBillEditAddressLink, "Click on 'Edit Address' link");
+		List<String> getElementValues = VendorPortalCommons.AddMultipleValuesInList(ids_NewBillVendorAddressPopupElements);
+		byId.clearThenSetText(getElementValues.get(4), value_SpecialCharcters+" "+value_ZipCode+id_NewBillFormHeader, "Enter combination of special characters, numerics and alphabets in 'Address1' field");
+		String getInnerHTML = byXpath.getAttribute("//*[@id='"+id_NewBillVendorAddressPopup+"']//label[contains(.,'Address 1')]//parent::div", "innerHTML", "Get html of Address 1 element");
+		Assert.assertEquals(getInnerHTML.contains("error"), false, "Address 1 field on Vendor address field is not allowing to enter combination of special characters, numerics and alphabets");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that no validation should be displayed and user is able to enter combination of special characters, numerics and alphabets in Address1 field on Vendor address Popup");
+	}
+	
+	@Test(priority = 24, enabled = false, groups = { "Harinder"})
+	public void P2M6_050() throws IOException, Throwable {
+		extentTest = extentReport.startTest("P2M6_050", "*H7 : Verify that placeholder 'Eg: Street Address2' should be displayed for Address 2 field on Vendor Address Popup");
+		setLogs.info("Add Vendor without Street Address");
+		vendorFirstName = "aa".concat(utility.uniqueString());
+		ApexCommon.newVendor(vendorFirstName, valueNewVendorTBLastName, "", vendorFirstName+value_DomainName, valueNewVendorTBPhoneNum, "", "", "", "", "", "", "", "");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		byId.clearThenSetText(id_NewBillFormVendorName, vendorFirstName+" ", "Enter Vendor Name in'Vendor Name' field on New Bill form");
+		Thread.sleep(2000);
+		getDriver().findElement(By.id(id_NewBillFormVendorName)).sendKeys(Keys.ENTER);
+		Thread.sleep(2000);
+		byId.click(id_NewBillEditAddressLink, "Click on 'Edit Address' link");
+		List<String> getElementValues = VendorPortalCommons.AddMultipleValuesInList(ids_NewBillVendorAddressPopupElements);
+		String getPlaceHolder = byId.getAttribute(getElementValues.get(5), "placeholder", "Get placeholder for 'Address2' field");
+		Assert.assertEquals(getPlaceHolder, value_VendorAddressPopupPlaceHolderAdd2, "Place Holder is not the same as 'Eg: Street Address2'");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that placeholder 'Eg: Street Address1' should be displayed for Address 2 field on Vendor Address Popup");
+	}
+	
+	@Test(priority = 25, enabled = false, groups = { "Harinder"})
+	public void P2M6_051() throws IOException, Throwable {
+		extentTest = extentReport.startTest("P2M6_051", "*H7 : Verify that Clicking on Address 2 field placeholder should be disappear");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		byId.clearThenSetText(id_NewBillFormVendorName, vendorFirstName+" ", "Enter Vendor Name in'Vendor Name' field on New Bill form");
+		Thread.sleep(2000);
+		getDriver().findElement(By.id(id_NewBillFormVendorName)).sendKeys(Keys.ENTER);
+		Thread.sleep(2000);
+		byId.click(id_NewBillEditAddressLink, "Click on 'Edit Address' link");
+		List<String> getElementValues = VendorPortalCommons.AddMultipleValuesInList(ids_NewBillVendorAddressPopupElements);
+		byId.clearThenSetText(getElementValues.get(5), "A", "Click on 'Address2' field");
+		String getText = byId.getAttribute(getElementValues.get(5), "value", "Get placeholder for 'Address2' field");
+		Assert.assertEquals(getText, "A", "Place Holder is not the same as 'Eg: Street Address2'");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that Clicking on Address 2 field placeholder should be disappear");
+	}
+	
+	@Test(priority = 26, enabled = false, groups = { "Harinder"})
+	public void P2M6_052() throws IOException, Throwable 
+	{
+		extentTest = extentReport.startTest("P2M6_052", "*H7 : Verify that no validation should be displayed and user is able to enter numerics in Address 2 field on Vendor address Popup");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		byId.clearThenSetText(id_NewBillFormVendorName, vendorFirstName+" ", "Enter Vendor Name in'Vendor Name' field on New Bill form");
+		Thread.sleep(2000);
+		getDriver().findElement(By.id(id_NewBillFormVendorName)).sendKeys(Keys.ENTER);
+		Thread.sleep(2000);
+		byId.click(id_NewBillEditAddressLink, "Click on 'Edit Address' link");
+		List<String> getElementValues = VendorPortalCommons.AddMultipleValuesInList(ids_NewBillVendorAddressPopupElements);
+		byId.clearThenSetText(getElementValues.get(5), value_ZipCode, "Enter numerics 'Address2' field");
+		String getInnerHTML = byXpath.getAttribute("//*[@id='"+id_NewBillVendorAddressPopup+"']//label[contains(.,'Address 2')]//parent::div", "innerHTML", "Get html of Address 2 element");
+		Assert.assertEquals(getInnerHTML.contains("error"), false, "Address 2 field on Vendor address field is not allowing to enter Numeric data");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that no validation should be displayed and user is able to enter numerics in Address 2 field on Vendor address Popup");
+	}
+	
+	@Test(priority = 27, enabled = false, groups = { "Harinder"})
+	public void P2M6_053() throws IOException, Throwable 
+	{
+		extentTest = extentReport.startTest("P2M6_053", "*H7 : Verify that no validation should be displayed and user is able to enter Alphabets in Address 2 field on Vendor address Popup");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		byId.clearThenSetText(id_NewBillFormVendorName, vendorFirstName+" ", "Enter Vendor Name in'Vendor Name' field on New Bill form");
+		Thread.sleep(2000);
+		getDriver().findElement(By.id(id_NewBillFormVendorName)).sendKeys(Keys.ENTER);
+		Thread.sleep(2000);
+		byId.click(id_NewBillEditAddressLink, "Click on 'Edit Address' link");
+		List<String> getElementValues = VendorPortalCommons.AddMultipleValuesInList(ids_NewBillVendorAddressPopupElements);
+		byId.clearThenSetText(getElementValues.get(5), id_NewBillFormHeader, "Enter Alphabets 'Address2' field");
+		String getInnerHTML = byXpath.getAttribute("//*[@id='"+id_NewBillVendorAddressPopup+"']//label[contains(.,'Address 2')]//parent::div", "innerHTML", "Get html of Address 2 element");
+		Assert.assertEquals(getInnerHTML.contains("error"), false, "Address 2 field on Vendor address field is not allowing to enter Alphabets data");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that no validation should be displayed and user is able to enter Alphabets in Address 2 field on Vendor address Popup");
+	}
+	
+	@Test(priority = 28, enabled = false, groups = { "Harinder"})
+	public void P2M6_054() throws IOException, Throwable 
+	{
+		extentTest = extentReport.startTest("P2M6_054", "*H7 : Verify that no validation should be displayed and user is able to enter special characters in Address 2 field on Vendor address Popup");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		byId.clearThenSetText(id_NewBillFormVendorName, vendorFirstName+" ", "Enter Vendor Name in'Vendor Name' field on New Bill form");
+		Thread.sleep(2000);
+		getDriver().findElement(By.id(id_NewBillFormVendorName)).sendKeys(Keys.ENTER);
+		Thread.sleep(2000);
+		byId.click(id_NewBillEditAddressLink, "Click on 'Edit Address' link");
+		List<String> getElementValues = VendorPortalCommons.AddMultipleValuesInList(ids_NewBillVendorAddressPopupElements);
+		byId.clearThenSetText(getElementValues.get(5), value_SpecialCharcters, "Enter special characters 'Address2' field");
+		String getInnerHTML = byXpath.getAttribute("//*[@id='"+id_NewBillVendorAddressPopup+"']//label[contains(.,'Address 2')]//parent::div", "innerHTML", "Get html of Address 2 element");
+		Assert.assertEquals(getInnerHTML.contains("error"), false, "Address 2 field on Vendor address field is not allowing to enter special characters data");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that no validation should be displayed and user is able to enter special characters in Address2 field on Vendor address Popup");
+	}
+	
+	@Test(priority = 29, enabled = false, groups = { "Harinder"})
+	public void P2M6_055() throws IOException, Throwable 
+	{
+		extentTest = extentReport.startTest("P2M6_049", "*H7 : Verify that no validation should be displayed and user is able to enter combination of special characters, numerics and alphabets in Address2 field on Vendor address Popup");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		byId.clearThenSetText(id_NewBillFormVendorName, vendorFirstName+" ", "Enter Vendor Name in'Vendor Name' field on New Bill form");
+		Thread.sleep(2000);
+		getDriver().findElement(By.id(id_NewBillFormVendorName)).sendKeys(Keys.ENTER);
+		Thread.sleep(2000);
+		byId.click(id_NewBillEditAddressLink, "Click on 'Edit Address' link");
+		List<String> getElementValues = VendorPortalCommons.AddMultipleValuesInList(ids_NewBillVendorAddressPopupElements);
+		byId.clearThenSetText(getElementValues.get(5), value_SpecialCharcters+" "+value_ZipCode+id_NewBillFormHeader, "Enter combination of special characters, numerics and alphabets in 'Address2' field");
+		String getInnerHTML = byXpath.getAttribute("//*[@id='"+id_NewBillVendorAddressPopup+"']//label[contains(.,'Address 2')]//parent::div", "innerHTML", "Get html of Address 2 element");
+		Assert.assertEquals(getInnerHTML.contains("error"), false, "Address 2 field on Vendor address field is not allowing to enter combination of special characters, numerics and alphabets");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that no validation should be displayed and user is able to enter combination of special characters, numerics and alphabets in Address2 field on Vendor address Popup");
+	}
+	
+	@Test(priority = 30, enabled = false, groups = { "Harinder"})
+	public void P2M6_056() throws IOException, Throwable {
+		extentTest = extentReport.startTest("P2M6_050", "*H7 : Verify that placeholder 'Eg: Street Address3' should be displayed for Address 3 field on Vendor Address Popup");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		byId.clearThenSetText(id_NewBillFormVendorName, vendorFirstName+" ", "Enter Vendor Name in'Vendor Name' field on New Bill form");
+		Thread.sleep(2000);
+		getDriver().findElement(By.id(id_NewBillFormVendorName)).sendKeys(Keys.ENTER);
+		Thread.sleep(2000);
+		byId.click(id_NewBillEditAddressLink, "Click on 'Edit Address' link");
+		List<String> getElementValues = VendorPortalCommons.AddMultipleValuesInList(ids_NewBillVendorAddressPopupElements);
+		String getPlaceHolder = byId.getAttribute(getElementValues.get(6), "placeholder", "Get placeholder for 'Address3' field");
+		Assert.assertEquals(getPlaceHolder, value_VendorAddressPopupPlaceHolderAdd3, "Place Holder is not the same as 'Eg: Street Address3'");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that placeholder 'Eg: Street Address3' should be displayed for Address 3 field on Vendor Address Popup");
+	}
+	
+	@Test(priority = 31, enabled = false, groups = { "Harinder"})
+	public void P2M6_057() throws IOException, Throwable {
+		extentTest = extentReport.startTest("P2M6_057", "*H7 : Verify that Clicking on Address 3 field placeholder should be disappear");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		byId.clearThenSetText(id_NewBillFormVendorName, vendorFirstName+" ", "Enter Vendor Name in'Vendor Name' field on New Bill form");
+		Thread.sleep(2000);
+		getDriver().findElement(By.id(id_NewBillFormVendorName)).sendKeys(Keys.ENTER);
+		Thread.sleep(2000);
+		byId.click(id_NewBillEditAddressLink, "Click on 'Edit Address' link");
+		List<String> getElementValues = VendorPortalCommons.AddMultipleValuesInList(ids_NewBillVendorAddressPopupElements);
+		byId.clearThenSetText(getElementValues.get(6), "A", "Click on 'Address3' field");
+		String getText = byId.getAttribute(getElementValues.get(6), "value", "Get placeholder for 'Address3' field");
+		Assert.assertEquals(getText, "A", "Place Holder is not the same as 'Eg: Street Address3'");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that Clicking on Address 3 field placeholder should be disappear");
+	}
+	
+	@Test(priority = 32, enabled = false, groups = { "Harinder"})
+	public void P2M6_058() throws IOException, Throwable 
+	{
+		extentTest = extentReport.startTest("P2M6_058", "*H7 : Verify that no validation should be displayed and user is able to enter numerics in Address 3 field on Vendor address Popup");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		byId.clearThenSetText(id_NewBillFormVendorName, vendorFirstName+" ", "Enter Vendor Name in'Vendor Name' field on New Bill form");
+		Thread.sleep(2000);
+		getDriver().findElement(By.id(id_NewBillFormVendorName)).sendKeys(Keys.ENTER);
+		Thread.sleep(2000);
+		byId.click(id_NewBillEditAddressLink, "Click on 'Edit Address' link");
+		List<String> getElementValues = VendorPortalCommons.AddMultipleValuesInList(ids_NewBillVendorAddressPopupElements);
+		byId.clearThenSetText(getElementValues.get(6), value_ZipCode, "Enter numerics 'Address6' field");
+		String getInnerHTML = byXpath.getAttribute("//*[@id='"+id_NewBillVendorAddressPopup+"']//label[contains(.,'Address 3')]//parent::div", "innerHTML", "Get html of Address 3 element");
+		Assert.assertEquals(getInnerHTML.contains("error"), false, "Address 3 field on Vendor address field is not allowing to enter Numeric data");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that no validation should be displayed and user is able to enter numerics in Address 3 field on Vendor address Popup");
+	}
+	
+	@Test(priority = 33, enabled = false, groups = { "Harinder"})
+	public void P2M6_059() throws IOException, Throwable 
+	{
+		extentTest = extentReport.startTest("P2M6_059", "*H7 : Verify that no validation should be displayed and user is able to enter Alphabets in Address 3 field on Vendor address Popup");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		byId.clearThenSetText(id_NewBillFormVendorName, vendorFirstName+" ", "Enter Vendor Name in'Vendor Name' field on New Bill form");
+		Thread.sleep(2000);
+		getDriver().findElement(By.id(id_NewBillFormVendorName)).sendKeys(Keys.ENTER);
+		Thread.sleep(2000);
+		byId.click(id_NewBillEditAddressLink, "Click on 'Edit Address' link");
+		List<String> getElementValues = VendorPortalCommons.AddMultipleValuesInList(ids_NewBillVendorAddressPopupElements);
+		byId.clearThenSetText(getElementValues.get(6), id_NewBillFormHeader, "Enter Alphabets 'Address3' field");
+		String getInnerHTML = byXpath.getAttribute("//*[@id='"+id_NewBillVendorAddressPopup+"']//label[contains(.,'Address 3')]//parent::div", "innerHTML", "Get html of Address 3 element");
+		Assert.assertEquals(getInnerHTML.contains("error"), false, "Address 3 field on Vendor address field is not allowing to enter Alphabets data");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that no validation should be displayed and user is able to enter Alphabets in Address 3 field on Vendor address Popup");
+	}
+	
+	@Test(priority = 34, enabled = false, groups = { "Harinder"})
+	public void P2M6_060() throws IOException, Throwable 
+	{
+		extentTest = extentReport.startTest("P2M6_060", "*H7 : Verify that no validation should be displayed and user is able to enter special characters in Address 3 field on Vendor address Popup");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		byId.clearThenSetText(id_NewBillFormVendorName, vendorFirstName+" ", "Enter Vendor Name in'Vendor Name' field on New Bill form");
+		Thread.sleep(2000);
+		getDriver().findElement(By.id(id_NewBillFormVendorName)).sendKeys(Keys.ENTER);
+		Thread.sleep(2000);
+		byId.click(id_NewBillEditAddressLink, "Click on 'Edit Address' link");
+		List<String> getElementValues = VendorPortalCommons.AddMultipleValuesInList(ids_NewBillVendorAddressPopupElements);
+		byId.clearThenSetText(getElementValues.get(6), value_SpecialCharcters, "Enter special characters 'Address3' field");
+		String getInnerHTML = byXpath.getAttribute("//*[@id='"+id_NewBillVendorAddressPopup+"']//label[contains(.,'Address 3')]//parent::div", "innerHTML", "Get html of Address 3 element");
+		Assert.assertEquals(getInnerHTML.contains("error"), false, "Address 3 field on Vendor address field is not allowing to enter special characters data");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that no validation should be displayed and user is able to enter special characters in Address3 field on Vendor address Popup");
+	}
+	
+	@Test(priority = 35, enabled = false, groups = { "Harinder"})
+	public void P2M6_061() throws IOException, Throwable 
+	{
+		extentTest = extentReport.startTest("P2M6_061", "*H7 : Verify that no validation should be displayed and user is able to enter combination of special characters, numerics and alphabets in Address3 field on Vendor address Popup");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		byId.clearThenSetText(id_NewBillFormVendorName, vendorFirstName+" ", "Enter Vendor Name in'Vendor Name' field on New Bill form");
+		Thread.sleep(2000);
+		getDriver().findElement(By.id(id_NewBillFormVendorName)).sendKeys(Keys.ENTER);
+		Thread.sleep(2000);
+		byId.click(id_NewBillEditAddressLink, "Click on 'Edit Address' link");
+		List<String> getElementValues = VendorPortalCommons.AddMultipleValuesInList(ids_NewBillVendorAddressPopupElements);
+		byId.clearThenSetText(getElementValues.get(6), value_SpecialCharcters+" "+value_ZipCode+id_NewBillFormHeader, "Enter combination of special characters, numerics and alphabets in 'Address3' field");
+		String getInnerHTML = byXpath.getAttribute("//*[@id='"+id_NewBillVendorAddressPopup+"']//label[contains(.,'Address 3')]//parent::div", "innerHTML", "Get html of Address 3 element");
+		Assert.assertEquals(getInnerHTML.contains("error"), false, "Address 3 field on Vendor address field is not allowing to enter combination of special characters, numerics and alphabets");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that no validation should be displayed and user is able to enter combination of special characters, numerics and alphabets in Address3 field on Vendor address Popup");
+	}
+	
+	@Test(priority = 36, enabled = false, groups = { "Harinder"})
+	public void P2M6_062() throws IOException, Throwable 
+	{
+		extentTest = extentReport.startTest("P2M6_062", "*H7 : Verify that when click on update button  on Vendor address Popup, the address of the Vendor should be updated and displayed in the Address field on New Bill page.");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		byId.clearThenSetText(id_NewBillFormVendorName, vendorFirstName+" ", "Enter Vendor Name in'Vendor Name' field on New Bill form");
+		Thread.sleep(2000);
+		getDriver().findElement(By.id(id_NewBillFormVendorName)).sendKeys(Keys.ENTER);
+		Thread.sleep(2000);
+		byId.click(id_NewBillEditAddressLink, "Click on 'Edit Address' link");
+		List<String> getElementValues = VendorPortalCommons.AddMultipleValuesInList(ids_NewBillVendorAddressPopupElements);
+		byId.clearThenSetText(getElementValues.get(0), value_ZipCode, "Enter Zipcode in Zipcode Field.");
+		byId.clearThenSetText(getElementValues.get(4), valueNewVendorTBAddress1, "Enter Address in 'Address 1' Field.");
+		byId.clearThenSetText(getElementValues.get(5), valueNewVendorTBAddress2, "Enter Address in 'Address 2' Field.");
+		byId.clearThenSetText(getElementValues.get(6), valueNewVendorTBAddress3, "Enter Address in 'Address 3' Field.");
+		byId.click(getElementValues.get(7), "Click on Update button on 'Vendor Address' popup");
+		String getAddress = byId.getAttribute(id_NewBillAddress, "value", "Get Address corressponding to selected Vendor");
+		Assert.assertTrue(getAddress.contains(value_ZipCode) && getAddress.contains(valueNewVendorTBAddress1) && getAddress.contains(valueNewVendorTBAddress2) && getAddress.contains(valueNewVendorTBAddress3), "Address field on New Bill from is not updated according to the address updated on 'Vendor Address' form.");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that when click on update button on Vendor address Popup, the address of the Vendor should be updated and displayed in the Address field on New Bill page.");
+	}
+	
+	@Test(priority = 37, enabled = false, groups = { "Harinder"})
+	public void P2M6_063() throws IOException, Throwable 
+	{
+		extentTest = extentReport.startTest("P2M6_063", "*H7 : Verify that when click on Cancel button on Vendor address Popup, the address of the Vendor should not be updated in the Address field on New Bill page.");
+		setLogs.info("Add Vendor without Street Address");
+		vendorFirstName = "aa".concat(utility.uniqueString());
+		ApexCommon.newVendor(vendorFirstName, valueNewVendorTBLastName, "", vendorFirstName+value_DomainName, valueNewVendorTBPhoneNum, "", "", "", "", "", "", "", "");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		byId.clearThenSetText(id_NewBillFormVendorName, vendorFirstName+" ", "Enter Vendor Name in'Vendor Name' field on New Bill form");
+		Thread.sleep(2000);
+		JavascriptExecutor jse = (JavascriptExecutor) getDriver();
+		jse.executeScript("arguments[0].click();", getDriver().findElement(By.xpath("//*[contains(@class,'cg-DivItem')][2]")));
+		//getDriver().findElement(By.id(id_NewBillFormVendorName)).sendKeys(Keys.ENTER);
+		Thread.sleep(2000);
+		byId.click(id_NewBillEditAddressLink, "Click on 'Edit Address' link");
+		List<String> getElementinList = VendorPortalCommons.AddMultipleValuesInList(ids_NewBillVendorAddressPopupElements);
+		List<String> getElementValues = VendorPortalCommons.getValuesByIds(ids_NewBillVendorAddressPopupElements.split(","));
+		List<String> getCoStCi = VendorPortalCommons.AddMultipleValuesInList(value_CoStCi);
+		byId.clearThenSetText(getElementinList.get(0), value_ZipCode, "Enter Zipcode in Zipcode Field.");
+		byId.clearThenSetText(getElementinList.get(4), valueNewVendorTBAddress1, "Enter Address in 'Address 1' Field.");
+		byId.clearThenSetText(getElementinList.get(5), valueNewVendorTBAddress2, "Enter Address in 'Address 2' Field.");
+		byId.clearThenSetText(getElementinList.get(6), valueNewVendorTBAddress3, "Enter Address in 'Address 3' Field.");
+		byId.click(getElementinList.get(8), "Click on Cancel button on 'Vendor Address' popup");
+		String getAddress = byId.getAttribute(id_NewBillAddress, "value", "Get Address corressponding to selected Vendor");
+		byName.click("Yes", "Click on Yes Button on Confirmation popup");
+		Assert.assertTrue(getAddress.contains(getElementValues.get(0)) && getAddress.contains(getElementValues.get(2)) && getAddress.contains(getElementValues.get(3)) && /*getAddress.contains(getElementValues.get(4)) && !getAddress.contains(value_ZipCode) &&*/ !getAddress.contains(valueNewVendorTBAddress1) && !getAddress.contains(valueNewVendorTBAddress2) && !getAddress.contains(valueNewVendorTBAddress3), "Address field on New Bill from is not updated according to the address updated on 'Vendor Address' form.");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that when click on Cancel button on Vendor address Popup, the address of the Vendor should not be updated in the Address field on New Bill page.");
+	}
+	
+	@Test(priority = 38, enabled = false, groups = { "Harinder"})
+	public void P2M6_064_1() throws IOException, Throwable 
+	{
+		extentTest = extentReport.startTest("P2M6_064_1", "*H7 : Verify that Bill Date it should be a mandatory field on New Bill page.");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		setLogs.info("Delete default date from 'Bill date'");
+		byId.clear(id_NewBillBillDate, "Clear Bill Date field");
+		Actions act = new Actions(getDriver());
+		act.moveToElement(getDriver().findElement(By.id(id_NewBillSelectTerm))).click().perform();
+		setLogs.info("Get error msg when 'Bill date' field is blank");
+		String getErrorMsg = byClassName.getText(class_MandatoryfieldErrorMessage, "get Error message");
+		Assert.assertTrue(getErrorMsg.equals(value_MandatoryfieldsMessage),	"'* This field is required' message is not displaying for this field");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that Bill Date it should be a mandatory field on New Bill page.");
+	}
+	
+	@Test(priority = 39, enabled = false, groups = { "Harinder"})
+	public void P2M6_064_2() throws IOException, Throwable 
+	{
+		extentTest = extentReport.startTest("P2M6_064_2", "*H7 : Verify that current date should be displayed in the 'Bill Date' field");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		setLogs.info("Get default date from 'Bill Date'");
+		String getDefaultBillDate = byId.getAttribute(id_NewBillBillDate, "value", "get 'Bill Date' field value");
+		Assert.assertTrue((getSystemDate+" "+getSystemDay).equals(getDefaultBillDate),	"no default Current date is displaying in 'Bill Date' field");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that current date should be displayed in the Bill Date field");
+	}
+	
+	@Test(priority = 40, enabled = false, groups = { "Harinder"})
+	public void P2M6_065_1() throws IOException, Throwable 
+	{
+		extentTest = extentReport.startTest("P2M6_065_1", "*H7 : Verify that clicking on the 'Bill Date' field Date Picker Calendar should be displayed");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		byId.click(id_NewBillBillDate, " Click on 'Bill Date' field to open Calendar");
+		int getDatesSize = byXpath.getSize(xpathNewTenantLeaseDetaulsTabLeaseStartDateCalendar, "Get Calendar's Dates size");
+		Assert.assertTrue(getDatesSize>0,	"No Calendar is displaying on clicking'Bill Date' field");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that clicking on the 'Bill Date' field Date Picker Calendar is displayed");
+	}
+	
+	@Test(priority = 41, enabled = false, groups = { "Harinder"})
+	public void P2M6_065_2() throws IOException, Throwable 
+	{
+		extentTest = extentReport.startTest("P2M6_065_2", "*H7 : Verify that Clicking on the 'Bill Date' field >> User should be able to choose current date from Calendar");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		byId.click(id_NewBillBillDate, " Click on 'Bill Date' field to open Calendar");
+		byClassName.click(class_CalendarTodaysDate, " Click on Todays Date");
+		String getDefaultBillDate = byId.getAttribute(id_NewBillBillDate, "value", "get Bill date field value");
+		Assert.assertTrue((getSystemDate+" "+getSystemDay).equals(getDefaultBillDate), "no seleted date is displaying in Bill Date field");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that Clicking on the 'Bill Date' field >> User is able to choose current date from Calendar");
+	}
+	
+	@Test(priority = 42, enabled = false, groups = { "Harinder"})
+	public void P2M6_065_3() throws IOException, Throwable 
+	{
+		extentTest = extentReport.startTest("P2M6_065_3", "*H7 : Verify that Clicking on the 'Bill Date' field >> User should be able to select previous date from Calendar");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		byId.click(id_NewBillBillDate, " Click on 'Bill Date' field to open Calendar");
+		setLogs.info("Select Previous Date from todays date");
+		VendorPortalCommons.SelectPrevDateFromTodaysDate();
+		String getDefaultBillDate = byId.getAttribute(id_NewBillBillDate, "value", "get Bill date field value");
+		setLogs.info("Select System date and customize into Previous date");
+		String getDate = getSystemDate.substring(3, 5);
+		String getMonth = getSystemDate.substring(0, 2);
+		String getYear = getSystemDate.substring(6, 10);
+		String getDefaultDate = getDefaultBillDate.substring(3, 5);
+		int getMonth1 = 0;
+		if(getDate.equals("01"))
+		{
+			getMonth1 = Integer.parseInt(getMonth)-1;
+			if (getMonth1==00 || getMonth1==0) {
+				getMonth1 = 12;
+				int getYear1 = Integer.parseInt(getYear)-1;
+				Assert.assertTrue(getDefaultBillDate.contains(getMonth1+"/"+getDefaultDate+"/"+getYear1), "no seleted date is displaying in Bill Date field");
+				}
+			}
+			
+		/*DecimalFormat df = new DecimalFormat("00");
+		int parseDateintoInt = Integer.parseInt(getDate) - 1;
+		getDate = df.format(parseDateintoInt);
+		getDate = getSystemDate.substring(0, 3) + getDate + getSystemDate.substring(5);*/
+		Assert.assertTrue(getDefaultBillDate.contains(getMonth1+"/"+getDefaultDate+"/"+getYear), "no seleted date is displaying in Bill Date field");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that Clicking on the 'Bill Date' field >> User is able to select previous date from Calendar");
+	}
+	
+	@Test(priority = 43, enabled = false, groups = { "Harinder"})
+	public void P2M6_065_4() throws IOException, Throwable 
+	{
+		extentTest = extentReport.startTest("P2M6_065_4", "*H7 : Verify that Clicking on the 'Bill Date' field >> User should be able to select future date from Calendar");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		byId.click(id_NewBillBillDate, " Click on 'Bill Date' field to open Calendar");
+		setLogs.info("Select Next Date from todays date");
+		Thread.sleep(2000);
+		VendorPortalCommons.SelectNextDateFromTodaysDate();
+		setLogs.info("Select System date and customize into future date");
+		String getDate = getSystemDate.substring(3, 5);
+		String getYear = getSystemDate.substring(6, 10);
+		if(getDate.equals("30") || getDate.equals("31"))
+		{
+			VendorPortalCommons.SelectNextDateFromTodaysDate();
+			getDate = getSystemDate.substring(0, 2);
+			int getDate2 = Integer.parseInt(getDate)+1;
+			if (getDate2==13) {
+				getDate = "01";
+				int getYear1= Integer.parseInt(getYear)+1;
+				getDate = getDate+"/"+getDate+"/getYear1";
+				String getDefaultBillDate = byId.getAttribute(id_NewBillBillDate, "value", "get Bill date field value");
+				Assert.assertTrue(getDefaultBillDate.contains(getDate), "no seleted date is displaying in Bill Date field");
+			}
+			
+			String getDefaultBillDate = byId.getAttribute(id_NewBillBillDate, "value", "get Bill date field value");
+			Assert.assertTrue(getDefaultBillDate.contains(getDate2+"/01/"+getYear), "no seleted date is displaying in Bill Date field");
+		}
+		else {
+		DecimalFormat df = new DecimalFormat("00");
+		int parseDateintoInt = Integer.parseInt(getDate) + 1;
+		getDate = df.format(parseDateintoInt);
+		getDate =getSystemDate.substring(0, 3)  +getDate+ getSystemDate.substring(5);
+		String getDefaultBillDate = byId.getAttribute(id_NewBillBillDate, "value", "get Bill date field value");
+		Assert.assertTrue(getDefaultBillDate.contains(getDate), "no seleted date is displaying in Bill Date field");
+		}
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that Clicking on the 'Bill Date' field >> User is able to select future date from Calendar");
+	
+		}
+	
+	@Test(priority = 44, enabled = false, groups = { "Harinder"})
+	public void P2M6_066_1() throws IOException, Throwable 
+	{
+		extentTest = extentReport.startTest("P2M6_066_1", "*H7 : Verify that In Month dropdown the all 12 months should be displayed for Bill Date field Calendar");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		byId.click(id_NewBillBillDate, " Click on 'Bill Date' field to open Calendar");
+		setLogs.info("Select Months from Bill Date field's Calendar.");
+		List<WebElement> getElements = byXpath.getElements("//*[@class='"+class_CalendarMonthDDL+"']/option", "Get all the Options in Month DDL on Bill Date Calendar");
+		int getMonthsCount = getElements.size();
+		Assert.assertEquals(getMonthsCount, 12 , "All Months are not displaying in Bill Date field's Calendar");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that In Month dropdown the all 12 months should be displayed for Bill Date field Calendar");
+	}
+	
+	@Test(priority = 45, enabled = false, groups = { "Harinder"})
+	public void P2M6_066_2() throws IOException, Throwable 
+	{
+		extentTest = extentReport.startTest("P2M6_066_2", "*H7 : Verify that In Year DDL the 100 Years should be displayed for Bill Date field Calendar");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		byId.click(id_NewBillBillDate, " Click on 'Bill Date' field to open Calendar");
+		setLogs.info("Select Years from Bill Date field's Calendar.");
+		List<WebElement> getElements = byXpath.getElements("//*[@class='"+class_CalendarYearDDL+"']/option", "Get all the Options in Year DDL on Bill Date Calendar");
+		int getYearsCount = getElements.size();
+		Assert.assertEquals(getYearsCount, 100 , "All 100 Years are not displaying in Bill Date field's Calendar");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that In Year DDL the 100 Years are displayed for Bill Date field Calendar");
+	}
+	
+	@Test(priority = 46, enabled = false, groups = { "Harinder"})
+	public void P2M6_067_1() throws IOException, Throwable 
+	{
+		extentTest = extentReport.startTest("P2M6_067_1", "*H7 : Verify that Amount field should be a mandatory field on New Bill Form");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		byId.click(id_NewBillAmount, "Click on Amount Field");
+		Actions action = new Actions(getDriver());
+		action.moveToElement(getDriver().findElement(By.id(id_NewBillReference))).click().perform();
+		String getErrorMsg = byClassName.getText(class_MandatoryfieldErrorMessage, "get Error message");
+		Assert.assertEquals(getErrorMsg, value_MandatoryfieldsMessage , "'* This field is required' message is not displaying for this field");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that Amount field should be a mandatory field on New Bill Form");
+	}
+	
+	@Test(priority = 47, enabled = false, groups = { "Harinder"})
+	public void P2M6_067_2() throws IOException, Throwable 
+	{
+		extentTest = extentReport.startTest("P2M6_067_2", "*H7 : Verify that Currency sign should be displayed in front of Amount field on New Bill Form");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		String getAmountLabel = byId.getText(id_NewBillAmountLabel, "Get Amount label on New Bill form");
+		int getIndexofStartBracet = getAmountLabel.indexOf("(");
+		int getIndexofEndBracet = getAmountLabel.indexOf(")");
+		getAmountLabel = getAmountLabel.substring(getIndexofStartBracet+1, getIndexofEndBracet);
+		setLogs.info("Get Default Currency Sign from Setting Tab");
+		byClassName.click(class_SettingLink, "click on Setting tab");
+		String getOption = byId.getFirstSelectedOption("ddlCurrency","get First Selected option in 'Default Currency' DDL");
+		int getAdminLeftBracesIndex = getOption.indexOf("(");
+		int getAdminRightBracesIndex = getOption.indexOf(")");
+		getOption = getOption.substring(getAdminLeftBracesIndex + 1, getAdminRightBracesIndex);
+		Assert.assertTrue(getAmountLabel.equals(getOption), "Default set Currency sign is not reflecting in Accounting >> New Bill Form for Amount Field");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that Currency sign should be displayed in front of Amount field on New Bill Form");
+	}
+	
+	@Test(priority = 48, enabled = false, groups = { "Harinder"})
+	public void P2M6_068_1() throws IOException, Throwable 
+	{
+		extentTest = extentReport.startTest("P2M6_068_1", "*H7 : Verify that Amount field should be a text field on New Bill Form");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		String getTagName = byId.getTagName(id_NewBillAmount, "Get Tag Name for 'Amount' field");
+		Assert.assertEquals(getTagName, "input", "Amount Field is not a text field on New Bill Form.");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that Amount field should be a text field on New Bill Form");
+	}
+	
+	@Test(priority = 49, enabled = false, groups = { "Harinder"})
+	public void P2M6_068_2() throws IOException, Throwable 
+	{
+		extentTest = extentReport.startTest("P2M6_068_2", "*H7 : Verify that Amount field should be clickable on New Bill Form");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		byId.clearThenSetText(id_NewBillAmount, value_Amount, "Enter value in 'Amount' field");
+		String getText =byId.getAttribute(id_NewBillAmount, "value", "Get Entered Value in 'Amount' field");
+		Assert.assertEquals(getText, value_Amount, "Amount Field is not a clickable field on New Bill Form.");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that Amount field is clickable on New Bill Form");
+	}
+	
+	@Test(priority = 50, enabled = false, groups = { "Harinder"})
+	public void P2M6_069() throws IOException, Throwable 
+	{
+		extentTest = extentReport.startTest("P2M6_069", "*H7 : Verify that 'Amount' field should not Accept alphabets on New Bill Form");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		byId.clearThenSetText(id_NewBillAmount, id_NewBillFormHeader, "Enter Special Characters in 'Amount' field");
+		String getText =byId.getAttribute(id_NewBillAmount, "value", "Get Entered Value in 'Amount' field");
+		Assert.assertEquals(getText, "", "Amount Field is Accepting alphabets on New Bill Form.");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that 'Amount' field is not Accept alphabets on New Bill Form");
+	}
+	
+	@Test(priority = 51, enabled = false, groups = { "Harinder"})
+	public void P2M6_070() throws IOException, Throwable 
+	{
+		extentTest = extentReport.startTest("P2M6_070", "*H7 : Verify that 'Amount' field should not Accept special Characters on New Bill Form");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		byId.clearThenSetText(id_NewBillAmount, value_SpecialCharcters, "Enter Special Characters in 'Amount' field");
+		String getText =byId.getAttribute(id_NewBillAmount, "value", "Get Entered Value in 'Amount' field");
+		Assert.assertEquals(getText, "", "Amount Field is Accepting special Characters on New Bill Form.");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that 'Amount' field is not Accept special Characters on New Bill Form");
+	}
+	
+	@Test(priority = 52, enabled = false, groups = { "Harinder"})
+	public void P2M6_071() throws IOException, Throwable 
+	{
+		extentTest = extentReport.startTest("P2M6_071", "*H7 : Verify that validation message should be displayed if amount field is blank on New Bill Form");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		byId.clearThenSetText(id_NewBillAmount, "", "Enter nothing in 'Amount' field");
+		Actions action = new Actions(getDriver());
+		action.moveToElement(getDriver().findElement(By.id(id_NewBillReference))).click().perform();
+		byId.click(id_NewBillAmount, "Click on 'Amount' field");
+		action.moveToElement(getDriver().findElement(By.id(id_NewBillReference))).click().perform();
+		String getText =byClassName.getText(class_MandatoryfieldErrorMessage, "Get Validation message for 'Amount' field");
+		Assert.assertEquals(getText, value_validationMsgForAmount, "validation message is not displayed for Amount Field on New Bill Form/ validation message text has been changed.");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that validation message should be displayed if amount field is blank on New Bill Form");
+	}
+	
+	@Test(priority = 53, enabled = false, groups = { "Harinder"})
+	public void P2M6_072_1() throws IOException, Throwable 
+	{
+		extentTest = extentReport.startTest("P2M6_072_1", "*H7 : Verify that Reference field should be a text field on New Bill Form");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		byId.clearThenSetText(id_NewBillReference, valueNewVendorTBAddress1, "Enter Text in 'Reference' field");
+		String getText =byId.getAttribute(id_NewBillReference, "value", "Get entered Text in 'Reference' field");
+		Assert.assertEquals(getText, valueNewVendorTBAddress1, "'Reference' is not a Text field/unable to enter Text in 'Reference' field");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that Reference field should be a text field on New Bill Form");
+	}
+	
+	@Test(priority = 54, enabled = false, groups = { "Harinder"})
+	public void P2M6_072_2() throws IOException, Throwable 
+	{
+		extentTest = extentReport.startTest("P2M6_072_2", "*H7 : Verify that Reference field should be non mandatory field on New Bill Form");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		byId.click(id_NewBillReference, "Click on 'Reference' field");
+		Actions action = new Actions(getDriver());
+		action.moveToElement(getDriver().findElement(By.id(id_NewBillDueDate))).click().perform();
+		int getError =byClassName.getSize(class_MandatoryfieldErrorMessage, "Get Validation message for 'Reference' field");
+		Assert.assertEquals(getError, 0, "'Reference' is a mandatory field");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that Reference field should be non mandatory field on New Bill Form");
+	}
+	
+	@Test(priority = 55, enabled = false, groups = { "Harinder"})
+	public void P2M6_073() throws IOException, Throwable {
+		extentTest = extentReport.startTest("P2M6_073", "*H7 : Verify that user is able to enter numerics in 'Reference' Field");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		byId.clearThenSetText(id_NewBillReference, valueNewVendorTBPhoneNum, "Enter numerics in 'Reference' field on New Bill form");
+		String getText = byId.getAttribute(id_NewBillReference, "value", "Get entered numerics in 'Reference' field on New Bill form");
+		int getError =byClassName.getSize(class_MandatoryfieldErrorMessage, "Get Validation message for 'Reference' field");
+		Assert.assertEquals(getError, 0, "'Reference' is a mandatory field");
+		Assert.assertTrue(getText.equals(valueNewVendorTBPhoneNum) && getError==0, "'Reference' field is not allowing to enter numerics");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that user is able to enter numerics in 'Reference' Field");
+	}
+	
+	@Test(priority = 56, enabled = false, groups = { "Harinder"})
+	public void P2M6_074() throws IOException, Throwable {
+		extentTest = extentReport.startTest("P2M6_074", "*H7 : Verify that user is able to enter alphabets in 'Reference' Field");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		String getUniqueString = "H" + utility.uniqueString();
+		byId.clearThenSetText(id_NewBillReference, getUniqueString, "Enter alphabets in 'Reference' field on New Bill form");
+		String getText = byId.getAttribute(id_NewBillReference, "value", "Get entered alphabets in 'Reference' field on New Bill form");
+		int getError =byClassName.getSize(class_MandatoryfieldErrorMessage, "Get Validation message for 'Reference' field");
+		Assert.assertEquals(getError, 0, "'Reference' is a mandatory field");
+		Assert.assertTrue(getText.equals(getUniqueString), "'Reference' field is not allowing to enter Alphabets");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that user is able to enter alphabets in 'Reference' Field");
+	}
+	
+	@Test(priority = 57, enabled = false, groups = { "Harinder"})
+	public void P2M6_075() throws IOException, Throwable {
+		extentTest = extentReport.startTest("P2M6_075", "*H7 : Verify that user is able to enter special characters in 'Reference' Field");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		byId.clearThenSetText(id_NewBillReference, value_SpecialCharcters, "Enter special characters in 'Reference' field on New Bill form");
+		String getText = byId.getAttribute(id_NewBillReference, "value", "Get entered special characters in 'Reference' field on New Bill form");
+		int getError =byClassName.getSize(class_MandatoryfieldErrorMessage, "Get Validation message for 'Reference' field");
+		Assert.assertEquals(getError, 0, "'Reference' is a mandatory field");
+		Assert.assertTrue(getText.equals(value_SpecialCharcters), "'Reference' field is not allowing to enter special characters");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that user is able to enter special characters in 'Reference' Field");
+	}
+	
+	@Test(priority = 58, enabled = false, groups = { "Harinder"})
+	public void P2M6_076() throws IOException, Throwable {
+		extentTest = extentReport.startTest("P2M6_073", "*H7 : Verify that user is able to enter combination of numerics, alphabets and special characters in 'Reference' Field");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		byId.clearThenSetText(id_NewBillReference, value_SpecialCharcters+" "+value_ZipCode+id_NewBillFormHeader, "Enter combination of numerics, alphabets and special characters in 'Reference' field on New Bill form");
+		String getText = byId.getAttribute(id_NewBillReference, "value", "Get entered combination of numerics, alphabets and special characters in 'Reference' field on New Bill form");
+		int getError =byClassName.getSize(class_MandatoryfieldErrorMessage, "Get Validation message for 'Reference' field");
+		Assert.assertEquals(getError, 0, "'Reference' is a mandatory field");
+		Assert.assertTrue(getText.equals(value_SpecialCharcters+" "+value_ZipCode+id_NewBillFormHeader), "'Reference' field is not allowing to enter combination of numerics, alphabets and special characters");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that user is able to enter combination of numerics, alphabets and special characters in 'Reference' Field");
+	}
+	
+	@Test(priority = 59, enabled = false, groups = { "Harinder"})
+	public void P2M6_077_1() throws IOException, Throwable {
+		extentTest = extentReport.startTest("P2M6_077_1", "*H7 : Verify that 'Tenant' Checkbox should be displayed in front of 'Charge To' field on New bill form");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		int getElementSize = byId.getSize(id_NewBillChargeToTenantCheckBox, "Get Element size('Tenant' Checkbox)");
+		Assert.assertEquals(getElementSize, 1, "'Tenant' Checkbox doesn't exists");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that 'Tenant' Checkbox should be displayed in front of 'Charge To' field on New bill form");
+	}
+	
+	@Test(priority = 60, enabled = false, groups = { "Harinder"})
+	public void P2M6_077_2() throws IOException, Throwable {
+		extentTest = extentReport.startTest("P2M6_077_2", "*H7 : Verify that 'Other' Checkbox should be displayed in front of 'Charge To' field on New bill form");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		int getElementSize = byId.getSize(id_NewBillChargeToOthersCheckbox, "Get Element size('Other' Checkbox)");
+		Assert.assertEquals(getElementSize, 1, "'Other' Checkbox doesn't exists");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that 'Other' Checkbox should be displayed in front of 'Charge To' field on New bill form");
+	}
+	
+	@Test(priority = 61, enabled = false, groups = { "Harinder"})
+	public void P2M6_078() throws IOException, Throwable {
+		extentTest = extentReport.startTest("P2M6_078", "*H7 : Verify that when click on Tenant Checkbox the the search textbox should be displayed with the ' Tenant Name' watermark on New bill form");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		byId.click(id_NewBillChargeToTenantCheckBox, "Click on 'Tenant' Checkbox)");
+		String getPlaceHolder = byId.getAttribute(id_NewBillChargeToTenantTextBox, "placeholder", "Get place holder for 'Tenant' textbox");
+		Assert.assertEquals(getPlaceHolder, "Tenant Name", "Place is Missing or has been Changed");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that when click on Tenant Checkbox the the search textbox should be displayed with the ' Tenant Name' watermark on New bill form");
+	}
+	
+	@Test(priority = 62, enabled = false, groups = { "Harinder"})
+	public void P2M6_079() throws IOException, Throwable {
+		List<String> headersName = new ArrayList<>();
+		extentTest = extentReport.startTest("P2M6_079", "*H7 : Verify that  tenant listing should be displayed when click on tenant search textfield.");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		byId.click(id_NewBillChargeToTenantCheckBox, "Click on 'Tenant' Checkbox)");
+		byId.clearThenSetText(id_NewBillChargeToTenantTextBox, tenantName,  "Enter Tenant Name in TextBox.");
+		List<WebElement> getLabels = byXpath.getElements("//*[@id='cg-divHeader']//div[not(contains(@style,'display:none;'))]//label", "get Headers for tenant info");
+		for (WebElement webElement : getLabels) {
+			String getheaderName = webElement.getText();
+			headersName.add(getheaderName);
+			}
+			System.out.println("headersName = " +headersName);
+			List<String> values = VendorPortalCommons.AddMultipleValuesInList(ids_tenantHeaderName);
+			Assert.assertEquals(headersName, values);
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that tenant listing should be displayed when click on tenant search textfield.");
+	}
+	
+	@Test(priority = 63, enabled = false, groups = { "Harinder"})
+	public void P2M6_081() throws IOException, Throwable {
+		extentTest = extentReport.startTest("P2M6_081", "*H7 : Verify that user should be able to search with Tenant name.");
+		/*setLogs.info("Add Portfolio");
+		portfolioName = addPortfolio("H");
+		setLogs.info("Add Bank and attach portolio to it");
+		String getUniqueNumber = utility.getCurrentDateTime("ddMMYYYYss");
+		ApexCommon.addBank(portfolioName, value_BankName, getUniqueNumber, getUniqueNumber, getUniqueNumber, value_BankIntialAmount, getUniqueNumber, "Active", "");
+		setLogs.info("Add Property");
+		byId.click(id_PropertiesTab, "Click on Properties Tab");
+		byId.click(id_NewPropertyBTN, "Click on 'New Property' button");
+		arr = addProperty(value_PropertyName, portfolioName, "", "", "", "1", "1");
+		byName.click(class_PopupYesButton, "Click on 'Yes' button on Popup");
+		building = addBuilding(value_PropertyName, "1", value_Address);
+		byName.click(class_PopupYesButton, "Click on 'Yes' button on Popup");
+		unitName = addUnit("", "", "1", "A", value_UnitNoStart, "", "", "", "", "", value_RentAmount, value_RentAmount, "", "");*/
+		/*byId.click(id_AdminPortalPeopleTab, "Click on People Tab");
+		tenantName = value_TenantFirstName+utility.uniqueString();
+		VendorPortalCommons.newTenant_SelectPropertyTab(arr[0], building.get(0),"", tenantName, value_TenantLastName,value_TenantFirstName+value_DomainName , value_PhoneNumber);
+		VendorPortalCommons.newTenant_LeaseDetailsTab("", "", "", "", "", "");
+		VendorPortalCommons.newTenant_ChargesAndMoveInTabWithoutParams();*/
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		byId.click(id_NewBillChargeToTenantCheckBox, "Click on 'Tenant' Checkbox");
+		byId.clearThenSetText(id_NewBillChargeToTenantTextBox, tenantName, "Enter Tenant name");
+		Thread.sleep(2000);
+		getDriver().findElement(By.id(id_NewBillChargeToTenantTextBox)).sendKeys(Keys.ARROW_DOWN);
+		getDriver().findElement(By.id(id_NewBillChargeToTenantTextBox)).sendKeys(Keys.ARROW_DOWN);
+		getDriver().findElement(By.id(id_NewBillChargeToTenantTextBox)).sendKeys(Keys.ENTER);
+		String getTenantName = byId.getAttribute(id_NewBillChargeToTenantTextBox, "value", "Get selected tenant name from textbox");
+		Assert.assertEquals(getTenantName, tenantName+ " "+value_TenantLastName, "Tenant name is not displayed in list/ Tenant is not selected");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that user is able to search with Tenant name.");
+	}
+	
+	@Test(priority = 64, enabled = false, groups = { "Harinder"})
+	public void P2M6_082() throws IOException, Throwable {
+		extentTest = extentReport.startTest("P2M6_082", "*H7 : Verify that user should be able to search with Email");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		byId.click(id_NewBillChargeToTenantCheckBox, "Click on 'Tenant' Checkbox");
+		byId.clearThenSetText(id_NewBillChargeToTenantTextBox, tenantName+value_DomainName, "Enter Tenant's Email Address in 'Tenant Name' TextBox");
+		Thread.sleep(2000);
+		getDriver().findElement(By.id(id_NewBillChargeToTenantTextBox)).sendKeys(Keys.ARROW_DOWN);
+		getDriver().findElement(By.id(id_NewBillChargeToTenantTextBox)).sendKeys(Keys.ARROW_DOWN);
+		getDriver().findElement(By.id(id_NewBillChargeToTenantTextBox)).sendKeys(Keys.ENTER);
+		String getTenantEmail = byId.getAttribute(id_NewBillChargeToTenantTextBox, "value", "Get selected tenant name from textbox");
+		Assert.assertEquals(getTenantEmail, tenantName+value_DomainName, "Search By Email is not Working for 'Tenant Name' search field.");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that user should be able to search with Email");
+	}
+	
+	@Test(priority = 65, enabled = false, groups = { "Harinder"})
+	public void P2M6_083() throws IOException, Throwable {
+		extentTest = extentReport.startTest("P2M6_083", "*H7 : Verify that user should be able to search with Property.");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		byId.click(id_NewBillChargeToTenantCheckBox, "Click on 'Tenant' Checkbox");
+		byId.clearThenSetText(id_NewBillChargeToTenantTextBox, arr[0], "Enter Property name(Associate to Tenant) in 'Tenant Name' TextBox");
+		Thread.sleep(2000);
+		getDriver().findElement(By.id(id_NewBillChargeToTenantTextBox)).sendKeys(Keys.ARROW_DOWN);
+		getDriver().findElement(By.id(id_NewBillChargeToTenantTextBox)).sendKeys(Keys.ARROW_DOWN);
+		getDriver().findElement(By.id(id_NewBillChargeToTenantTextBox)).sendKeys(Keys.ENTER);
+		String getTenantPorperty = byId.getAttribute(id_NewBillChargeToTenantTextBox, "value", "Get selected tenant name from textbox");
+		Assert.assertEquals(getTenantPorperty, arr[0], "Search By Property is not Working for 'Tenant Name' search field.");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that user is able to search with Property.");
+	}
+	
+	@Test(priority = 66, enabled = false, groups = { "Harinder"})
+	public void P2M6_084() throws IOException, Throwable {
+		extentTest = extentReport.startTest("P2M6_084", "*H7 : Verify that user should be able to search with Building.");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		byId.click(id_NewBillChargeToTenantCheckBox, "Click on 'Tenant' Checkbox");
+		byId.clearThenSetText(id_NewBillChargeToTenantTextBox, building.get(0), "Enter Building name(Associate to Tenant) in 'Tenant Name' TextBox");
+		Thread.sleep(2000);
+		getDriver().findElement(By.id(id_NewBillChargeToTenantTextBox)).sendKeys(Keys.ARROW_DOWN);
+		getDriver().findElement(By.id(id_NewBillChargeToTenantTextBox)).sendKeys(Keys.ARROW_DOWN);
+		getDriver().findElement(By.id(id_NewBillChargeToTenantTextBox)).sendKeys(Keys.ENTER);
+		String getTenantBuilding = byId.getAttribute(id_NewBillChargeToTenantTextBox, "value", "Get selected tenant name from textbox");
+		Assert.assertEquals(getTenantBuilding, building.get(0), "Search By Property is not Working for 'Tenant Name' search field.");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that user is able to search with Property.");
+	}
+	
+	@Test(priority = 67, enabled = false, groups = { "Harinder"})
+	public void P2M6_085() throws IOException, Throwable {
+		extentTest = extentReport.startTest("P2M6_085", "*H7 : Verify that user should be able to search with Unit.");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		byId.click(id_NewBillChargeToTenantCheckBox, "Click on 'Tenant' Checkbox");
+		byId.clearThenSetText(id_NewBillChargeToTenantTextBox, unitName, "Enter Unit name(Associate to Tenant) in 'Tenant Name' TextBox");
+		Thread.sleep(2000);
+		getDriver().findElement(By.id(id_NewBillChargeToTenantTextBox)).sendKeys(Keys.ARROW_DOWN);
+		getDriver().findElement(By.id(id_NewBillChargeToTenantTextBox)).sendKeys(Keys.ARROW_DOWN);
+		getDriver().findElement(By.id(id_NewBillChargeToTenantTextBox)).sendKeys(Keys.ENTER);
+		String getTenantUnit = byId.getAttribute(id_NewBillChargeToTenantTextBox, "value", "Get selected tenant name from textbox");
+		Assert.assertEquals(getTenantUnit, unitName, "Search By Unit is not Working for 'Tenant Name' search field.");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that user is able to search with Property.");
+	}
+	
+	@Test(priority = 68, enabled = false, groups = { "Harinder"})
+	public void P2M6_086() throws IOException, Throwable {
+		extentTest = extentReport.startTest("P2M6_086", "*H7 : Verify that Portfolio, Property, Building and Unit should be auto populated when user selects the Tenant from the tenant Name field.");
+		List<String> getValues = new ArrayList<>();
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		byId.click(id_NewBillChargeToTenantCheckBox, "Click on 'Tenant' Checkbox");
+		byId.clearThenSetText(id_NewBillChargeToTenantTextBox, tenantName, "Enter Tenant Name in 'Tenant Name' TextBox");
+		Thread.sleep(2000);
+		getDriver().findElement(By.id(id_NewBillChargeToTenantTextBox)).sendKeys(Keys.ARROW_DOWN);
+		getDriver().findElement(By.id(id_NewBillChargeToTenantTextBox)).sendKeys(Keys.ARROW_DOWN);
+		getDriver().findElement(By.id(id_NewBillChargeToTenantTextBox)).sendKeys(Keys.ENTER);
+		List<String> tenantProBuilUnit = new ArrayList<>();
+		tenantProBuilUnit.add(arr[1]);
+		tenantProBuilUnit.add(arr[0]);
+		tenantProBuilUnit.add(building.get(0));
+		tenantProBuilUnit.add(unitName+" "+value_UnitNoStart);
+		getValues.clear();
+		getValues.add(byId.getFirstSelectedOption(id_NewBillPortfolio, "Get First Selected value in Portfolio DDL"));
+		getValues.add(byId.getAttribute(id_NewBillSplitBillProperty, "value", "Get First Selected value in Property DDL"));
+		getValues.add(byId.getFirstSelectedOption(id_AddItemsSectionBuildingDDL, "get First Selected value in Building DDL"));
+		getValues.add(byId.getFirstSelectedOption(id_NewBillAddItemsUnit, "get First Selected value in Unit DDL"));
+		System.out.println("values1 = " +tenantProBuilUnit);
+		System.out.println("values2 = " +getValues);
+		Assert.assertEquals(getValues, tenantProBuilUnit, "Portfolio, Property, Building and Unit are not auto populated associated to the selected Tenant from the tenant Name field.");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that Portfolio, Property, Building and Unit is auto populated when user selects the Tenant from the tenant Name field.");
+	}
+
+	@Test(priority = 69, enabled = false, groups = { "Harinder"})
+	public void P2M6_087() throws IOException, Throwable {
+		extentTest = extentReport.startTest("P2M6_087", "*H7 : Verify that  when click on Other checkbox the textfield should be displayed to enter other as Tenant,Owner,Vendor, Contact who is not in the system");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		byId.click(id_NewBillChargeToOthersCheckbox, "Click on 'Other' Checkbox");
+		byId.clearThenSetText(id_NewBillChargeToOthersTextBox, title_CalendarNextIcon, "Enter any name in 'Other' TextBox");
+		String getValue = byId.getAttribute(id_NewBillChargeToOthersTextBox, "value", "Get entered text from Other Textbox");
+		Assert.assertEquals(getValue, title_CalendarNextIcon, "User is unable enter text in 'Other' TextBox");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that  when click on Other checkbox the textfield is displayed to enter other as Tenant,Owner,Vendor, Contact who is not in the system");
+	}
+	
+	@Test(priority = 70, enabled = false, groups = { "Harinder"})
+	public void P2M6_088() throws IOException, Throwable {
+		extentTest = extentReport.startTest("P2M6_088", "*H7 : Verify that user is able to enter numerics in Other Textbox and no validation messgae should be displayed");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		byId.click(id_NewBillChargeToOthersCheckbox, "Click on 'Other' Checkbox");
+		byId.clearThenSetText(id_NewBillChargeToOthersTextBox, value_ZipCode, "Enter numerics in 'Other' TextBox on New Bill form");
+		int getErrorMgsSize = byXpath.getSize("//*[@id='"+id_NewBillFormVendorName+"']//following-sibling::div", "Get Error message size for 'Other' TextBox on New Bill form");
+		Assert.assertEquals(getErrorMgsSize, 0, "'Other' field is not allowing to enter numerics");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that user is able to enter numerics in Other Textbox and no validation messgae should be displayed");
+	}
+	
+	@Test(priority = 71, enabled = false, groups = { "Harinder"})
+	public void P2M6_089() throws IOException, Throwable {
+		extentTest = extentReport.startTest("P2M6_089", "*H7 : Verify that user is able to enter alphabets in Other Textbox and no validation messgae should be displayed");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		byId.click(id_NewBillChargeToOthersCheckbox, "Click on 'Other' Checkbox");
+		byId.clearThenSetText(id_NewBillChargeToOthersTextBox, id_NewBillFormVendorNameListHeaderNameVendorName, "Enter alphabets in Other Textbox  on New Bill form");
+		int getErrorMgsSize = byXpath.getSize("//*[@id='"+id_NewBillFormVendorName+"']//following-sibling::div", "Get Error message size for Other Textbox on New Bill form");
+		Assert.assertEquals(getErrorMgsSize, 0, "'Other' field is not allowing to enter Alphabets");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that user is able to enter alphabets in Other Textbox and no validation messgae should be displayed");
+	}
+	
+	
+	@Test(priority = 72, enabled = false, groups = { "Harinder"})
+	public void P2M6_090() throws IOException, Throwable {
+		extentTest = extentReport.startTest("P2M6_090", "*H7 : Verify that user is able to enter special characters in Other Textbox and no validation messgae should be displayed");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		byId.click(id_NewBillChargeToOthersCheckbox, "Click on 'Other' Checkbox");
+		byId.clearThenSetText(id_NewBillChargeToOthersTextBox, value_SpecialCharcters, "Enter special characters in Other Textbox  on New Bill form");
+		int getErrorMgsSize = byXpath.getSize("//*[@id='"+id_NewBillFormVendorName+"']//following-sibling::div", "Get Error message size for Other Textbox on New Bill form");
+		Assert.assertEquals(getErrorMgsSize, 0, "'Other' field is not allowing to enter special characters");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that user is able to enter special characters in Other Textbox and no validation messgae should be displayed");
+	}
+	
+	@Test(priority = 73, enabled = false, groups = { "Harinder"})
+	public void P2M6_091() throws IOException, Throwable {
+		extentTest = extentReport.startTest("P2M6_091", "*H7 : Verify that user is able to enter combination of special characters, numerals and alphabets in Other Textbox and no validation messgae should be displayed");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		byId.click(id_NewBillChargeToOthersCheckbox, "Click on 'Other' Checkbox");
+		byId.clearThenSetText(id_NewBillChargeToOthersTextBox, value_SpecialCharcters+" "+value_ZipCode+id_NewBillFormHeader, "Enter combination of special characters, numerals and alphabets in Other Textbox  on New Bill form");
+		int getErrorMgsSize = byXpath.getSize("//*[@id='"+id_NewBillFormVendorName+"']//following-sibling::div", "Get Error message size for Other Textbox on New Bill form");
+		Assert.assertEquals(getErrorMgsSize, 0, "'Other' field is not allowing to enter combination of special characters, numerals and alphabets");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that user is able to enter combination of special characters, numerals and alphabets in Other Textbox and no validation messgae should be displayed");
+	}
+	
+	@Test(priority = 74, enabled = false, groups = { "Harinder"})
+	public void P2M6_092_1() throws IOException, Throwable 
+	{
+		extentTest = extentReport.startTest("P2M6_092_1", "*H7 : Verify that 'Due Date' should be a mandatory field");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		String getAsterikSign = byXpath.getText("//*[@id='"+id_NewBillDueDate+"']//parent::span//preceding-sibling::label//span", "Get Asterik Sign for 'Due Date' field on New Bill form");
+		Assert.assertEquals(getAsterikSign,"*", "Asterik Sign is missing for 'Due Date' field");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that 'Due Date' should be a mandatory field");
+	}
+	
+	@Test(priority = 75, enabled = false, groups = { "Harinder"})
+	public void P2M6_092_2() throws IOException, Throwable 
+	{
+		extentTest = extentReport.startTest("P2M6_092_2", "*H7 : Verify that current date should be displayed in the Due Date field on New Bill Form");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		String getDefaultDate = byId.getAttribute(id_NewBillDueDate,"value", "Get Default current date from 'Due Date' field on New Bill form");
+		Assert.assertEquals(getDefaultDate,(getSystemDate+" "+getSystemDay), "no default Current date is displaying in 'Due Date' field");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that current date should be displayed in the Due Date field on New Bill Form");
+	}
+	
+	@Test(priority = 76, enabled = false, groups = { "Harinder"})
+	public void P2M6_093_1() throws IOException, Throwable 
+	{
+		extentTest = extentReport.startTest("P2M6_093_1", "*H7 : Verify that Date Picker Calendar should be displayed to choose the date on New Bill Form");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		byId.click(id_NewBillDueDate, "Click on 'Due Date' field on New Bill form");
+		int getDatesSize = byXpath.getSize(xpathNewTenantLeaseDetaulsTabLeaseStartDateCalendar, "Get Calendar's Dates size");
+		Assert.assertTrue(getDatesSize>0,	"No Calendar is displaying on clicking 'Due Date' field");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that Date Picker Calendar is displayed to choose the date on New Bill Form");
+	}
+	
+	@Test(priority = 77, enabled = false, groups = { "Harinder"})
+	public void P2M6_093_2() throws IOException, Throwable 
+	{
+		extentTest = extentReport.startTest("P2M6_093_2", "*H7 : Verify that Clicking on the 'Due Date' field >> User should be able to choose current date from Calendar");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		byId.click(id_NewBillDueDate, " Click on 'Due Date' field to open Calendar");
+		byClassName.click(class_CalendarTodaysDate, " Click on Todays Date");
+		String getDefaultBillDate = byId.getAttribute(id_NewBillDueDate, "value", "Get 'Due Date' field value");
+		Assert.assertTrue((getSystemDate+" "+getSystemDay).equals(getDefaultBillDate), "no seleted date is displaying in 'Due Date' field");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that Clicking on the 'Due Date' field >> User is able to choose current date from Calendar");
+	}
+	
+	@Test(priority = 78, enabled = false, groups = { "Harinder"})
+	public void P2M6_093_3() throws IOException, Throwable 
+	{
+		extentTest = extentReport.startTest("P2M6_093_3", "*H7 : Verify that Clicking on the ''Due Date'' field >> User should be able to select previous date from Calendar");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		byId.click(id_NewBillDueDate, " Click on 'Due Date' field to open Calendar");
+		setLogs.info("Select Previous Date from todays date");
+		VendorPortalCommons.SelectPrevDateFromTodaysDate();
+		String getDefaultBillDate = byId.getAttribute(id_NewBillDueDate, "value", "get Due date field value");
+		setLogs.info("Select System date and customize into Previous date");
+		String getDate = getSystemDate.substring(3, 5);
+		String getMonth = getSystemDate.substring(0, 2);
+		String getYear = getSystemDate.substring(6, 10);
+		String getDefaultDate = getDefaultBillDate.substring(3, 5);
+		int getMonth1 = 0;
+		if(getDate.equals("01"))
+		{
+			getMonth1 = Integer.parseInt(getMonth)-1;
+			if (getMonth1==00 || getMonth1==0) {
+				getMonth1 = 12;
+				int getYear1 = Integer.parseInt(getYear)-1;
+				Assert.assertTrue(getDefaultBillDate.contains(getMonth1+"/"+getDefaultDate+"/"+getYear1), "no seleted date is displaying in Due Date field");
+				}
+			}
+		/*DecimalFormat df = new DecimalFormat("00");
+		int parseDateintoInt = Integer.parseInt(getDate) - 1;
+		getDate = df.format(parseDateintoInt);
+		getDate = getSystemDate.substring(0, 3) + getDate + getSystemDate.substring(5);*/
+		Assert.assertTrue(getDefaultBillDate.contains(getMonth1+"/"+getDefaultDate+"/"+getYear), "no seleted date is displaying in Due Date field");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that Clicking on the 'Due Date' field >> User is able to select previous date from Calendar");
+	}
+	
+	@Test(priority = 79, enabled = false, groups = { "Harinder"})
+	public void P2M6_093_4() throws IOException, Throwable 
+	{
+		extentTest = extentReport.startTest("P2M6_093_4", "*H7 : Verify that Clicking on the 'Due Date' field >> User should be able to select future date from Calendar");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		
+		setLogs.info("Select Next Date from todays date");
+		Thread.sleep(2000);
+		byId.click(id_NewBillDueDate, " Click on 'Due Date' field to open Calendar");
+		Thread.sleep(2000);
+		VendorPortalCommons.SelectNextDateFromTodaysDate();
+		setLogs.info("Select System date and customize into future date");
+		String getDate = getSystemDate.substring(3, 5);
+		String getYear = getSystemDate.substring(6, 10);
+		if(getDate.equals("30") || getDate.equals("31"))
+		{
+			byId.click(id_NewBillDueDate, " Click on 'Due Date' field to open Calendar");
+			VendorPortalCommons.SelectNextDateFromTodaysDate();
+			getDate = getSystemDate.substring(0, 2);
+			int getDate2 = Integer.parseInt(getDate)+1;
+			if (getDate2==13) {
+				getDate = "01";
+				int getYear1= Integer.parseInt(getYear)+1;
+				getDate = getDate+"/"+getDate+"/getYear1";
+				String getDefaultBillDate = byId.getAttribute(id_NewBillDueDate, "value", "get Bill date field value");
+				Assert.assertTrue(getDefaultBillDate.contains(getDate), "no seleted date is displaying in Bill Date field");
+			}
+			
+			String getDefaultBillDate = byId.getAttribute(id_NewBillDueDate, "value", "get Bill date field value");
+			Assert.assertTrue(getDefaultBillDate.contains(getDate2+"/01/"+getYear), "no seleted date is displaying in Bill Date field");
+		}
+		else {
+		DecimalFormat df = new DecimalFormat("00");
+		int parseDateintoInt = Integer.parseInt(getDate) + 1;
+		getDate = df.format(parseDateintoInt);
+		getDate = getSystemDate.substring(0, 3) + getDate + getSystemDate.substring(5);
+		String getDefaultBillDate = byId.getAttribute(id_NewBillDueDate, "value", "get 'Due Date' field value");
+		Assert.assertTrue(getDefaultBillDate.contains(getDate), "no seleted date is displaying in 'Due Date' field");
+		}
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that Clicking on the 'Due Date' field >> User is able to select future date from Calendar");
+	}
+	
+	@Test(priority = 80, enabled = false, groups = { "Harinder"})
+	public void P2M6_094_1() throws IOException, Throwable 
+	{
+		extentTest = extentReport.startTest("P2M6_094_1", "*H7 : Verify that In Month dropdown the all 12 months should be displayed for 'Due Date' field Calendar");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		byId.click(id_NewBillDueDate, " Click on 'Due Date' field to open Calendar");
+		setLogs.info("Select Months from 'Due Date' field's Calendar.");
+		List<WebElement> getElements = byXpath.getElements("//*[@class='"+class_CalendarMonthDDL+"']/option", "Get all the Options in Month DDL on 'Due Date' Calendar");
+		int getMonthsCount = getElements.size();
+		Assert.assertEquals(getMonthsCount, 12 , "All Months are not displaying in 'Due Date' field's Calendar");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that In Month dropdown the all 12 months should be displayed for 'Due Date' field Calendar");
+	}
+	
+	@Test(priority = 81, enabled = false, groups = { "Harinder"})
+	public void P2M6_094_2() throws IOException, Throwable 
+	{
+		extentTest = extentReport.startTest("P2M6_094_2", "*H7 : Verify that In Year DDL the 100 Years should be displayed for 'Due Date' field Calendar");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		byId.click(id_NewBillDueDate, " Click on 'Due Date' field to open Calendar");
+		setLogs.info("Select Years from 'Due Date' field's Calendar.");
+		List<WebElement> getElements = byXpath.getElements("//*[@class='"+class_CalendarYearDDL+"']/option", "Get all the Options in Year DDL on 'Due Date' Calendar");
+		int getYearsCount = getElements.size();
+		Assert.assertEquals(getYearsCount, 100 , "All 100 Years are not displaying in 'Due Date' field's Calendar");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that In Year DDL the 100 Years are displayed for 'Due Date' field Calendar");
+	}
+	
+	@Test(priority = 82, enabled = false, groups = { "Harinder"})
+	public void P2M6_095() throws IOException, Throwable 
+	{
+		List<String> list = new ArrayList<>();
+		List<String> list1 = new ArrayList<>();
+		extentTest = extentReport.startTest("P2M6_095", "*H7 : Verify that 'Select Term' DDL should be displayed with following hardcoded options");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		list1 = VendorPortalCommons.AddMultipleValuesInList(value_SelectTermDDL);
+		setLogs.info("Get all option values from 'Select Term' DDL");
+		List<WebElement> getWebEle = byXpath.getElements("//*[@id='" + id_NewBillSelectTerm + "']/option",
+				"get all options from 'Select Term' ddl");
+		for (WebElement webElement : getWebEle) {
+			String getValue = webElement.getText();
+			list.add(getValue);
+		}
+		System.out.println(list);
+		System.out.println(list1);
+		Assert.assertEquals(list, list1, "Some values are missing/Added in 'Select Term DDL'");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that 'Select Term' DDL should be displayed with following hardcoded options");
+	}
+	
+	@Test(priority = 83, enabled = false, groups = { "Harinder"})
+	public void P2M6_096() throws IOException, Throwable 
+	{
+		extentTest = extentReport.startTest("P2M6_096", "*H7 : Verify that Net 30 should be the default term selected and displayed in 'Select Term' DDL");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		String getSelectedValue = byId.getFirstSelectedOption(id_NewBillSelectTerm,
+				"get first selected value from 'Select Term' ddl");
+		Assert.assertTrue(getSelectedValue.equals(value_SelectTermNet30), "'Net 30' is not the Default Selected value");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that Net 30 should be the default term selected and displayed in 'Select Term' DDL");
+	}
+	
+	@Test(priority = 84, enabled = false, groups = { "Harinder"})
+	public void P2M6_097_1() throws IOException, Throwable 
+	{
+		List<Object> list = new ArrayList<>();
+		extentTest = extentReport.startTest("P2M6_097_1", "*H7 : Verify that when 1% 10 Net 30 term selected, the 1% discount should be given to the tenant on payment of that bill");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		setLogs.info("Create New Bill with 1% 10 Net 30 term Charge to Tenant");
+		refNo = utility.uniqueNo();
+		AccountingCommon.Admin_NewBill(vendorFirstName, value_Amount, value_SelectTermDDLValue, refNo, arr[1], "", arr[0], "Tenant", tenantName, "", "", "", value_Amount, "", "");
+		list = PayVendorBill(vendorFirstName, refNo, "", "", "", "");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'Bill Register')]", "Click on 'Bill Register' option in Right Navigation Panel");
+		byId.clearThenSetText(id_BillRegisterSearchVendorTB, vendorFirstName+" ", "Enter Vendor name to search the record.");
+		Thread.sleep(2000);
+		getDriver().findElement(By.id(id_BillRegisterSearchVendorTB)).sendKeys(Keys.ENTER);
+		String getPaidAmount = byXpath.getText("//*[@id='"+id_ManageBillGridListingTable+"']//tbody//tr//td[contains(text(),'"+refNo+"')]//following-sibling::td[contains(@aria-describedby,'tblVendorInvoiceRegisterPO_AmountPaid')]", "get Paid Amount after paying bill");
+		Assert.assertEquals(getPaidAmount,list.get(4) , "Discounted amount Not is displaying");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that when 1% 10 Net 30 term selected, the 1% discount should be given to the tenant on payment of that bill");
+	}
+	
+	@Test(priority = 85, enabled = false, groups = { "Harinder"})
+	public void P2M6_097_3() throws IOException, Throwable 
+	{
+		List<WebElement> list = new ArrayList<>();
+		List<String> list2 = new ArrayList<>();
+		extentTest = extentReport.startTest("P2M6_097_3", "*H7 : Verify that On due bill discount should not be deducted");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		setLogs.info("Create New Bill");
+		refNo = utility.uniqueNo();
+		AccountingCommon.Admin_NewBill(vendorFirstName, value_Amount, value_SelectTermDDLValue, refNo, arr[1], "", arr[0], "Tenant", tenantName, "", "", "", value_Amount, "", "");
+		//list = PayVendorBill(vendorName, refNo, "", "", "", "");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'Bill Register')]", "Click on 'Bill Register' option in Right Navigation Panel");
+		byId.clearThenSetText(id_BillRegisterSearchVendorTB, vendorFirstName+" ", "Enter Vendor name to search the record.");
+		Thread.sleep(2000);
+		getDriver().findElement(By.id(id_BillRegisterSearchVendorTB)).sendKeys(Keys.ENTER);
+		Thread.sleep(2000);
+		list = byXpath.getElements("//*[@id='"+id_ManageBillGridListingTable+"']//tbody//tr//td[contains(text(),'"+refNo+"')]//following-sibling::td", "get Paid Amount after paying bill");
+		for (WebElement webElement : list) {
+			list2.add(webElement.getText().trim());
+		}
+		softAssert.assertEquals(list2.get(5),value_Amount+".00","Due bill discount is deducted");
+		softAssert.assertEquals(list2.get(7), "Due" , "UnPaid bill status is not 'Due' in Bill Register Table");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that On due bill discount should not be deducted");
+	}
+	
+	@Test(priority = 86, enabled = false, groups = { "Harinder"})
+	public void P2M6_098_1() throws InterruptedException {
+		extentTest = extentReport.startTest("P2M6_098_1", "*H7 : Verify that 'Portfolio' DDL should be a mandatory field");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		Thread.sleep(2000);
+		String getAsterikSign = byXpath.getText("//*[@id='"+id_NewBillPortfolio+"']//parent::span//preceding-sibling::label//span", "Get Asterik Sign for 'Portfolio' DDL on New Bill form");
+		Assert.assertEquals(getAsterikSign,"*", "Asterik Sign is missing for 'Portfolio' DDL");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that 'Portfolio' DDL should be a mandatory field");
+	}
+	
+	@Test(priority = 87, enabled = false, groups = { "Harinder"})
+	public void P2M6_098_2() throws InterruptedException {
+		extentTest = extentReport.startTest("P2M6_098_2", "*H7 : Verify that 'Portfolio' DDL should displayed in front of 'Select Term' DDL");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		Thread.sleep(2000);
+		int getSize = byXpath.getSize("//div//span//select[@id='"+id_NewBillSelectTerm+"']//parent::span//parent::div//following-sibling::div//span//select[@id='"+id_NewBillPortfolio+"']", " Get Size if 'Portfolio' DDL is exists in front of 'Select Term' DDL");
+		Assert.assertEquals(getSize,1, "Portfolio' DDL is not exists in front of 'Select Term' DDL");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that 'Portfolio' DDL should displayed in front of 'Select Term' DDL");
+	}
+	
+	@Test(priority = 88, enabled = false, groups = { "Harinder"})
+	public void P2M6_099() throws IOException, Throwable {
+		extentTest = extentReport.startTest("P2M6_099", "*H7 : Verify that All the Created Portfolios displayed in Portfolio Tab(in Master Setup) should also display in 'Portfolio' DDL on New Bill Form");
+		byClassName.click(class_SettingLink, "Click on Setting Link");
+		byXpath.click(xpath_MasterSetupLNP+"[contains(.,'Property Setup')]", "Click on 'Property Setup'");
+		byXpath.click(xpath_MasterSetupLNP+"//ul//li[contains(.,'Portfolio')]", "Click on 'Portfolio' Sub Tab");
+		String getNumOfRecord = byClassName.getText(class_SettingTableBottomLeft, "Get Number of Record from bottom left of grid");
+		int getIndex = getNumOfRecord.indexOf("f");
+		getIndex = getIndex+2;
+		getNumOfRecord = (getNumOfRecord.substring(getIndex));
+		int getTotalRecords =Integer.parseInt(getNumOfRecord);
+		defaultPage();
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		Thread.sleep(2000);
+		int getCount = byXpath.getSize("//*[@id='"+id_NewBillPortfolio+"']//option", "Get Count of all the options under 'Portfolio' DDL");
+		Assert.assertEquals(getCount,getTotalRecords+1, "PortfolioS Count is not the same in 'Portfolio' Grid(in Master Setup) and in 'Portfolio' DDL on New Bill form");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that All the Created Portfolios displayed in Portfolio Tab(in Master Setup) are also displaying in 'Portfolio' DDL on New Bill Form");
+	}
+	
+	@Test(priority = 89, enabled = false, groups = { "Harinder"})
+	public void P2M6_100() throws IOException, Throwable {
+		extentTest = extentReport.startTest("P2M6_100", "*H7 : Verify that User should be able to select any portfolio from the DDL");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		Thread.sleep(2000);
+		byId.selectByVisibleText(id_NewBillPortfolio, arr[1], "Select Portfolio");
+		String getSelectedPortfolio = byId.getFirstSelectedOption(id_NewBillPortfolio, "Get selected Portfolio");
+		Assert.assertEquals(getSelectedPortfolio, arr[1], "User is unable to select Portfolio from Portfolio DDL on New Bill form");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that User should be able to select any portfolio from the DDL");
+	}
+	
+	@Test(priority = 90, enabled = false, groups = { "Harinder"})
+	public void P2M6_101() throws IOException, Throwable {
+		extentTest = extentReport.startTest("P2M6_101", "*H7 : Verify that Property for the respective selected portfolio should be displayed in the Property DDL on New bill form");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		Thread.sleep(2000);
+		byId.selectByVisibleText(id_NewBillPortfolio, arr[1], "Select Portfolio");
+		String getProperty = byId.getAttribute(id_NewBillSplitBillProperty, "value", "Get First Selected value in Property DDL");
+		Assert.assertEquals(getProperty, arr[0], "Property is not binded in property DDL respective to the Portfolio DDL.");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that Property for the respective selected portfolio should be displayed in the Property DDL on New bill form");
+	}
+	@Test(priority = 91, enabled = false, groups = { "Harinder"})
+	public void P2M6_102_1() throws InterruptedException {
+		extentTest = extentReport.startTest("P2M6_102_1", "*H7 : Verify that 'Property' DDL should be a mandatory field on New bill form");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		Thread.sleep(2000);
+		String getAsterikSign = byXpath.getText("//*[@id='"+id_NewBillSplitBillProperty+"']//parent::span//preceding-sibling::label//span", "Get Asterik Sign for 'Property' DDL on New Bill form");
+		Assert.assertEquals(getAsterikSign,"*", "Asterik Sign is missing for 'Property' DDL");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that 'Property' DDL should be a mandatory field on New bill form");
+	}
+	
+	@Test(priority = 92, enabled = false, groups = { "Harinder"})
+	public void P2M6_102_2() throws InterruptedException {
+		extentTest = extentReport.startTest("P2M6_102_2", "*H7 : Verify that 'Property' DDL should displayed in front of 'Select Portfolio' DDL on New bill form");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		Thread.sleep(2000);
+		int getSize = byXpath.getSize("//div//span//select[@id='"+id_NewBillPortfolio+"']//parent::span//parent::div//following-sibling::div//label//span", " Get Size if 'Property' DDL is exists in front of 'Portfolio' DDL");
+		Assert.assertEquals(getSize,1, "Property' DDL is not exists in front of 'Portfolio' DDL");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that 'Property' DDL should displayed in front of 'Select Portfolio' DDL on New bill form");
+	}
+	
+	@Test(priority = 93, enabled = false, groups = { "Harinder"})
+	public void P2M6_103() throws InterruptedException {
+		extentTest = extentReport.startTest("P2M6_103", "*H7 : Verify that all Property for selected Portfolio should be displayed in the DDL on New bill form");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		Thread.sleep(2000);
+		byId.selectByVisibleText(id_NewBillPortfolio, arr[1], "Select Portfolio");
+		byId.click(id_NewBillSplitBillProperty, "Click on property ddl");
+		int valueOptionsListing = byXpath.getSize(xpath_NewBillPropertyddlOptions, "get size of listing of property ddl");
+		Assert.assertTrue(valueOptionsListing > 1, "property ddl not showing list of Properties");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that all Property for selected Portfolio should be displayed in the DDL on New bill form");
+	}
+	
+	@Test(priority = 94, enabled = false, groups = { "Harinder"})
+	public void P2M6_104() throws InterruptedException {
+		extentTest = extentReport.startTest("P2M6_104", "*H7 : Verify that user should be able to select any Property from the DDL on New bill form");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		Thread.sleep(2000);
+		byId.selectByVisibleText(id_NewBillPortfolio, arr[1], "Select Portfolio");
+		byId.click(id_NewBillSplitBillProperty, "Click on property ddl");
+		getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ARROW_DOWN);
+		getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ARROW_DOWN);
+		getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ENTER);
+		String getProperty = byId.getAttribute(id_NewBillSplitBillProperty, "value", "Get First Selected value in Property DDL");
+		Assert.assertEquals(getProperty, arr[0], "Property is not binded in property DDL respective to the Portfolio DDL.");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that user should be able to select any Property from the DDL on New bill form");
+	}
+	
+	@Test(priority = 95, enabled = false, groups = { "Harinder"})
+	public void P2M6_105() throws InterruptedException {
+		extentTest = extentReport.startTest("P2M6_105", "*H7 : Verify that Building for the respective selected property should be displayed in the Building DDL on New bill form");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		Thread.sleep(2000);
+		byId.selectByVisibleText(id_NewBillPortfolio, arr[1], "Select Portfolio");
+		byId.click(id_NewBillSplitBillProperty, "Click on property ddl");
+		getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ARROW_DOWN);
+		getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ARROW_DOWN);
+		getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ENTER);
+		byId.selectByVisibleText(id_AddItemsSectionBuildingDDL, building.get(0), "Select Building name");
+		String getBuilding = byId.getFirstSelectedOption(id_AddItemsSectionBuildingDDL, "Get First Selected value in Building DDL");
+		Assert.assertEquals(getBuilding, building.get(0), "Buildings are not binded in Building DDL respective to the Selected Property DDL.");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that Building for the respective selected property should be displayed in the Building DDL on New bill form");
+	}
+	
+	@Test(priority = 96, enabled = false, groups = { "Harinder"})
+	public void P2M6_106() throws InterruptedException {
+		extentTest = extentReport.startTest("P2M6_106", "*H7 : Verify that Memo text field should be displayed on New bill form");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		Thread.sleep(2000);
+		int getSize = byId.getSize(id_NewBillMemo, "Get Memo text field size");
+		Assert.assertEquals(getSize, 1 , "Memo text field is not exists on New Bill page");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that Memo text field should be displayed on New bill form");
+	}
+	
+	@Test(priority = 97, enabled = false, groups = { "Harinder"})
+	public void P2M6_107() throws IOException, Throwable {
+		extentTest = extentReport.startTest("P2M6_107", "*H7 : Verify that user is able to enter numerics in Memo Text Field on New bill form");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		byId.clearThenSetText(id_NewBillMemo, value_ZipCode, "Enter numerics in 'Memo' field on New Bill form");
+		String getText = byId.getAttribute(id_NewBillMemo, "value", "Get entered value in 'Memo' field on New Bill form");
+		Assert.assertEquals(getText, value_ZipCode, " 'Memo' Text Field is not allowing to enter numerics");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that user is able to enter numerics  in Memo Text Field on New bill form");
+	}
+	
+	@Test(priority = 98, enabled = false, groups = { "Harinder"})
+	public void P2M6_108() throws IOException, Throwable {
+		extentTest = extentReport.startTest("P2M6_108", "*H7 : Verify that user is able to enter alphabets in Memo Text Field on New bill form");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		byId.clearThenSetText(id_NewBillMemo, id_NewBillFormVendorNameListHeaderNameVendorName, "Enter alphabets in 'Memo' field on New Bill form");
+		String getText = byId.getAttribute(id_NewBillMemo, "value", "Get entered value in 'Memo' field on New Bill form");
+		Assert.assertEquals(getText, id_NewBillFormVendorNameListHeaderNameVendorName, "'Memo' Text Field is not allowing to enter Alphabets");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that user is able to enter alphabets in Memo Text Field on New bill form");
+	}
+	
+	
+	@Test(priority = 99, enabled = false, groups = { "Harinder"})
+	public void P2M6_109() throws IOException, Throwable {
+		extentTest = extentReport.startTest("P2M6_109", "*H7 : Verify that user is able to enter special characters in Memo Text Field on New bill form");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		byId.clearThenSetText(id_NewBillMemo, value_SpecialCharcters, "Enter special characters in 'Memo' field on New Bill form");
+		String getText = byId.getAttribute(id_NewBillMemo, "value", "Get entered value in 'Memo' field on New Bill form");
+		Assert.assertEquals(getText, value_SpecialCharcters, "'Memo' Text Field is not allowing to enter special characters");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that user is able to enter special characters in Memo Text Field on New bill form");
+	}
+	
+	@Test(priority = 100, enabled = false, groups = { "Harinder"})
+	public void P2M6_110() throws IOException, Throwable {
+		extentTest = extentReport.startTest("P2M6_110", "*H7 : Verify that user is able to enter combination of special characters, numerals and alphabets in Memo Text Field on New bill form");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		byId.clearThenSetText(id_NewBillMemo, value_SpecialCharcters+" "+value_ZipCode+id_NewBillFormHeader, "Enter combination of special characters, numerals and alphabets in 'Memo' field on New Bill form");
+		String getText = byId.getAttribute(id_NewBillMemo, "value", "Get entered value in 'Memo' field on New Bill form");
+		Assert.assertEquals(getText, value_SpecialCharcters+" "+value_ZipCode+id_NewBillFormHeader, "'Memo' Text Field is not allowing to enter combination of special characters, numerals and alphabets");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that user is able to entercombination of special characters, numerals and alphabets in Memo Text Field on New bill form");
+	}
+	
+	@Test(priority = 111, enabled = false, groups = { "Harinder"})
+	public void P2M6_111() throws IOException, Throwable {
+		extentTest = extentReport.startTest("P2M6_110", "*H7 : Verify that No validation should be displayed for Memo Text Field on New bill form");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		byId.clearThenSetText(id_NewBillMemo, "","Enter nothing in 'Memo' field on New Bill form");
+		Actions action = new Actions(getDriver());
+		action.moveToElement(getDriver().findElement(By.id(id_NewBillSplitBillProperty))).click().perform();
+		int getSize = byXpath.getSize("//*[@id='"+id_NewBillMemo+"']//following-sibling::div", "Get validation message for 'Memo' field on New Bill form");
+		Assert.assertEquals(getSize, 0, "'Memo' Text Field is mandatory but it should not be a mandatory on New Bill form");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that No validation should be displayed for Memo Text Field on New bill form");
+	}
+	
+	@Test(priority = 112, enabled = false, groups = { "Harinder"})
+	public void P2M6_113_1() throws InterruptedException {
+		extentTest = extentReport.startTest("P2M6_113_1", "*H7 : Verify that building should be displayed for the selected property on New bill form");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		Thread.sleep(2000);
+		byId.selectByVisibleText(id_NewBillPortfolio, arr[1], "Select Portfolio");
+		byId.click(id_NewBillSplitBillProperty, "Click on property ddl");
+		getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ARROW_DOWN);
+		getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ARROW_DOWN);
+		getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ENTER);
+		byId.selectByVisibleText(id_AddItemsSectionBuildingDDL, building.get(0), "Select Building name");
+		String getBuilding = byId.getFirstSelectedOption(id_AddItemsSectionBuildingDDL, "Get First Selected value in Building DDL");
+		Assert.assertEquals(getBuilding, building.get(0), "Buildings are not binded in Building DDL respective to the Selected Property DDL.");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that building should be displayed for the selected property on New bill form");
+	}
+	
+	@Test(priority = 113, enabled = false, groups = { "Harinder"})
+	public void P2M6_113_2() throws InterruptedException {
+		extentTest = extentReport.startTest("P2M6_113_2", "*H7 : Verify that Building should be a mandatory field on New bill form");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		Thread.sleep(2000);
+		byId.click(id_AddItemsSectionBuildingDDL,"Click on 'Building' DDL in Add Item Section on New Bill form");
+		Actions action = new Actions(getDriver());
+		action.moveToElement(getDriver().findElement(By.id(id_NewBillAddItemsUnit))).click().perform();
+		String getErrorMsg = byXpath.getText("//*[@id='"+id_AddItemsSectionBuildingDDL+"']//following-sibling::div", "Get validation message for 'Building' DDL on New Bill form");
+		Assert.assertEquals(getErrorMsg, value_MandatoryfieldsMessage, "Building DDL is not a mandatory field on New Bill form");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that Building should be a mandatory field on New bill form");
+	}
+	
+	@Test(priority = 114, enabled = false, groups = { "Harinder"})
+	public void P2M6_114_1() throws InterruptedException {
+		extentTest = extentReport.startTest("P2M6_114_1", "*H7 : Verify that Unit should be displayed for the selected Building on New bill form");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		Thread.sleep(2000);
+		byId.selectByVisibleText(id_NewBillPortfolio, arr[1], "Select Portfolio");
+		byId.click(id_NewBillSplitBillProperty, "Click on property ddl");
+		getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ARROW_DOWN);
+		getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ARROW_DOWN);
+		getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ENTER);
+		byId.selectByVisibleText(id_AddItemsSectionBuildingDDL, building.get(0), "Select Building name");
+		byId.selectByIndex(id_NewBillAddItemsUnit, 1, "Select Unit");
+		String getUnitName = byId.getFirstSelectedOption(id_NewBillAddItemsUnit, "Select Selected Unit");
+		Assert.assertEquals(getUnitName, unitName+" "+value_UnitNoStart, "Units are not binded in Unit DDL respective to the Selected Building DDL on New Bill form");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that Unit should be displayed for the selected Building on New bill form");
+	}
+	
+	@Test(priority = 115, enabled = false, groups = { "Harinder"})
+	public void P2M6_114_2() throws InterruptedException {
+		extentTest = extentReport.startTest("P2M6_114_2", "*H7 : Verify that Unit should be a mandatory field on New bill form");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		Thread.sleep(2000);
+		byId.click(id_NewBillAddItemsUnit,"Click on 'Unit' DDL in Add Item Section on New Bill form");
+		Actions action = new Actions(getDriver());
+		action.moveToElement(getDriver().findElement(By.id(id_NewBillAddItemsAccount))).click().perform();
+		String getErrorMsg = byXpath.getText("//*[@id='"+id_NewBillAddItemsUnit+"']//following-sibling::div", "Get validation message for 'Unit' DDL on New Bill form");
+		Assert.assertEquals(getErrorMsg, value_MandatoryfieldsMessage, "Unit DDL is not a mandatory field on New Bill form");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that Unit should be a mandatory field on New bill form");
+	}
+	
+	@Test(priority = 116, enabled = false, groups = { "Harinder"})
+	public void P2M6_115_1() throws IOException, Throwable {
+		List<WebElement> getAccountCodeEle = new ArrayList<>();
+		List<WebElement> getAccountNameEle = new ArrayList<>();
+		List<String> getAllAccountOption = new ArrayList<>();
+		List<String> getAccountOptions = new ArrayList<>();
+		List<String> getAccountCode = new ArrayList<>();
+		List<String> getAccountName = new ArrayList<>();
+		String getAccCode;
+		String getAccName = null;
+		String getAccount;
+		extentTest = extentReport.startTest("P2M6_115_1", "*H7 : Verify that COA (Chart of Account) hardcoded listing of values should be displayed on New Bill Form");
+		byClassName.click(class_SettingLink, "Click on Setting Link");
+		byXpath.click(xpath_MasterSetupLNP+"[contains(.,'Accounting')]", "Click on 'Accounting' Tab");
+		byXpath.click(xpath_MasterSetupLNP+"//ul//li[contains(.,'Chart of Accounts')]", "Click on 'Chart of Accounts' Sub Tab");
+		
+		/******Search the Record************/
+		byId.click("search_tblGrid", "Click on Grid Search in bottom right");
+		byXpath.click("//*[@id='fbox_tblGrid']//table/tbody/tr[3]/td[2]/select", "Select Account Type");
+		byXpath.click("//*[@id='fbox_tblGrid']//table/tbody/tr[3]/td[3]/select", "Select any required Option");
+		byXpath.clearThenSetText("//*[@id='fbox_tblGrid']/table/tbody/tr[3]/td//input", "Expense", "Enter Account Type");
+		byId.click("fbox_tblGrid_search", "Click on Find Link");
+		Robot rb=new Robot();
+		rb.keyPress(KeyEvent.VK_ENTER);
+		byXpath.click("//*[@id='searchhdfbox_tblGrid']/a", "Click on Cross icon to close the Search Popup");
+		
+		/******Get All the records based on Search************/
+		String getNumOfRecord = byClassName.getText(class_SettingTableBottomLeft, "Get Number of Record from bottom left of grid");
+		if (getNumOfRecord.equals("No records to view")) {
+			Assert.fail("Search Functionlity in Grid is not working");
+		}
+		else {
+		int getIndex = getNumOfRecord.indexOf("f");
+		getIndex = getIndex+2;
+		getNumOfRecord = (getNumOfRecord.substring(getIndex));
+		int getTotalRecords =Integer.parseInt(getNumOfRecord);
+		int i=0;
+		int listSize;
+		byClassName.selectByVisibleText(class_SettingTablePaginationDDL, "200", "Select '200' from table to show 200 records in table");
+		getAccountCodeEle = byXpath.getElements("//*[@id='"+id_SettingTable+"']//tbody//tr//td[2]", "Get all the 'Account Code' from 'Chart of Accounts' grid");
+		getAccountNameEle = byXpath.getElements("//*[@id='"+id_SettingTable+"']//tbody//tr//td[3]", "Get all the 'Account Name' from 'Chart of Accounts' grid");
+		
+		if(getTotalRecords>200)
+		{
+			byXpath.click("//*[@id='next_divPaging']/span", "Click on 'Next' icon from bottom center of 'Charts of Accounts' grid");
+			getAccountCodeEle = byXpath.getElements("//*[@id='"+id_SettingTable+"']//tbody//tr//td[2]", "Get all the 'Account Code' from 'Chart of Accounts' grid");
+			getAccountNameEle = byXpath.getElements("//*[@id='"+id_SettingTable+"']//tbody//tr//td[3]", "Get all the 'Account Name' from 'Chart of Accounts' grid");	
+		}
+		
+		for (WebElement webElement : getAccountCodeEle) {
+			getAccCode = webElement.getText();
+			getAccountCode.add(getAccCode);
+		}
+		
+		for (WebElement webElement2 : getAccountNameEle) {
+			getAccName = webElement2.getText();
+			getAccountName.add(getAccName);
+		}
+		defaultPage();
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		Thread.sleep(2000);
+		getAllAccountOption = byId.getOptions(id_NewBillAddItemsAccount, "Get all the options under 'Account' DDL");
+		listSize = getAllAccountOption.size();
+			for (String code : getAccountCode) {
+				for (String name : getAccountName) {
+					for (String accountOption : getAllAccountOption) {
+						if((code+"-"+name).equals(accountOption)){
+							Assert.assertEquals((code+"-"+name),accountOption,"COA (Chart of Account) hardcoded listing of values is displayed in Account ddl on New Bill Form");
+							i++;
+						}
+				}
+				}
+			}
+				if (getTotalRecords==i) {
+					Assert.assertEquals(true,true,"COA (Chart of Account) hardcoded listing of values is displayed in Account ddl on New Bill Form");
+				}
+				else {
+					Assert.assertFalse(false,"COA (Chart of Account) hardcoded listing of values is displayed in Account ddl on New Bill Form");
+				}
+		}
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that COA (Chart of Account) hardcoded listing of values should be displayed on New Bill Form");
+	}
+	
+	@Test(priority = 116, enabled = false, groups = { "Harinder"})
+	public void P2M6_115_2() throws InterruptedException {
+		extentTest = extentReport.startTest("P2M6_115_2", "*H7 : Verify that 'Account' DDL in add items Section should be a mandatory field on New bill form");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		Thread.sleep(2000);
+		byId.click(id_NewBillAddItemsAccount,"Click on 'Account' DDL in Add Item Section on New Bill form");
+		Actions action = new Actions(getDriver());
+		action.moveToElement(getDriver().findElement(By.id(id_NewBillAddItemsAmount))).click().perform();
+		String getErrorMsg = byXpath.getText("//*[@id='"+id_NewBillAddItemsAccount+"']//following-sibling::div", "Get validation message for 'Account' DDL on New Bill form");
+		Assert.assertEquals(getErrorMsg, value_MandatoryfieldsMessage, "Account DDL is not a mandatory field on New Bill form");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that 'Account' DDL in add items Section should be a mandatory field on New bill form");
+	}
+	
+	@Test(priority = 117, enabled = false, groups = { "Harinder"})
+	public void P2M6_116_1() throws InterruptedException {
+		extentTest = extentReport.startTest("P2M6_116_1", "*H7 : Verify that 'Amount' field in Add Items Section should be a text field  on New bill form");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		Thread.sleep(2000);
+		String getTagName = byId.getTagName(id_NewBillAddItemsAmount, "Get 'Amount' field's(in Add Items Section) Tag Name");
+		Assert.assertEquals(getTagName, "input", "'Amount' field in Add Items Section is not a text field on New Bill form");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that 'Amount' field in Add Items Section should be a text field  on New bill form");
+	}
+	
+	@Test(priority = 118, enabled = false, groups = { "Harinder"})
+	public void P2M6_116_2() throws InterruptedException {
+		extentTest = extentReport.startTest("P2M6_116_2", "*H7 : Verify that currency sign should be displayed on Grid heading for 'Amount' field in Add Items Section on New bill form");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		Thread.sleep(2000);
+		String getAmountLabel = byXpath.getText("//*[@id='"+id_NewBillAddItemsSection+"']//table//tr//th[4]", "Get Amount Header from grid in Add Items section on New Bill form");
+		int getIndexofStartBracet = getAmountLabel.indexOf("(");
+		int getIndexofEndBracet = getAmountLabel.indexOf(")");
+		getAmountLabel = getAmountLabel.substring(getIndexofStartBracet+1, getIndexofEndBracet);
+		setLogs.info("Get Default Currency Sign from Setting Tab");
+		byClassName.click(class_SettingLink, "click on Setting tab");
+		String getOption = byId.getFirstSelectedOption("ddlCurrency","get First Selected option in 'Default Currency' DDL");
+		int getAdminLeftBracesIndex = getOption.indexOf("(");
+		int getAdminRightBracesIndex = getOption.indexOf(")");
+		getOption = getOption.substring(getAdminLeftBracesIndex + 1, getAdminRightBracesIndex);
+		Assert.assertTrue(getAmountLabel.equals(getOption), "Default set Currency sign is not reflecting for 'Amount' field in Add Items Section on New bill form");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that currency sign should be displayed on Grid heading for 'Amount' field in Add Items Section on New bill form");
+	}
+	
+	@Test(priority = 119, enabled = false, groups = { "Harinder"})
+	public void P2M6_116_3() throws InterruptedException {
+		extentTest = extentReport.startTest("P2M6_116_3", "*H7 : Verify that 'Amount' DDL in add items Section should be a mandatory field on New bill form");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		Thread.sleep(2000);
+		byId.click(id_NewBillAddItemsAmount,"Click on 'Amount' DDL in Add Item Section on New Bill form");
+		Actions action = new Actions(getDriver());
+		action.moveToElement(getDriver().findElement(By.id(id_NewBillAddItemsDescription))).click().perform();
+		String getErrorMsg = byXpath.getText("//*[@id='"+id_NewBillAddItemsAmount+"']//following-sibling::div", "Get validation message for 'Amount' DDL on New Bill form");
+		Assert.assertEquals(getErrorMsg, value_MandatoryfieldsMessage, "Amount DDL is not a mandatory field on New Bill form");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that 'Amount' DDL in add items Section should be a mandatory field on New bill form");
+	}
+	
+	@Test(priority = 120, enabled = false, groups = { "Harinder"})
+	public void P2M6_117() throws IOException, Throwable {
+		extentTest = extentReport.startTest("P2M6_117", "*H7 : Verify that user should not able to enter alphabets in 'Amount' Field in Add Item section on New bill form");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		Thread.sleep(2000);
+		byId.clearThenSetText(id_NewBillAmount, id_NewBillFormVendorNameListHeaderNameVendorName, "Enter value in 'Amount' field");
+		byId.clearThenSetText(id_NewBillAddItemsAmount, id_NewBillFormVendorNameListHeaderNameVendorName, "Enter alphabets in 'Amount' field on New Bill form");
+		String getText = byId.getAttribute(id_NewBillAddItemsAmount, "value", "Get entered value in 'Amount' field on New Bill form");
+		Assert.assertNotEquals(getText, id_NewBillFormVendorNameListHeaderNameVendorName, "'Amount' Text Field is allowing to enter Alphabets");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that user should not able to enter alphabets in 'Amount' Field in Add Item section on New bill form");
+	}
+	
+	
+	@Test(priority = 121, enabled = false, groups = { "Harinder"})
+	public void P2M6_118() throws IOException, Throwable {
+		extentTest = extentReport.startTest("P2M6_118", "*H7 : Verify that user should not able to enter special Characters in 'Amount' Field in Add Item section on New bill form");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		Thread.sleep(2000);
+		byId.clearThenSetText(id_NewBillAmount, value_SpecialCharcters, "Enter value in 'Amount' field");
+		byId.clearThenSetText(id_NewBillAddItemsAmount, value_SpecialCharcters, "Enter special characters in 'Amount' field on New Bill form");
+		String getText = byId.getAttribute(id_NewBillAddItemsAmount, "value", "Get entered value in 'Amount' field on New Bill form");
+		Assert.assertNotEquals(getText, value_SpecialCharcters, "'Amount' Text Field is allowing to enter special characters");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that user should not able to enter special Characters in 'Amount' Field in Add Item section on New bill form");
+	}
+	
+	@Test(priority = 122, enabled = false, groups = { "Harinder"})
+	public void P2M6_119() throws IOException, Throwable {
+		extentTest = extentReport.startTest("P2M6_119", "*H7 : Verify that user is able to enter numerics in Amount Text Field in Add Item section on New bill form");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		Thread.sleep(2000);
+		byId.clearThenSetText(id_NewBillAmount, value_ZipCode, "Enter value in 'Amount' field");
+		byId.clearThenSetText(id_NewBillAddItemsAmount, value_ZipCode, "Enter numerics in 'Amount' field on New Bill form");
+		String getText = byId.getAttribute(id_NewBillAddItemsAmount, "value", "Get entered value in 'Amount' field on New Bill form");
+		Assert.assertEquals(getText, value_ZipCode, " 'Amount' Text Field is not allowing to enter numerics");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that user is able to enter numerics  in Amount Text Field in Add Item section on New bill form");
+	}
+	
+	@Test(priority = 123, enabled = false, groups = { "Harinder"})
+	public void P2M6_120() throws IOException, Throwable {
+		extentTest = extentReport.startTest("P2M6_120", "*H7 : Verify that user should not able to enter combination of alphabets, special characters and numerics in 'Amount' Field in Add Item section on New bill form");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		Thread.sleep(2000);
+		byId.clearThenSetText(id_NewBillAmount, value_SpecialCharcters+" "+value_ZipCode+id_NewBillFormHeader, "Enter value in 'Amount' field");
+		byId.clearThenSetText(id_NewBillAddItemsAmount, value_SpecialCharcters+" "+value_ZipCode+id_NewBillFormHeader, "Enter combination of special characters, numerals and alphabets in 'Amount' field on New Bill form");
+		String getText = byId.getAttribute(id_NewBillAddItemsAmount, "value", "Get entered value in 'Amount' field on New Bill form");
+		Assert.assertNotEquals(getText, value_SpecialCharcters+" "+value_ZipCode+id_NewBillFormHeader, "'Amount' Text Field is allowing to enter combination of special characters, numerals and alphabets");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that user should not able to enter combination of alphabets, special characters and numerics in 'Amount' Field in Add Item section on New bill form");
+	}
+	
+	@Test(priority = 124, enabled = false, groups = { "Harinder"})
+	public void P2M6_121() throws IOException, Throwable {
+		extentTest = extentReport.startTest("P2M6_121", "*H7 : Verify that user 'Description' should be a text field in Add Item Section on New bill form");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		Thread.sleep(2000);
+		String getTagName = byId.getTagName(id_NewBillAddItemsDescription, "Get 'Description' field's(in Add Items Section) Tag Name");
+		Assert.assertEquals(getTagName, "input", "'Description' field in Add Items Section is not a text field on New Bill form");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that user 'Description' should be a text field in Add Item Section on New bill form");
+	}
+	
+	@Test(priority = 123, enabled = false, groups = { "Harinder"})
+	public void P2M6_122() throws IOException, Throwable {
+		extentTest = extentReport.startTest("P2M6_122", "*H7 : Verify that user is able to enter Description in Amount Text Field in Add Item section on New bill form");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		Thread.sleep(2000);
+		byId.clearThenSetText(id_NewBillAddItemsDescription, value_ZipCode, "Enter numerics in 'Description' field on New Bill form");
+		String getText = byId.getAttribute(id_NewBillAddItemsDescription, "value", "Get entered value in 'Description' field on New Bill form");
+		Assert.assertEquals(getText, value_ZipCode, " 'Description' Text Field is not allowing to enter numerics");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that user is able to enter numerics  in Description Text Field in Add Item section on New bill form");
+	}
+	
+	@Test(priority = 124, enabled = false, groups = { "Harinder"})
+	public void P2M6_123() throws IOException, Throwable {
+		extentTest = extentReport.startTest("P2M6_123", "*H7 : Verify that user should not able to enter alphabets in 'Description' Field in Add Item section on New bill form");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		Thread.sleep(2000);
+		byId.clearThenSetText(id_NewBillAddItemsDescription, id_NewBillFormVendorNameListHeaderNameVendorName, "Enter alphabets in 'Description' field on New Bill form");
+		String getText = byId.getAttribute(id_NewBillAddItemsDescription, "value", "Get entered value in 'Description' field on New Bill form");
+		Assert.assertEquals(getText, id_NewBillFormVendorNameListHeaderNameVendorName, "'Description' Text Field is not allowing to enter Alphabets");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that user should not able to enter alphabets in 'Description' Field in Add Item section on New bill form");
+	}
+	
+	
+	@Test(priority = 125, enabled = false, groups = { "Harinder"})
+	public void P2M6_124() throws IOException, Throwable {
+		extentTest = extentReport.startTest("P2M6_124", "*H7 : Verify that user should not able to enter special Characters in 'Description' Field in Add Item section on New bill form");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		Thread.sleep(2000);
+		byId.clearThenSetText(id_NewBillAddItemsDescription, value_SpecialCharcters, "Enter special characters in 'Description' field on New Bill form");
+		String getText = byId.getAttribute(id_NewBillAddItemsDescription, "value", "Get entered value in 'Description' field on New Bill form");
+		Assert.assertEquals(getText, value_SpecialCharcters, "'Description' Text Field is not allowing to enter special characters");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that user should not able to enter special Characters in 'Description' Field in Add Item section on New bill form");
+	}
+	
+	
+	@Test(priority = 126, enabled = false, groups = { "Harinder"})
+	public void P2M6_125() throws IOException, Throwable {
+		extentTest = extentReport.startTest("P2M6_125", "*H7 : Verify that user should not able to enter combination of alphabets, special characters and numerics in 'Description' Field in Add Item section on New bill form");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		Thread.sleep(2000);
+		byId.clearThenSetText(id_NewBillAddItemsDescription, value_SpecialCharcters+" "+value_ZipCode+id_NewBillFormHeader, "Enter combination of special characters, numerals and alphabets in 'Description' field on New Bill form");
+		String getText = byId.getAttribute(id_NewBillAddItemsDescription, "value", "Get entered value in 'Description' field on New Bill form");
+		Assert.assertEquals(getText, value_SpecialCharcters+" "+value_ZipCode+id_NewBillFormHeader, "'Description' Text Field is not allowing to enter combination of special characters, numerals and alphabets");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that user should not able to enter combination of alphabets, special characters and numerics in 'Description' Field in Add Item section on New bill form");
+	}
+	
+	@Test(priority = 127, enabled = false, groups = { "Harinder"})
+	public void P2M6_126() throws IOException, Throwable {
+		extentTest = extentReport.startTest("P2M6_126", "*H7 : Verify that Add Item Grid should have cross sign under Action column to delete the entered record on New bill form");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		Thread.sleep(2000);
+		String getTagName = byClassName.getTagName(classNewBillAddItemsGridDeleteIcon, "Get delete icon Tag name");
+		Assert.assertEquals(getTagName, "img", "Cross icon under Action column is not exists in Add Item table ");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that Add Item Grid should have cross sign under Action column to delete the entered record on New bill form");
+	}
+	
+	@Test(priority = 128, enabled = false, groups = { "Harinder"})
+	public void P2M6_127() throws IOException, Throwable {
+		extentTest = extentReport.startTest("P2M6_127", "*H7 : Verify that when click on cross icon in add item table, the entered record should be deleted from the grid on New bill form");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		Thread.sleep(2000);
+		byClassName.click(classNewBillAddItemsGridDeleteIcon, "Click on delete icon in Add item table");
+		int getSize = byXpath.getSize("//*[@id='tbodyAddProduct']//tr", "Get Size if row exists after deleting");
+		Assert.assertEquals(getSize, 0, "Record is deleted after clicking on Cross icon under Action column in Add Item table ");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that when click on cross icon in add item table, the entered record is deleted from the grid on New bill form");
+	}
+	
+	@Test(priority = 129, enabled = false, groups = { "Harinder"})
+	public void P2M6_128() throws IOException, Throwable {
+		extentTest = extentReport.startTest("P2M6_128", "*H7 : Verify that 'Add' button should be displayed below the grid to add new record in the grid on New bill form");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		Thread.sleep(2000);
+		int getSize = byId.getSize(id_NewBillAddItemsAddButton, "Get Size if 'Add' button is exists in add item section");
+		Assert.assertEquals(getSize, 1, "'Add' button is not exists in add item section");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that button should be displayed below the grid to add new record in the grid on New bill form");
+	}
+	
+	@Test(priority = 130, enabled = false, groups = { "Harinder"})
+	public void P2M6_129() throws IOException, Throwable {
+		extentTest = extentReport.startTest("P2M6_129", "*H7 : Verify that  when click on Add button the blank record should be added in the Add Items Grid to add the item");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		Thread.sleep(2000);
+		byId.click(id_NewBillAddItemsAddButton, "Click on Add Item button.");
+		int getSize = byXpath.getSize("//*[@id='tbodyAddProduct']//tr", "Get Size if row exists after deleting");
+		Assert.assertEquals(getSize, 2, "Clicking on 'Add' button new Row is added in add item table");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that  when click on Add button the blank record should be added in the Add Items Grid to add the item");
+	}
+	
+	@Test(priority = 131, enabled = false, groups = {"Smoke", "Harinder"})
+	public void P2M6_139() throws IOException, Throwable {
+		List<WebElement> element = new ArrayList<>();
+		List<String> list = new ArrayList<>();
+		extentTest = extentReport.startTest("P2M6_139", "*H7 : Verify that File Library section should be displayed with two buttons Add files and Remove All.");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		Thread.sleep(2000);
+		element = byXpath.getElements("//*[@id='"+id_NewBillFileLibrarySection+"']//span", "Get all elements in 'File Library' section");
+		list.add(element.get(1).getText());
+		list.add(element.get(2).getText());
+		softAssert.assertTrue(list.get(0).equals("Add files..."), "'Add files...' button is not exist in 'File Library section'");
+		softAssert.assertTrue(list.get(1).equals("Remove All"), "'Remove All' button is not exist in 'File Library section'");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that File Library section should be displayed with two buttons Add files and Remove All.");
+	}
+	
+	@Test(priority = 132, enabled = false, groups = {"Smoke", "Harinder"})
+	public void P2M6_141_1() throws IOException, Throwable {
+		extentTest = extentReport.startTest("*H7 : P2M6_141_1", "*H7 : Verify that User should able to upload .png file format in 'File Library section'");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		Thread.sleep(2000);
+		byXpath.click("//*[@id='"+id_NewBillFileLibrarySection+"']//span[text()='Add files...']", "Click on 'Add File' in 'File Library' section");
+		utility.uploadFiles(System.getProperty("user.dir")+Path_UploadablesFiles+TestingPngFile);
+		String getText = byXpath.getText("//*[@id='"+id_FileLibrarySectionUploadedFilesSection+"']//strong[contains(@class,'error')]", "Get Error text if file section doesn't allow to upload .png format");
+		if(getText.length()==0)
+			{
+			Assert.assertTrue(true, "user is able to upload .png file format in 'File Library section'");
+			}
+		else {
+			Assert.fail("user is unable to upload .png file format in 'File Library section'");
+		}
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that User is able to upload .png file format in 'File Library section'");
+	}
+	
+	@Test(priority = 133, enabled = false, groups = {"Smoke", "Harinder"})
+	public void P2M6_141_2() throws IOException, Throwable {
+		extentTest = extentReport.startTest("*H7 : P2M6_141_2", "*H7 : Verify that User should able to upload .jpg file format in 'File Library section'");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		Thread.sleep(2000);
+		byXpath.click("//*[@id='"+id_NewBillFileLibrarySection+"']//span[text()='Add files...']", "Click on 'Add File' in 'File Library' section");
+		utility.uploadFiles(System.getProperty("user.dir")+Path_UploadablesFiles+TestingJPGFile);
+		String getText = byXpath.getText("//*[@id='"+id_FileLibrarySectionUploadedFilesSection+"']//strong[contains(@class,'error')]", "Get Error text if file section doesn't allow to upload .jpg format");
+		if(getText.length()==0)
+			{
+			Assert.assertTrue(true, "user is able to upload .jpg file format in 'File Library section'");
+			}
+		else {
+			Assert.fail("user is unable to upload .jpg file format in 'File Library section'");
+		}
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that User is able to upload .jpg file format in 'File Library section'");
+	}
+	
+	@Test(priority = 134, enabled = false, groups = {"Smoke", "Harinder"})
+	public void P2M6_141_3() throws IOException, Throwable {
+		extentTest = extentReport.startTest("*H7 : P2M6_141_3", "*H7 : Verify that User should able to upload .jpeg file format in 'File Library section'");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		Thread.sleep(2000);
+		byXpath.click("//*[@id='"+id_NewBillFileLibrarySection+"']//span[text()='Add files...']", "Click on 'Add File' in 'File Library' section");
+		utility.uploadFiles(System.getProperty("user.dir")+Path_UploadablesFiles+TestingJPEGFile);
+		String getText = byXpath.getText("//*[@id='"+id_FileLibrarySectionUploadedFilesSection+"']//strong[contains(@class,'error')]", "Get Error text if file section doesn't allow to upload .jpeg format");
+		if(getText.length()==0)
+			{
+			Assert.assertTrue(true, "user is able to upload .jpeg file format in 'File Library section'");
+			}
+		else {
+			Assert.fail("user is unable to upload .jpeg file format in 'File Library section'");
+		}
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that User is able to upload .jpeg file format in 'File Library section'");
+	}
+	
+	@Test(priority = 135, enabled = false, groups = {"Smoke", "Harinder"})
+	public void P2M6_141_4() throws IOException, Throwable {
+		extentTest = extentReport.startTest("*H7 : P2M6_141_4", "*H7 : Verify that User should able to upload .bmp file format in 'File Library section'");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		Thread.sleep(2000);
+		byXpath.click("//*[@id='"+id_NewBillFileLibrarySection+"']//span[text()='Add files...']", "Click on 'Add File' in 'File Library' section");
+		utility.uploadFiles(System.getProperty("user.dir")+Path_UploadablesFiles+TestingBMPFile);
+		String getText = byXpath.getText("//*[@id='"+id_FileLibrarySectionUploadedFilesSection+"']//strong[contains(@class,'error')]", "Get Error text if file section doesn't allow to upload .bmp format");
+		if(getText.length()==0)
+			{
+			Assert.assertTrue(true, "user is able to upload .bmp file format in 'File Library section'");
+			}
+		else {
+			Assert.fail("user is unable to upload .bmp file format in 'File Library section'");
+		}
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that User is able to upload .bmp file format in 'File Library section'");
+	}
+	
+	@Test(priority = 136, enabled = false, groups = {"Smoke", "Harinder"})
+	public void P2M6_141_5() throws IOException, Throwable {
+		extentTest = extentReport.startTest("*H7 : P2M6_141_5", "*H7 : Verify that User should able to upload .gif file format in 'File Library section'");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		Thread.sleep(2000);
+		byXpath.click("//*[@id='"+id_NewBillFileLibrarySection+"']//span[text()='Add files...']", "Click on 'Add File' in 'File Library' section");
+		utility.uploadFiles(System.getProperty("user.dir")+Path_UploadablesFiles+TestingGIFFile);
+		String getText = byXpath.getText("//*[@id='"+id_FileLibrarySectionUploadedFilesSection+"']//strong[contains(@class,'error')]", "Get Error text if file section doesn't allow to upload .gif format");
+		if(getText.length()==0)
+			{
+			Assert.assertTrue(true, "user is able to upload .gif file format in 'File Library section'");
+			}
+		else {
+			Assert.fail("user is unable to upload .gif file format in 'File Library section'");
+		}
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that User is able to upload .gif file format in 'File Library section'");
+	}
+	
+	@Test(priority = 137, enabled = false, groups = {"Smoke", "Harinder"})
+	public void P2M6_141_6() throws IOException, Throwable {
+		extentTest = extentReport.startTest("*H7 : P2M6_141_6", "*H7 : Verify that User should able to upload .pdf file format in 'File Library section'");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		Thread.sleep(2000);
+		byXpath.click("//*[@id='"+id_NewBillFileLibrarySection+"']//span[text()='Add files...']", "Click on 'Add File' in 'File Library' section");
+		utility.uploadFiles(System.getProperty("user.dir")+Path_UploadablesFiles+TestingPDFFile);
+		String getText = byXpath.getText("//*[@id='"+id_FileLibrarySectionUploadedFilesSection+"']//strong[contains(@class,'error')]", "Get Error text if file section doesn't allow to upload .pdf format");
+		if(getText.length()==0)
+			{
+			Assert.assertTrue(true, "user is able to upload .pdf file format in 'File Library section'");
+			}
+		else {
+			Assert.fail("user is unable to upload .pdf file format in 'File Library section'");
+		}
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that User is able to upload .pdf file format in 'File Library section'");
+	}
+	
+	@Test(priority = 138, enabled = false, groups = {"Smoke", "Harinder"})
+	public void P2M6_141_7() throws IOException, Throwable {
+		extentTest = extentReport.startTest("*H7 : P2M6_141_7", "*H7 : Verify that User should able to upload .doc file format in 'File Library section'");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		Thread.sleep(2000);
+		byXpath.click("//*[@id='"+id_NewBillFileLibrarySection+"']//span[text()='Add files...']", "Click on 'Add File' in 'File Library' section");
+		utility.uploadFiles(System.getProperty("user.dir")+Path_UploadablesFiles+TestingDOCFile);
+		Thread.sleep(2000);
+		String getText = byXpath.getText("//*[@id='"+id_FileLibrarySectionUploadedFilesSection+"']//strong[contains(@class,'error')]", "Get Error text if file section doesn't allow to upload .doc format");
+		if(getText.length()==0)
+			{
+			Assert.assertTrue(true, "user is able to upload .doc file format in 'File Library section'");
+			}
+		else {
+			Assert.fail("user is unable to upload .pdf file format in 'File Library section'");
+		}
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that User is able to upload .doc file format in 'File Library section'");
+	}
+	
+	@Test(priority = 139, enabled = false, groups = {"Smoke", "Harinder"})
+	public void P2M6_141_8() throws IOException, Throwable {
+		extentTest = extentReport.startTest("*H7 : P2M6_141_8", "*H7 : Verify that User should able to upload .docx file format in 'File Library section'");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		Thread.sleep(2000);
+		byXpath.click("//*[@id='"+id_NewBillFileLibrarySection+"']//span[text()='Add files...']", "Click on 'Add File' in 'File Library' section");
+		utility.uploadFiles(System.getProperty("user.dir")+Path_UploadablesFiles+TestingDOCXFile);
+		String getText = byXpath.getText("//*[@id='"+id_FileLibrarySectionUploadedFilesSection+"']//strong[contains(@class,'error')]", "Get Error text if file section doesn't allow to upload .docx format");
+		if(getText.length()==0)
+			{
+			Assert.assertTrue(true, "user is able to upload .docx file format in 'File Library section'");
+			}
+		else {
+			Assert.fail("user is unable to upload .docx file format in 'File Library section'");
+		}
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that User is able to upload .docx file format in 'File Library section'");
+	}
+	
+	@Test(priority = 140, enabled = false, groups = {"Smoke", "Harinder"})
+	public void P2M6_141_9() throws IOException, Throwable {
+		extentTest = extentReport.startTest("*H7 : P2M6_141_9", "*H7 : Verify that User should able to upload .xlsx file format in 'File Library section'");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		Thread.sleep(2000);
+		byXpath.click("//*[@id='"+id_NewBillFileLibrarySection+"']//span[text()='Add files...']", "Click on 'Add File' in 'File Library' section");
+		utility.uploadFiles(System.getProperty("user.dir")+Path_UploadablesFiles+TestingXLSXFile);
+		String getText = byXpath.getText("//*[@id='"+id_FileLibrarySectionUploadedFilesSection+"']//strong[contains(@class,'error')]", "Get Error text if file section doesn't allow to upload .xlsx format");
+		if(getText.length()==0)
+			{
+			Assert.assertTrue(true, "user is able to upload .xlsx file format in 'File Library section'");
+			}
+		else {
+			Assert.fail("user is unable to upload .xlsx file format in 'File Library section'");
+		}
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that User is able to upload .xlsx file format in 'File Library section'");
+	}
+	
+	@Test(priority = 141, enabled = false, groups = {"Smoke", "Harinder"})
+	public void P2M6_141_10() throws IOException, Throwable {
+		extentTest = extentReport.startTest("*H7 : P2M6_141_10", "*H7 : Verify that User should able to upload .txt file format in 'File Library section'");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		Thread.sleep(2000);
+		byXpath.click("//*[@id='"+id_NewBillFileLibrarySection+"']//span[text()='Add files...']", "Click on 'Add File' in 'File Library' section");
+		utility.uploadFiles(System.getProperty("user.dir")+Path_UploadablesFiles+TestingTXTFile);
+		String getText = byXpath.getText("//*[@id='"+id_FileLibrarySectionUploadedFilesSection+"']//strong[contains(@class,'error')]", "Get Error text if file section doesn't allow to upload .txt format");
+		if(getText.length()==0)
+			{
+			Assert.assertTrue(true, "user is able to upload .txt file format in 'File Library section'");
+			}
+		else {
+			Assert.fail("user is unable to upload .txt file format in 'File Library section'");
+		}
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that User is able to upload .txt file format in 'File Library section'");
+	}
+	
+	@Test(priority = 142, enabled = false, groups = {"Smoke", "Harinder"})
+	public void P2M6_144_1() throws IOException, Throwable {
+		extentTest = extentReport.startTest("*H7 : P2M6_144_1", "*H7 : Verify that when click on save button the message 'This record saved successfully' should be displayed");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		Thread.sleep(2000);
+		setLogs.info("Create New Bill");
+		refNo = utility.uniqueNo();
+		AccountingCommon.Admin_NewBill(vendorFirstName, value_Amount, value_SelectTermDDLValue, refNo, arr[1], "", arr[0], "Tenant", tenantName, "", "", "", value_Amount, "", "");
+		//String getPopupText = byXpath.getText(xpath_PopupText, "get Popup Text");
+		String getPopupText = getDriver().findElement(By.xpath(xpath_PopupText)).getText();
+		Assert.assertEquals(getPopupText, value_common_peopleModule_successMessage_text, "Popup with 'value_common_peopleModule_successMessage_text' text is not displaying after Submitting New Bill form/ Popup Text has been changed");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that when click on save button the message 'This record saved successfully' should be displayed");
+	}
+	
+	@Test(priority = 143, enabled = false, groups = {"Smoke", "Harinder"})
+	public void P2M6_144_2() throws IOException, Throwable {
+		extentTest = extentReport.startTest("*H7 : P2M6_144_2", "*H7 : Verify that when click on save button the Created bill should be saved in Bill register grid");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		Thread.sleep(2000);
+		setLogs.info("Create New Bill");
+		refNo = utility.uniqueNo();
+		AccountingCommon.Admin_NewBill(vendorFirstName, value_Amount, value_SelectTermDDLValue, refNo, arr[1], "", arr[0], "Tenant", tenantName, "", "", "", value_Amount, "", "");
+		int getSize = byXpath.getSize("//*[@id='"+id_ManageBillGridListingTable+"']//tbody//tr//td[contains(text(),'"+refNo+"')]", "get Size if Created bill is saved in Bill register grid");
+		Assert.assertEquals(getSize, 1, "Created bill is not displaying in Bill register grid");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that when click on save button the Created bill is saved in Bill register grid");
+	}
+	
+	@Test(priority = 144, enabled = false, groups = {"Smoke", "Harinder"})
+	public void P2M6_144_3() throws IOException, Throwable {
+		extentTest = extentReport.startTest("*H7 : P2M6_144_3", "*H7 : Verify that when click on save button the Created bill should be saved in Bill register grid with due status");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		Thread.sleep(2000);
+		setLogs.info("Create New Bill");
+		refNo = utility.uniqueNo();
+		AccountingCommon.Admin_NewBill(vendorFirstName, value_Amount, value_SelectTermDDLValue, refNo, arr[1], "", arr[0], "Tenant", tenantName, "", "", "", value_Amount, "", "");
+		String getStatus = byXpath.getText("//*[@id='"+id_ManageBillGridListingTable+"']//tbody//tr//td[contains(text(),'"+refNo+"')]//following-sibling::td[@aria-describedby='tblVendorInvoiceRegisterPO_Status']", "get Status if Created bill is saved in Bill register grid");
+		Assert.assertEquals(getStatus, "Due", "Created bill Status is not equal to 'Due' in Bill register grid");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that when click on save button the Created bill is saved in Bill register grid with due status");
+	}
+	
+	@Test(priority = 145, enabled = false, groups = {"Smoke", "Harinder"})
+	public void P2M6_144_4() throws IOException, Throwable {
+		extentTest = extentReport.startTest("*H7 : P2M6_144_4", "*H7 : Admin should be able to Pay Created bill from Pay Bills ");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'New Bill')]", "Click on 'New Bill' option in Right Navigation Panel");
+		Thread.sleep(2000);
+		setLogs.info("Create New Bill");
+		refNo = utility.uniqueNo();
+		AccountingCommon.Admin_NewBill(vendorFirstName, value_Amount, value_SelectTermDDLValue, refNo, arr[1], "", arr[0], "Tenant", tenantName, "", "", "", value_Amount, "", "");
+		//String getStatus = byXpath.getText("//*[@id='"+id_ManageBillGridListingTable+"']//tbody//tr//td[contains(text(),'"+refNo+"')]//following-sibling::td[@aria-describedby='tblVendorInvoiceRegisterPO_Status']", "get Status if Created bill is saved in Bill register grid");
+		PayVendorBill(vendorFirstName, refNo, "", "", "", "");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		byXpath.click(xpath_AccountingRNPLinks+"[contains(.,'Bill Register')]", "Click on 'Bill Register' option in Right Navigation Panel");
+		byId.clearThenSetText(id_BillRegisterSearchVendorTB, vendorFirstName+" ", "Enter Vendor name to search the record.");
+		Thread.sleep(2000);
+		getDriver().findElement(By.id(id_BillRegisterSearchVendorTB)).sendKeys(Keys.ENTER);
+		String getStatus = byXpath.getText("//*[@id='"+id_ManageBillGridListingTable+"']//tbody//tr//td[contains(text(),'"+refNo+"')]//following-sibling::td[contains(@aria-describedby,'tblVendorInvoiceRegisterPO_Status')]", "get Status after Bill payment from Bill register grid");
+		Assert.assertEquals(getStatus, "Paid" , "Status after Bill payment is not equals to 'Paid' in Bill register grid");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that Admin is able to Pay Created bill from Pay Bills");
+	}
+	
+}

@@ -1,0 +1,138 @@
+package p2M6.Accounting;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Keys;
+import org.openqa.selenium.interactions.Actions;
+import org.testng.Assert;
+
+import com.relevantcodes.extentreports.LogStatus;
+
+import frameworkGlobals.BrowserSelection;
+import interfaces.GlobalComponents;
+import objectRepository.ApexLinkGlobalComponents;
+import objectRepository.IManageBill;
+import p2M6.Accounting.objectRepositry.ACTG_PayBill;
+import p2M6.Accounting.objectRepositry.Admin_AccountingTab;
+import utilities.Utility;
+
+	public class AccountingCommon extends BrowserSelection implements ACTG_PayBill ,IManageBill, GlobalComponents, ApexLinkGlobalComponents, Admin_AccountingTab {
+	
+		public static List<Object> Admin_NewBill(String vendorName, String amount, String selectTerm_B, String reference_B, String Portfolio,
+				String memo_B, String property, String chargeTo_B, String tenantNameOrOthersText_B, String buildingName_B,
+				String unitNo_B, String account_B, String SplitBill_Amount, String Notes_B, String filePath_B)
+				throws InterruptedException {
+			List<Object> list = new ArrayList<>();
+			extentTest.log(LogStatus.INFO, "VendorPortalCommons.NewBill() starts");
+			//byId.click(id_ManageBillNewBillButton, "Click on 'New Bill' button");
+			Thread.sleep(3000);
+			byId.clearThenSetText(id_NewBillFormVendorName, vendorName+" ", "Enter Vendor Name in 'Vendor Name' field on New Bill form");
+			Thread.sleep(4000);
+			getDriver().findElement(By.id(id_NewBillFormVendorName)).sendKeys(Keys.ENTER);
+			Thread.sleep(2000);
+			String getBillDate = byId.getAttribute(id_NewBillBillDate, "value", "get Default date from 'Bill Date' field");
+			list.add(getBillDate);
+			byId.clearThenSetText(id_NewBillAmount, amount, " Enter Amount in Amount field");
+			list.add(byId.getText(id_NewBillAmount, "get Entered Amount"));
+			if (!selectTerm_B.equals("") && !selectTerm_B.equals(null)) {
+				byId.selectByVisibleText(id_NewBillSelectTerm, selectTerm_B, "Select 'Term' from 'Select Term' DDL");
+			}
+			String getDefaultSelectTerm = byId.getFirstSelectedOption(id_NewBillSelectTerm,
+					"get Default Term from 'Select Term' DDL");
+			list.add(getDefaultSelectTerm);
+			if (!reference_B.equals("") && !reference_B.equals(null)) {
+				byId.clearThenSetText(id_NewBillReference, reference_B, "Enter Reference# in 'Referecne#' field");
+				list.add(reference_B);
+			}
+			String getDueDate = byId.getAttribute(id_NewBillDueDate, "value", "get Default date from 'Due Date' field");
+			list.add(getDueDate);
+			Thread.sleep(2000);
+			JavascriptExecutor jse = (JavascriptExecutor) getDriver();
+			byId.selectByVisibleText(id_NewBillPortfolio, Portfolio, "Select Portfolio");
+			if (!memo_B.equals("") && !memo_B.equals(null)) {
+				byId.clearThenSetText(id_NewBillMemo, memo_B, "Enter Memo in 'Memo' field");
+			}
+			Thread.sleep(2000);
+			//byId.click(id_NewBillSplitBillProperty, "Enter Property from Property DDL in 'Add Items' Section");
+			byId.setText(id_NewBillSplitBillProperty,property, "Enter Property from Property DDL in 'Add Items' Section");
+			Thread.sleep(3000);
+			//byXpath.click("//*[@id='ui-id-1']//li[contains(.,'"+property+"')]", "Select Property");
+			//getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ARROW_DOWN);
+			getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ARROW_DOWN);
+			getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ENTER);
+			/*Actions act = new Actions(getDriver());
+			act.moveToElement(getDriver().findElement(By.id(id_NewBillChargeToTenantCheckBox))).perform();*/
+			if (!chargeTo_B.equals("") && !chargeTo_B.equals(null)) {
+				if (chargeTo_B.equals("Tenant") || chargeTo_B.equals("tenant")) {
+					byId.click(id_NewBillChargeToTenantCheckBox, "Click on 'Tenant' Checkbox)");
+					//if (!tenantNameOrOthersText_B.equals("") && chargeTo_B.equals(null))
+						//byId.click(id_NewBillChargeToTenantCheckBox, "Click on 'Tenant' Checkbox");
+					byId.clearThenSetText(id_NewBillChargeToTenantTextBox, tenantNameOrOthersText_B, "Enter Tenant name");
+					Thread.sleep(3000);
+					getDriver().findElement(By.id(id_NewBillChargeToTenantTextBox)).sendKeys(Keys.ARROW_DOWN);
+					getDriver().findElement(By.id(id_NewBillChargeToTenantTextBox)).sendKeys(Keys.ARROW_DOWN);
+					getDriver().findElement(By.id(id_NewBillChargeToTenantTextBox)).sendKeys(Keys.ENTER);
+				} else {
+					byId.click(id_NewBillChargeToOthersCheckbox, "Check 'Others' CheckBox");
+					//if (!chargeTo_B.equals("") && chargeTo_B.equals(null))
+						byId.clearThenSetText(id_NewBillChargeToOthersTextBox, tenantNameOrOthersText_B,
+								"Enter data in Others Textbox");
+				}
+			}
+			String getBuildingName = byId.getFirstSelectedOption(id_AddItemsSectionBuildingDDL, "get selected value");
+			if (getBuildingName.equals("Select") && !buildingName_B.equals("") && !buildingName_B.equals(null)) {
+				byId.selectByVisibleText(id_AddItemsSectionBuildingDDL, buildingName_B, "Select Building name");
+			} else {
+				byId.selectByIndex(id_AddItemsSectionBuildingDDL, 1, "Select Building by Index");
+			}
+			getBuildingName = byId.getFirstSelectedOption(id_AddItemsSectionBuildingDDL, "get selected value");
+			list.add(getBuildingName);
+			String getUnitNum = byId.getFirstSelectedOption(id_NewBillAddItemsUnit, "Get Selected unit No");
+			if (getUnitNum.equals("Select")) {
+				/*
+				 * byId.click(id_NewBillSplitBillUnit, "Click on Unit DDL");
+				 * byXpath.click("//*[@class='"+class_NewBillUnitPopupUnitsCheckBox+
+				 * "'][1]//input", "Check the checkbox to select Unit");
+				 * byId.click("btnInvoiceUnitSave", "Click on Save button");
+				 */
+				if (unitNo_B.equals("") || unitNo_B.equals(null)) {
+					byId.selectByIndex(id_NewBillAddItemsUnit, 1, "Select Unit by Index");
+				} else {
+					byId.selectByVisibleText(id_NewBillAddItemsUnit, unitNo_B, "Select Unit No by visible text");
+				}
+				getUnitNum = byId.getFirstSelectedOption(id_NewBillAddItemsUnit, "Get Selected unit No");
+			}
+			list.add(getUnitNum);
+			if (!account_B.equals("") && !account_B.equals(null)) {
+				byId.selectByVisibleText(id_NewBillAddItemsAccount, account_B, "Select Account");
+			} else {
+				byId.selectByIndex(id_NewBillAddItemsAccount, 1, "Select Account by Index");
+				String getAccountName = byId.getFirstSelectedOption(id_NewBillAddItemsAccount, "Get Selected Account");
+				list.add(getAccountName);
+			}
+			byId.clearThenSetText(id_NewBillAddItemsAmount, SplitBill_Amount, "Enter Amount in add items section");
+			list.add(byId.getAttribute(id_NewBillAddItemsAmount, "value", "get Amount from add items Section"));
+			Actions actions = new Actions(getDriver());
+			actions.moveToElement(getDriver().findElement(By.id(id_NewBillAddItemsDescription))).click().perform();
+
+			if (!Notes_B.equals("") && !Notes_B.equals(null)) {
+				byId.clearThenSetText(id_NewBillNotes, Notes_B, "Enter Notes in Notes Section");
+			}
+			if (!filePath_B.equals("") && !filePath_B.equals(null)) {
+				byXpath.click("//*[@id='" + id_NewBillFileLibrarySection + "']/div[1]/span", "Click Add Files button");
+				utility.uploadFiles(System.getProperty("user.dir") + filePath_B);
+			}
+			byId.click(id_NewBillSaveButton, "Click on Save Button");
+			extentTest.log(LogStatus.INFO, "VendorPortalCommons.NewBill() ends");
+			return list;
+		}
+		
+		
+		
+		
+		
+
+}

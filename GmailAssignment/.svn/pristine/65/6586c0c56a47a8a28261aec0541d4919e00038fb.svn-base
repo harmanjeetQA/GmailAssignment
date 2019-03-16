@@ -1,0 +1,820 @@
+package p2M6.Accounting;
+
+import java.awt.AWTException;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
+import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
+import org.testng.asserts.SoftAssert;
+
+import common.ApexCommon;
+import p2M6.Accounting.objectRepositry.Admin_AccountingTab;
+import p2M6.Accounting.objectRepositry.IRecurringBill;
+
+public class RecurringBill extends AccountingCommon implements IRecurringBill {
+	
+	String propertyName = null;
+	String tenant_FirstName = null;
+	
+	@BeforeClass(alwaysRun = true, groups = {"Smoke", "Regression", "Jasmeet"})
+	public void beforeClass() throws InterruptedException {
+		ApexCommon.login("", adminEmail, password);
+	}
+	
+	@BeforeMethod(alwaysRun = true, groups = {"Smoke", "Regression", "Jasmeet"})
+	public void refresh() {
+		getDriver().navigate().refresh();
+		byClassName.click("logo", ": Click on company logo.");
+		//byId.click(id_CompanyLogo, ": Click on company logo.");
+	}
+	
+	public void newRecurringTab()
+	{
+		byId.click(Admin_AccountingTab.id_AccountingTab, ": Accounting Tab");
+		byId.click(id_recurringBillTab, ": Recurring Transactions Tab");
+		byId.click(id_newRecurringBillBtn, ": New Recurring Bill Button");
+	}
+	
+	//**********************Test Cases Start*******************#
+	
+		@Test(groups = {"Smoke", "Jasmeet"})
+		public void P2M6_273(){
+			extentTest = extentReport.startTest("P2M6_273", "JS: Accounting>>RNP>>"
+					+ " New Recurring Bill: Ensure that New Recurring Bill page should be"
+					+ " displayed with following fields: "
+					+ "1. Vendor name 2. Bill Date 3. Address 4. Amount 5. Reference 6. Charge To"
+					+ " 7. Due Date 8. Select Term 9. Portfolio 10. Property 11. Memo"
+					+ " 12. Add Items grid 13. Add Button 14. Notes 15. + sign for Notes"
+					+ " 16. File Library 17. File Library - Add Files 18. File Library - Remove All"
+					+ " 19. Save 20. Cancel");
+			newRecurringTab();
+			
+			SoftAssert Assert = new SoftAssert();
+			
+			
+			Assert.assertEquals(byId.getSize(id_VendorNameNewRecurringBill,
+					": Vendor Name"), 1, ": Vendor Name not Exists");
+			Assert.assertEquals(byId.getSize(id_BillDatenewRecurringBill,
+					": Bill Date"), 1, ": Bill Date not Exists");
+			Assert.assertEquals(byId.getSize(id_AddressNewRecurringBill,
+					": Address"), 1, ": Address not Exists");
+			Assert.assertEquals(byId.getSize(id_AmountNewRecurringBill,
+					": Amount"), 1, ": Amount not Exists");
+			Assert.assertEquals(byId.getSize(id_ReferenceRecurringBill,
+					": Reference"), 1, ": Reference not Exists");
+			Assert.assertEquals(byId.getSize(id_TenantNewRecurringBillChkbox,
+					": Tenant CheckBox"), 1, ": Tenant CheckBox not Exists");
+			Assert.assertEquals(byId.getSize(id_OtherNewRecurringBillChkbox,
+					": Other CheckBox"), 1, ": Other CheckBox not Exists");
+			Assert.assertEquals(byId.getSize(id_DueDateNewRecurringBill,
+					": Due Date"), 1, ": Due Date not Exists");
+			Assert.assertEquals(byId.getSize(id_SelectTermNewRecurringBill,
+					": Select Term"), 1, ": Select Term not Exists");
+			Assert.assertEquals(byId.getSize(id_PortfolioNewRecurringBill,
+					": PortFolio"), 1, ": PortFolio not Exists");
+			Assert.assertEquals(byId.getSize(id_PropertyNewRecurringBill,
+					": Property"), 1, ": Property not Exists");
+			Assert.assertEquals(byId.getSize(id_MemoNewRecurringBill,
+					": Memo"), 1, ": Memo not Exists");
+			Assert.assertEquals(byId.getSize(id_AddProductNewRecurringBillDiv,
+					": Add Items Div"), 1, ": Add Items Div not Exists");
+			Assert.assertEquals(byId.getSize(id_AddProductNewRecurringBillBtn,
+					": Add Btn"), 1, ": Add Btn not Exists");
+			Assert.assertEquals(byId.getSize(id_NotesNewRecurringBillDiv,
+					": Notes"), 1, ": Notes not Exists");
+			
+			String text = byId.getText(id_NewRecurringBillDiv,
+					": NewRecurringBill Div");
+			Assert.assertTrue(text.contains("File Library"), ": File Library not Exists");
+			Assert.assertTrue(text.contains("Add files"), ": Add Files not Exists");
+			Assert.assertTrue(text.contains("Remove All"), ": Remove All not Exists");
+			
+			Assert.assertEquals(byId.getSize(id_SaveNewewRecurringBillBtn,
+					": Save Btn"), 1, ": Save Btn not Exists");
+			Assert.assertEquals(byId.getSize(id_VendorNameNewRecurringBill,
+					": Cancel Btn"), 1, ": Cancel Btn not Exists");
+			Assert.assertEquals(byClassName.getSize(class_AddNotesNewRecurringBill,
+					": Add Notes"), 1, ": Add Notes not Exists");
+			
+			Assert.assertAll();
+			
+		}
+		
+		@Test(groups = {"Smoke", "Jasmeet"})
+		public void P2M6_274(){
+			extentTest = extentReport.startTest("P2M6_274", "JS: Accounting>>RNP>>"
+					+ " New Recurring Bill: Ensure that user is able to click in"
+					+ " the Vendor Name field and Place holder 'Type Vendor’s Name'"
+					+ " should be displayed and should be a mandatory field.");
+			newRecurringTab();
+			
+			SoftAssert Assert = new SoftAssert();
+			Assert.assertEquals(byId.getAttribute(id_VendorNameNewRecurringBill, "placeholder",
+					"Get WaterMark"), "Type Vendor’s Name",
+					"'Type Vendor’s Name' should be displayed");
+			
+			byId.click(id_SaveNewewRecurringBillBtn, ": Save btn");
+			
+			Assert.assertEquals(byXpath.getSize("//span[@id='spnWorkOrderVedor']/div",
+					": Error message"), 1,
+					"Vendor Name should be a mandatory field");
+			Assert.assertAll();
+			}
+		
+		@Test(groups = {"Smoke", "Jasmeet"})
+		public void P2M6_275(){
+			extentTest = extentReport.startTest("P2M6_275", "JS: Accounting>>RNP>>"
+					+ " New Recurring Bill: Ensure that when click in Vendor Name"
+					+ " field the listing of vendors should be displayed and user"
+					+ " is able to select vendor from that list.");
+			newRecurringTab();
+			byId.setText(id_VendorNameNewRecurringBill, " ", ": Vendor Name Field");
+			byId.click(id_VendorNameNewRecurringBill, ": Vendor Name Field");
+			
+			SoftAssert Assert = new SoftAssert();
+			Assert.assertEquals(byId.getSize(id_ListVendorNameHeaderNewRecurringBillDiv,
+					": Headers of Vendors List"), 1,
+					"'List should open");
+			List<WebElement> vendors = byXpath.getElements(xpath_ListVendorNamesNewRecurringBill,
+					": Get  Names Of vendors");
+			if(vendors.size()==0){
+				// Code to add new vendor and go follow all same steps again
+			}
+			String name = vendors.get(1).getText();
+			vendors.get(1).click();
+			Assert.assertEquals(byId.getAttribute(id_VendorNameNewRecurringBill, "value",
+					": Selected name"), name, "User is able to select vendor from that list");
+			Assert.assertAll();
+			}
+		
+		@Test(groups = {"Smoke", "Jasmeet"})
+		public void P2M6_280(){
+			extentTest = extentReport.startTest("P2M6_280", "JS: Accounting>>RNP>>"
+					+ " New Recurring Bill: Ensure that when vendor name enter"
+					+ " in the field the Address of that vendor should"
+					+ " be autopopulate in the Address field.");
+			newRecurringTab();
+			
+			byId.setText(id_VendorNameNewRecurringBill, " ", ": Vendor Name Field");
+			byId.click(id_VendorNameNewRecurringBill, ": Vendor Name Field");
+			SoftAssert Assert = new SoftAssert();
+			Assert.assertEquals(byId.getSize(id_ListVendorNameHeaderNewRecurringBillDiv,
+					": Headers of Vendors List"), 1,
+					"'List should open");
+			List<WebElement> vendors = byXpath.getElements(xpath_ListVendorNamesNewRecurringBill,
+					": Get  Names Of vendors");
+			if(vendors.size()==0){
+				// Code to add new vendor and go follow all same steps again
+			}
+			
+			vendors.get(1).click();
+			Assert.assertTrue(byId.getAttribute(id_AddressNewRecurringBill, "value",
+					": Selected name").length()>0, "User is able to select vendor from that list");
+			Assert.assertAll();
+			}
+		
+		@Test(groups = {"Smoke", "Jasmeet"})
+		public void P2M6_281(){
+			extentTest = extentReport.startTest("P2M6_281", "JS: Accounting>>RNP>>"
+					+ " New Recurring Bill: Ensure that address"
+					+ " should be autopopulated as for the selected vendor. ");
+			newRecurringTab();
+			
+			byId.setText(id_VendorNameNewRecurringBill, " ", ": Vendor Name Field");
+			byId.click(id_VendorNameNewRecurringBill, ": Vendor Name Field");
+			SoftAssert Assert = new SoftAssert();
+			Assert.assertEquals(byId.getSize(id_ListVendorNameHeaderNewRecurringBillDiv,
+					": Headers of Vendors List"), 1,
+					"'List should open");
+			List<WebElement> vendors = byXpath.getElements(xpath_ListVendorAddressNewRecurringBill,
+					": Get Address Of vendors");
+			if(vendors.size() == 0){
+				// Code to add new vendor and go follow all same steps again
+			}
+			String address = vendors.get(0).getText();
+			System.out.println(address);
+			vendors.get(0).click();
+			String actualAdd = byId.getAttribute(id_AddressNewRecurringBill,
+					"value", ": Selected Address");
+			System.out.println(actualAdd);
+			for (String add : address.split(" ")) {
+				if (add.contains(".")) {
+					break;
+				}
+				Assert.assertTrue(actualAdd.contains(add),
+						"Address should be autopopulated as for the selected vendor");
+			}
+			/*Assert.assertTrue(byId.getAttribute(id_AddressNewRecurringBill,
+					"value", ": Selected Address").contains(address),
+					"Address should be autopopulated as for the selected vendor");*/
+			/*Assert.assertEquals(byId.getAttribute(id_AddressNewRecurringBill,
+					"value", ": Selected Address"), address,
+					"Address should be autopopulated as for the selected vendor");*/
+			Assert.assertAll();
+			}
+				
+		@Test(groups = {"Smoke", "Jasmeet"})
+		public void P2M6_282(){
+			extentTest = extentReport.startTest("P2M6_282", "JS: Accounting>>RNP>>"
+					+ " New Recurring Bill: Ensure that user should"
+					+ " not able to click in the Address field ");
+			newRecurringTab();
+			
+			Assert.assertFalse(byId.isEnabled(id_AddressNewRecurringBill, ": Is Address field enable?"),
+					"Should not able to click in the Address field");			
+			}
+		
+		@Test(groups = {"Smoke", "Jasmeet"})
+		public void P2M6_283(){
+			extentTest = extentReport.startTest("P2M6_283", "JS: Accounting>>RNP>>"
+					+ " New Recurring Bill>> Edit Address: Ensure that Vendor"
+					+ " Address popup shoud be displayed.");
+			newRecurringTab();
+			
+			byId.setText(id_VendorNameNewRecurringBill, " ", ": Vendor Name Field");
+			byId.click(id_VendorNameNewRecurringBill, ": Vendor Name Field");
+			List<WebElement> vendors = byXpath.getElements(xpath_ListVendorNamesNewRecurringBill,
+					": Get  Names Of vendors");
+			if(vendors.size() == 0){
+				// Code to add new vendor and go follow all same steps again
+			}
+			
+			vendors.get(1).click();
+			byId.click(id_EditAddressNewRecurringBill, ": Edit Address");
+			Assert.assertEquals(byId.getSize(id_EditVendorAddressNewRecurringBillDiv,
+					": Edit Address Div"), 1,
+					"Vendor Address popup shoud be displayed");
+			
+			}
+		
+		@Test(groups = {"Smoke", "Jasmeet"})
+		public void P2M6_284(){
+			extentTest = extentReport.startTest("P2M6_284", "JS: Accounting>>RNP>>"
+					+ " New Recurring Bill>> Edit Address: Ensure that following fields"
+					+ " should be displayed in the Vendor Address popup:"
+					+ " Zip / Postal Code, Country,  State / Province, City"
+					+ "Address1, Address2, Address3, Update, Cancel");
+			newRecurringTab();
+			
+			byId.setText(id_VendorNameNewRecurringBill, " ", ": Vendor Name Field");
+			byId.click(id_VendorNameNewRecurringBill, ": Vendor Name Field");
+			List<WebElement> vendors = byXpath.getElements(xpath_ListVendorNamesNewRecurringBill,
+					": Get  Names Of vendors");
+			if(vendors.size() == 0){
+				// Code to add new vendor and go follow all same steps again
+				
+			}
+			
+			vendors.get(1).click();
+			byId.click(id_EditAddressNewRecurringBill, ": Edit Address");
+			
+			SoftAssert Assert = new SoftAssert();			
+			
+			Assert.assertEquals(byId.getSize(id_ZipPCEditVendorAddressPopUp,
+					": Zip / Postal Code"), 1, ": 'Zip / Postal Code' not Exists");
+			Assert.assertEquals(byId.getSize(id_CountryEditVendorAddressPopUp,
+					": Country"), 1, ": 'Country' not Exists");
+			Assert.assertEquals(byId.getSize(id_StateEditVendorAddressPopUp,
+					": State / Province"), 1, ": 'State / Province' not Exists");
+			Assert.assertEquals(byId.getSize(id_CityEditVendorAddressPopUp,
+					": City"), 1, ": 'City' not Exists");
+			Assert.assertEquals(byId.getSize(id_Address1EditVendorAddressPopUp,
+					": Address1"), 1, ": 'Address1' not Exists");
+			Assert.assertEquals(byId.getSize(id_Address2EditVendorAddressPopUp,
+					": Address2"), 1, ": 'Address2' not Exists");
+			Assert.assertEquals(byId.getSize(id_Address3EditVendorAddressPopUp,
+					": Address3"), 1, ": 'Address3' not Exists");
+			Assert.assertEquals(byId.getSize(id_UpdateEditVendorAddressPopUp,
+					": Update"), 1, ": 'Update' not Exists");
+			Assert.assertEquals(byId.getSize(id_CancelEditVendorAddressPopUp,
+					": Cancel"), 1, ": 'Cancel' not Exists");
+			Assert.assertAll();
+						
+			}
+		
+		@Test(groups = {"Smoke", "Jasmeet"})
+		public void P2M6_309(){
+			extentTest = extentReport.startTest("P2M6_309", "JS: Accounting>>RNP>>"
+					+ " New Recurring Bill>> Bill Date: Ensure that it should be"
+					+ " a mandatory field and current date should"
+					+ " be displayed in the Bill Date field.");
+			newRecurringTab();
+			
+			SoftAssert Assert = new SoftAssert();
+			String actualDate = byId.getAttribute(id_BillDatenewRecurringBill, "value",
+					": Get Showing bill Date");
+			for (String string : extentDate.split("_")) {
+				Assert.assertTrue(actualDate.contains(string),
+						"current date should be displayed in the Bill Date field.");
+			}
+			byId.clear(id_BillDatenewRecurringBill, ": Clear bill date");
+			byId.click(id_MemoNewRecurringBill, ": Memo");
+			
+			Assert.assertEquals(byClassName.getSize(class_MandatoryfieldErrorMessage,
+					": Error message"), 1,
+					"Bill Date should be a mandatory field");
+			Assert.assertAll();
+			}
+		
+		@Test(groups = {"Smoke", "Jasmeet"})
+		public void P2M6_310(){
+			extentTest = extentReport.startTest("P2M6_310", "JS: Accounting>>RNP>>"
+					+ " New Recurring Bill>> Bill Date: Ensure that Date Picker Calendar"
+					+ " should be displayed to choose the date. User should be able to"
+					+ " choose current date, previous date and future date for Bill.");
+			newRecurringTab();
+			Date ExpectedDate;
+			SoftAssert Assert = new SoftAssert();
+			for(int i = -1; i < 2; i++){
+				byId.click(id_BillDatenewRecurringBill, ": Bill Date");
+				ExpectedDate = new Date(System.currentTimeMillis()+24*60*60*1000*(i));
+				String year = new SimpleDateFormat("yyyy").format(ExpectedDate);
+				String month = new SimpleDateFormat("MMM").format(ExpectedDate);
+				Integer Day = Integer.parseInt(new SimpleDateFormat("dd").format(ExpectedDate));
+				String day = Day.toString();
+				System.out.println("Year is : "+year+". Month is : "+month+". Day is : "+day);
+				
+				byClassName.selectByVisibleText(class_CalendarYearDDL, year,
+						": Yesterday's Year");
+				byClassName.selectByVisibleText(class_MonthDDL, month,
+						": Yesterday's Month");
+				byClassName.getElement(class_DateTable, "Get Dates").
+				findElement(By.linkText(day)).click();
+				
+				String actualDate = byId.getAttribute(id_BillDatenewRecurringBill, "value",
+						": Get Showing bill Date");
+				System.out.println("Date should be: "+new SimpleDateFormat("MM/dd/yyyy").
+						format(ExpectedDate)+", but found:"+actualDate);
+				for (String string : new SimpleDateFormat("MM/dd/yyyy").
+						format(ExpectedDate).split("/")) {
+					System.out.println(string);
+					Assert.assertTrue(actualDate.contains(string), "Should be able to select"
+							+ " current date, previous date and future date for Bill.");
+				}				
+			}
+			Assert.assertAll();
+		}
+		
+		@Test(groups = {"Smoke", "Jasmeet"})
+		public void P2M6_312(){
+			extentTest = extentReport.startTest("P2M6_312", "JS: Accounting>>RNP>>"
+					+ " New Recurring Bill>> Ensure that amount field should be a"
+					+ " mandatory field and currency sign should be displayed in"
+					+ " front of Amount e.g., Amount($)");
+			newRecurringTab();
+			
+			SoftAssert Assert = new SoftAssert();
+			String amountLabel = byId.getText(id_AmountNewRecurringBillLbl,
+					"Amount field Label front of Amount");
+			System.out.println(amountLabel.indexOf(")") - amountLabel.indexOf("("));
+			
+			Assert.assertTrue(amountLabel.indexOf(")") - amountLabel.indexOf("(") >= 2,
+					"Currency sign should be displayed in");
+			byId.click(id_SaveNewewRecurringBillBtn, ": Save btn");
+			
+			Assert.assertEquals(byXpath.getSize("//span[@class='spn-right']/div",
+					": Error message"), 1, "Amount should be a mandatory field");			
+			
+			Assert.assertAll();
+		}
+		
+		@Test(groups = {"Smoke", "Jasmeet"})
+		public void P2M6_316(){
+			extentTest = extentReport.startTest("P2M6_316", "JS: Accounting>>RNP>>"
+					+ " New Recurring Bill>> Click Amount >>Ensure that validation"
+					+ " message should be displayed if amount field is blank.");
+			newRecurringTab();
+			
+			byId.click(id_AmountNewRecurringBill, ": In text Field Amount");
+			byId.click(id_AmountNewRecurringBillLbl, ": In Amount Label");
+			
+			Assert.assertEquals(byXpath.getSize("//span[@class='spn-right']/div",
+					": Error message"), 1, "Validation message should be displayed");
+			
+		}
+		
+		@Test(groups = {"Smoke", "Jasmeet"})
+		public void P2M6_317(){
+			extentTest = extentReport.startTest("P2M6_317", "JS: Accounting>>RNP>>"
+					+ " New Recurring Bill>> Ensure that Reference field should"
+					+ " be a text field and non mandatory field");
+			newRecurringTab();
+			
+			Assert.assertFalse(byXpath.getText(xpath_ReferenceNewRecurringBillLBL,
+					"Reference Label").contains("*"),
+					"Reference field should be non mandatory field");
+			
+		}
+		
+		@Test(groups = {"Smoke", "Jasmeet"})
+		public void P2M6_322(){
+			extentTest = extentReport.startTest("P2M6_322", "JS: Accounting>>RNP>>"
+					+ " New Recurring Bill>> View for Charge To >> Ensure that two"
+					+ " options should be displayed in front of Charge To field:"
+					+ "1. Tenant, 2. Other");
+			newRecurringTab();
+
+			SoftAssert Assert = new SoftAssert();
+			
+			Assert.assertEquals(byId.getSize(id_TenantNewRecurringBillChkbox,
+					": Tenant CheckBox"), 1, ": Tenant CheckBox not Exists");
+			Assert.assertEquals(byId.getSize(id_OtherNewRecurringBillChkbox,
+					": Other CheckBox"), 1, ": Other CheckBox not Exists");
+			
+			
+			Assert.assertAll();			
+		}
+		
+		@Test(groups = {"Smoke", "Jasmeet"})
+		public void P2M6_323(){
+			extentTest = extentReport.startTest("P2M6_323", "JS: Accounting>>RNP>>"
+					+ " New Recurring Bill>> View for Charge To >> Ensure that "
+					+ "when click on Tenant Checkbox then the search textbox"
+					+ " should be displayed with the 'Tenant Name' watermark");
+			newRecurringTab();
+
+			SoftAssert Assert = new SoftAssert();
+			Assert.assertFalse(getDriver().findElement(By.
+					id(id_TenantNameNewRecurringBill)).isDisplayed(),
+					"TenantBox should not displayed");
+			byId.click(id_TenantNewRecurringBillChkbox,	": Tenant CheckBox");
+			
+			Assert.assertTrue(getDriver().findElement(By.
+					id(id_TenantNameNewRecurringBill)).isDisplayed(),
+					"TenantBox should displayed");
+			Assert.assertEquals(byId.getAttribute(id_TenantNameNewRecurringBill,
+					"placeholder", "TenantBox watermark"), "Tenant Name",
+					"Should be displayed with the 'Tenant Name' watermark");
+			
+			Assert.assertAll();			
+		}
+		
+		@Test(groups = {"Smoke", "Jasmeet"})
+		public void P2M6_324(){
+			extentTest = extentReport.startTest("P2M6_324", "JS: Accounting>>RNP>>"
+					+ " New Recurring Bill>> View for Charge To >> Tenant checkbox >>"
+					+ "Search Text Field >> Ensure that tenant listing should be"
+					+ " displayed when click on tenant search textfield.");
+			newRecurringTab();
+			
+			byId.click(id_TenantNewRecurringBillChkbox,	": Tenant CheckBox");
+			byId.setText(id_TenantNameNewRecurringBill," ",	": space in Tenant textbox");
+			byId.click(id_TenantNameNewRecurringBill,	": Tenant textbox");
+			
+			Assert.assertTrue(getDriver().findElement(By.
+					id(id_ListVendorNameHeaderNewRecurringBillDiv)).isDisplayed(),
+					"Tenant List should displayed");					
+		}
+		
+		@Test(groups = {"Smoke", "Jasmeet"})
+		public void P2M6_325(){
+			extentTest = extentReport.startTest("P2M6_325", "JS: Accounting>>RNP>>"
+					+ " New Recurring Bill>> View for Charge To >> Tenant checkbox >>"
+					+ "Search Text Field >> Ensure that user should be able to "
+					+ "search with following keywords: 1. Tenant Name 2. Email"
+					+ " 3. Property 4. Building 5. Unit");
+			newRecurringTab();
+			
+			byId.click(id_TenantNewRecurringBillChkbox,	": Tenant CheckBox");
+			byId.setText(id_TenantNameNewRecurringBill," ",	": space in Tenant textbox");
+			byId.click(id_TenantNameNewRecurringBill,	": Tenant textbox");
+			String coploumnNames = byId.getText(id_ListVendorNameHeaderNewRecurringBillDiv,
+					"Coulmn names of Tenant List ");
+			
+			for (String string : columnTenantListNewRecurringBill) {
+				Assert.assertTrue(coploumnNames.contains(string),
+						"Should have following coloumn names");
+			}					
+		}
+		
+		@Test(groups = {"Smoke", "Jasmeet"})
+		public void P2M6_326() throws IOException, InterruptedException, AWTException{
+			extentTest = extentReport.startTest("P2M6_326", "JS: Accounting>>RNP>>"
+					+ " New Recurring Bill>> View for Charge To >> Tenant checkbox >>"
+					+ "Search Text Field >> Enter Tenant Name >> Ensure that"
+					+ "user should be able to search with Tenant name.");
+			propertyName = ApexCommon.addProperty()[0];//"Property143718";//
+				System.out.println(propertyName);
+				tenant_FirstName = utility.uniqueString();
+				ApexCommon.addTenant(propertyName, tenant_FirstName, "Somal",
+						tenant_FirstName+"id@yopmail.com", "9400123123");			
+			newRecurringTab();
+			
+			byId.click(id_TenantNewRecurringBillChkbox,	": Tenant CheckBox");
+			byId.click(id_TenantNameNewRecurringBill,	": Tenant TextBox");
+			byId.setText(id_TenantNameNewRecurringBill, tenant_FirstName, "Tenant Name");
+			Assert.assertTrue(byXpath.getText("//div[@id='ui-active-menuitem']//div[2]",
+					"Name of Tenant").contains(tenant_FirstName),
+					"Should be able to search with Tenant name");				
+		}
+		
+		@Test(groups = {"Smoke", "Jasmeet"})
+		public void P2M6_327() throws IOException, InterruptedException, AWTException{
+			extentTest = extentReport.startTest("P2M6_327", "JS: Accounting>>RNP>>"
+					+ " New Recurring Bill>> View for Charge To >> Tenant checkbox >>"
+					+ "Search Text Field >> Enter Tenant Name >> Ensure that"
+					+ "user should be able to search with Email.");
+			if(tenant_FirstName == null)
+			{
+				propertyName = ApexCommon.addProperty()[0];//"Property143718";//
+				System.out.println(propertyName);
+				tenant_FirstName = utility.uniqueString();
+				ApexCommon.addTenant(propertyName, tenant_FirstName, "Somal",
+						tenant_FirstName+"id@yopmail.com", "9400123123");
+			}			
+			newRecurringTab();
+			
+			byId.click(id_TenantNewRecurringBillChkbox,	": Tenant CheckBox");
+			byId.click(id_TenantNameNewRecurringBill,	": Tenant TextBox");
+			byId.setText(id_TenantNameNewRecurringBill, tenant_FirstName+"id@yop",
+					"Tenant Name");
+			if(byXpath.getSize("//div[@id='ui-active-menuitem']//div[3]",
+					"Name of Tenant")>0){
+				Assert.assertTrue(byXpath.getText("//div[@id='ui-active-menuitem']//div[3]",
+						"Name of Tenant").contains(tenant_FirstName),
+						"Should be able to search with Email");
+			}
+			else 
+				Assert.fail("Should be able to search with Email");							
+		}
+		
+		@Test(groups = {"Smoke", "Jasmeet"})
+		public void P2M6_328() throws IOException, InterruptedException, AWTException{
+			extentTest = extentReport.startTest("P2M6_328", "JS: Accounting>>RNP>>"
+					+ " New Recurring Bill>> View for Charge To >> Tenant checkbox >>"
+					+ "Search Text Field >> Enter Tenant Name >> Ensure that"
+					+ "user should be able to search with Property.");
+			if(tenant_FirstName == null)
+			{
+				propertyName = ApexCommon.addProperty()[0];//"Property143718";//
+				System.out.println(propertyName);
+				tenant_FirstName = utility.uniqueString();
+				ApexCommon.addTenant(propertyName, tenant_FirstName, "Somal",
+						tenant_FirstName+"id@yopmail.com", "9400123123");
+			}			
+			newRecurringTab();
+			
+			byId.click(id_TenantNewRecurringBillChkbox,	": Tenant CheckBox");
+			byId.click(id_TenantNameNewRecurringBill,	": Tenant TextBox");
+			byId.setText(id_TenantNameNewRecurringBill, propertyName,
+					"Tenant Name");
+			if(byXpath.getSize("//div[@id='ui-active-menuitem']//div[4]",
+					"Name of Tenant")>0){
+				Assert.assertTrue(byXpath.getText("//div[@id='ui-active-menuitem']//div[4]",
+						"Name of Tenant").contains(propertyName),
+						"Should be able to search with Property");
+			}
+			else 
+				Assert.fail("Should be able to search with Property");							
+		}
+		
+		@Test(groups = {"Smoke", "Jasmeet"})
+		public void P2M6_329() throws IOException, InterruptedException, AWTException{
+			extentTest = extentReport.startTest("P2M6_329", "JS: Accounting>>RNP>>"
+					+ " New Recurring Bill>> View for Charge To >> Tenant checkbox >>"
+					+ "Search Text Field >> Enter Tenant Name >> Ensure that"
+					+ "user should be able to search with Building.");
+			if(tenant_FirstName == null)
+			{
+				propertyName = ApexCommon.addProperty()[0];//"Property143718";//
+				System.out.println(propertyName);
+				tenant_FirstName = utility.uniqueString();
+				ApexCommon.addTenant(propertyName, tenant_FirstName, "Somal",
+						tenant_FirstName+"id@yopmail.com", "9400123123");
+			}			
+			newRecurringTab();
+			
+			byId.click(id_TenantNewRecurringBillChkbox,	": Tenant CheckBox");
+			byId.click(id_TenantNameNewRecurringBill,	": Tenant TextBox");
+			byId.setText(id_TenantNameNewRecurringBill, propertyName,
+					"Tenant Name");
+			if(byXpath.getSize("//div[@id='ui-active-menuitem']//div[5]",
+					"Name of Tenant")>0){
+				Assert.assertTrue(byXpath.getText("//div[@id='ui-active-menuitem']//div[5]",
+						"Name of Tenant").contains(propertyName),
+						"Should be able to search with Building");
+			}
+			else 
+				Assert.fail("Should be able to search with Building");							
+		}
+		
+		@Test(groups = {"Smoke", "Jasmeet"})
+		public void P2M6_330() throws IOException, InterruptedException, AWTException{
+			extentTest = extentReport.startTest("P2M6_330", "JS: Accounting>>RNP>>"
+					+ " New Recurring Bill>> View for Charge To >> Tenant checkbox >>"
+					+ "Search Text Field >> Enter Tenant Name >> Ensure that"
+					+ "user should be able to search with Unit.");
+			if(tenant_FirstName == null)
+			{
+				propertyName = ApexCommon.addProperty()[0];//"Property143718";//
+				System.out.println(propertyName);
+				tenant_FirstName = utility.uniqueString();
+				ApexCommon.addTenant(propertyName, tenant_FirstName, "Somal",
+						tenant_FirstName+"id@yopmail.com", "9400123123");
+			}			
+			newRecurringTab();
+			
+			byId.click(id_TenantNewRecurringBillChkbox,	": Tenant CheckBox");
+			byId.click(id_TenantNameNewRecurringBill,	": Tenant TextBox");
+			byId.setText(id_TenantNameNewRecurringBill, propertyName,
+					"Tenant Name");
+			if(byXpath.getSize("//div[@id='ui-active-menuitem']//div[6]",
+					"Name of Tenant")>0){
+				Assert.assertTrue(byXpath.getText("//div[@id='ui-active-menuitem']//div[6]",
+						"Name of Tenant").contains(propertyName),
+						"Should be able to search with Unit");
+			}
+			else 
+				Assert.fail("Should be able to search with Unit");							
+		}
+		
+		@Test(groups = {"Smoke", "Jasmeet"})
+		public void P2M6_331() throws IOException, InterruptedException, AWTException{
+			extentTest = extentReport.startTest("P2M6_331", "JS: Accounting>>RNP>>"
+					+ " New Recurring Bill>> View for Charge To >> Tenant checkbox >>"
+					+ "Search Text Field >> Enter Tenant Name >> Ensure that the "
+					+ "following should be autopopulate: 1. Portfolio 2. Property "
+					+ "3. Building 4. Unit");
+			
+			String []array = ApexCommon.addProperty();
+			propertyName = array[0];
+			String portfolio = array[1];//"Property143718";//
+			System.out.println(propertyName);
+			tenant_FirstName = utility.uniqueString();
+			Thread.sleep(2000);
+			ApexCommon.addTenant(propertyName, tenant_FirstName, "Somal",
+					tenant_FirstName+"id@yopmail.com", "9400123123");
+			
+			newRecurringTab();
+			
+			byId.click(id_TenantNewRecurringBillChkbox,	": Tenant CheckBox");
+			byId.click(id_TenantNameNewRecurringBill,	": Tenant TextBox");
+			byId.setText(id_TenantNameNewRecurringBill, tenant_FirstName,
+					"Tenant Name");
+			if(byXpath.getSize("//div[@id='ui-active-menuitem']//div[2]",
+					"Name of Tenant")>0){
+				byXpath.click("//div[@id='ui-active-menuitem']//div[2]", "Tenant from list");
+				SoftAssert Assert = new SoftAssert();
+				Assert.assertTrue(byId.getFirstSelectedOption(id_PortfolioNewRecurringBill,
+						"Portfolio").contains(portfolio),
+						"Portfolio should be autopopulated");
+				Assert.assertTrue(byId.getAttribute(id_PropertyNewRecurringBill,
+						"value", "Property value").contains(propertyName),
+						"Property should be autopopulated");
+				Assert.assertTrue(byId.getFirstSelectedOption(id_BuildingNewRecurringBill,
+						"Building").contains(propertyName),
+						"Building should be autopopulated");
+				Assert.assertTrue(byId.getFirstSelectedOption(id_UnitNewRecurringBill,
+						"Unit").contains(propertyName),
+						"Unit should be autopopulated");
+				Assert.assertAll();
+			}
+			else 
+				Assert.fail("Should be able to search with Unit");							
+		}
+		
+		@Test(groups = {"Smoke", "Jasmeet"})
+		public void P2M6_332(){
+			extentTest = extentReport.startTest("P2M6_332", "JS: Accounting>>RNP>>"
+					+ " New Recurring Bill>> View for Charge To >> Other checkbox >>"
+					+ "Ensure that when click on Other checkbox the textfield should"
+					+ " be displayed to enter other as Tenant, Owner, Vendor,"
+					+ " Contact who is not in the system.");
+			newRecurringTab();
+			
+			byId.click(id_OtherNewRecurringBillChkbox,	": Other CheckBox");
+			Assert.assertEquals(byId.getSize(id_OtherChargeToNewRecurringBillTxt,
+					" Other Charge To field"), 1, "Textfield should apear");								
+		}
+		
+		@Test(groups = {"Smoke", "Jasmeet"})
+		public void P2M6_333(){
+			extentTest = extentReport.startTest("P2M6_333", "JS: Accounting>>RNP>>"
+					+ " New Recurring Bill>> View for Charge To >> Other checkbox >>"
+					+ "Ensure that user should be able to enter numerics.");
+			newRecurringTab();
+			
+			byId.click(id_OtherNewRecurringBillChkbox,	": Other CheckBox");
+			byId.setText(id_OtherChargeToNewRecurringBillTxt, "123456",
+					" Numerics in Other Charge To field");
+			Assert.assertEquals(byId.getAttribute(id_OtherChargeToNewRecurringBillTxt,
+					"value", " Other Charge To field"), "123456",
+					"User should be able to enter numerics");								
+		}
+
+		@Test(groups = {"Smoke", "Jasmeet"})
+		public void P2M6_334(){
+			extentTest = extentReport.startTest("P2M6_334", "JS: Accounting>>RNP>>"
+					+ " New Recurring Bill>> View for Charge To >> Other checkbox >>"
+					+ "Ensure that user should be able to enter alphabets.");
+			newRecurringTab();
+			
+			byId.click(id_OtherNewRecurringBillChkbox,	": Other CheckBox");
+			byId.setText(id_OtherChargeToNewRecurringBillTxt, "ABCDef",
+					" Alphabets in Other Charge To field");
+			Assert.assertEquals(byId.getAttribute(id_OtherChargeToNewRecurringBillTxt,
+					"value", " Other Charge To field"), "ABCDef",
+					"User should be able to enter alphabets");								
+		}
+
+		@Test(groups = {"Smoke", "Jasmeet"})
+		public void P2M6_335(){
+			extentTest = extentReport.startTest("P2M6_335", "JS: Accounting>>RNP>>"
+					+ " New Recurring Bill>> View for Charge To >> Other checkbox >>"
+					+ "Ensure that user should be able to enter Special Characters.");
+			newRecurringTab();
+			
+			byId.click(id_OtherNewRecurringBillChkbox,	": Other CheckBox");
+			byId.setText(id_OtherChargeToNewRecurringBillTxt, "$&$^%&",
+					" Special Characters in Other Charge To field");
+			Assert.assertEquals(byId.getAttribute(id_OtherChargeToNewRecurringBillTxt,
+					"value", " Other Charge To field"), "$&$^%&",
+					"User should be able to enter Special Characters");								
+		}
+
+		@Test(groups = {"Smoke", "Jasmeet"})
+		public void P2M6_336(){
+			extentTest = extentReport.startTest("P2M6_336", "JS: Accounting>>RNP>>"
+					+ " New Recurring Bill>> View for Charge To >> Other checkbox >>"
+					+ "Ensure that user should be able to enter combination of"
+					+ " numerics, alphabest and Special Characters .");
+			newRecurringTab();
+			
+			byId.click(id_OtherNewRecurringBillChkbox,	": Other CheckBox");
+			byId.setText(id_OtherChargeToNewRecurringBillTxt, "12ABa$&",
+					" Numerics, alphabest, Special Characters in Other Charge To field");
+			Assert.assertEquals(byId.getAttribute(id_OtherChargeToNewRecurringBillTxt,
+					"value", " Other Charge To field"), "12ABa$&",
+					"User should be able to enter numerics, alphabest, Special Characters");								
+		}
+		
+		@Test(groups = {"Smoke", "Jasmeet"})
+		public void P2M6_337(){
+			extentTest = extentReport.startTest("P2M6_337", "JS: Accounting>>RNP>>"
+					+ " New Recurring Bill>> Ensure that it should be a mandatory field"
+					+ " and current date should be displayed in the Due  Date field.");
+			newRecurringTab();
+			
+			SoftAssert Assert = new SoftAssert();
+			String actualDate = byId.getAttribute(id_DueDateNewRecurringBill, "value",
+					": Get Showing bill Date");
+			for (String string : extentDate.split("_")) {
+				Assert.assertTrue(actualDate.contains(string),
+						"Current date should be displayed in the Due Date field.");
+			}
+			byId.clear(id_DueDateNewRecurringBill, ": Clear bill date");
+			byId.click(id_MemoNewRecurringBill, ": Memo");
+			
+			Assert.assertEquals(byClassName.getSize(class_MandatoryfieldErrorMessage,
+					": Error message"), 1,
+					"Due Date should be a mandatory field");
+			Assert.assertAll();
+		}
+		
+		@Test(groups = {"Smoke", "Jasmeet"})
+		public void P2M6_338(){
+			extentTest = extentReport.startTest("P2M6_338", "JS: Accounting>>RNP>>"
+					+ " New Recurring Bill>> Due Date: Ensure that Date Picker Calendar"
+					+ " should be displayed to choose the date. User should be able to"
+					+ " choose current date and future date for Bill.");
+			newRecurringTab();
+			Date ExpectedDate;
+			SoftAssert Assert = new SoftAssert();
+			for(int i = 0; i < 2; i++){
+				byId.click(id_DueDateNewRecurringBill, ": Due Date");
+				ExpectedDate = new Date(System.currentTimeMillis()+24*60*60*1000*(i));
+				String year = new SimpleDateFormat("yyyy").format(ExpectedDate);
+				String month = new SimpleDateFormat("MMM").format(ExpectedDate);
+				Integer Day = Integer.parseInt(new SimpleDateFormat("dd").format(ExpectedDate));
+				String day = Day.toString();
+				System.out.println("Year is : "+year+". Month is : "+month+". Day is : "+day);
+				
+				byClassName.selectByVisibleText(class_CalendarYearDDL, year,
+						": Year");
+				byClassName.selectByVisibleText(class_MonthDDL, month,
+						": Month");
+				byClassName.getElement(class_DateTable, "Get Dates").
+				findElement(By.linkText(day)).click();
+				
+				String actualDate = byId.getAttribute(id_DueDateNewRecurringBill, "value",
+						": Get Showing bill Date");
+				System.out.println("Date should be: "+new SimpleDateFormat("MM/dd/yyyy").
+						format(ExpectedDate)+", but found:"+actualDate);
+				for (String string : new SimpleDateFormat("MM/dd/yyyy").
+						format(ExpectedDate).split("/")) {
+					System.out.println(string);
+					Assert.assertTrue(actualDate.contains(string), "Should be able to select"
+							+ " current date and future date for Due.");
+				}				
+			}
+			Assert.assertAll();
+		}
+		
+}

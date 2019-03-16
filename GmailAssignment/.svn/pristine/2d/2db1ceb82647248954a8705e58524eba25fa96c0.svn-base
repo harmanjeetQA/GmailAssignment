@@ -1,0 +1,109 @@
+package p2M6.Accounting.objectRepositry;
+
+public interface ACTG_Invoice {
+
+	String id_Invoices="tabConsolidatedInvoice";
+	String id_InvoiceNewInvoice="btnNewConsolidateInvoice";
+	String id_InvoiceReceiveMoney="btnReceiveConsolidateInvoice";
+	String id_InvoiceEmail="btnInvoiceEmail";
+	String id_InvoicePrint="btnInvoicePrint";
+	String id_InvoiceDelete="btnDeleteInvoices";
+	String id_InvoiceInvoiceToTenatRadioButton="chkInvoiceTypeTenant";
+	String id_NewInvoiceTenatTextbox="txtTenantConsolideInvoice";
+	String id_NewInvoiceTenatProperty="txtInvoiceProperty_";
+	String id_NewInvoiceTenatUnit="txtInvoiceUnitId_";
+	String id_NewInvoiceChargeCodeDDL = "ddlInvoiceChargeCode_";
+	String id_InvoiceInvoiceToOwnerRadioButton="chkInvoiceTypeOwner";
+	String id_NewInvoiceOwnerTextbox="txtOwnerConsolideInvoice";
+	String id_InvoiceInvoiceToOtherRadioButton="chkInvoiceTypeOther";
+	String id_NewInvoiceOtherTextbox="txtOtherConsolideInvoice";
+	String id_NewInvoiceGridCrossIcon=	"imgRemoveInvoiceCharge_";
+	String id_NewInvoiceDescription = "txtChargeCodeDescrip_";
+	String id_NewInvoiceAmount = "txtInvoiceAmount_";
+	String id_NewInvoicePlusIcon = "imgInvoiceChargesRow";
+	String id_NewInvoiceGrid = "gridNewConsolidateInvoice";
+	String id_NewInvoiceTotalAmount = "spnTotalAmt";
+	String id_NewInvoiceInvoiceDate = "txtConsolidateInvoiceDate";
+	String id_NewInvoiceLateDate = "txtConsolidateLastDate";
+	String id_NewInvoiceEmailThisInvoiceCheckbox = "chkEmailConsolidateInvoice";
+	String id_NewInvoiceNoLateFeeForThisInvoiceCheckbox = "chkNoLateFeeConsolidateInvoice";
+	String id_NewInvoiceSaveButton = "btnSaveConsolidateInvoice";
+	String id_InvoiceListingTable = "tblConsolidatedInvoice";
+	String id_NewInvoiceCancelButton = "btnCancelNewConsolidateInvoice";
+	String id_ReceiveMoneySearchTB = "SearchTenantName";
+	String id_ReceiveMoneyListOfTenantGridData = "tblTenantSummary";
+	String id_ReceiveMoneyFirstTable = "formPayment";
+	String id_ReceiveMoneySecondTable = "divChargeGrid";
+	String id_ReceiveMoneyFirstTableNameDDL = "ddlTenants";
+	String id_ReceiveMoneyFirstTablePaymentTypeDDL = "ddlPaymentTypeForPayment";
+	String id_ReceiveMoneyFirstTableCheckNo = "txtInvoice";
+	String id_ReceiveMoneyFirstTableReffNo = "dropdownlistContentjqxComboBox";
+	String id_ReceiveMoneyDebitCardSection = "divCreditCard";
+	String id_ReceiveMoneyFirstTableCardType = "ddlCardType";
+	String id_ReceiveMoneyFirstTableCreditCardNumber = "txtCreditCardNumber";
+	String id_ReceiveMoneyFirstTableCardHolderName= "txtNameOnCard";
+	String id_ReceiveMoneyFirstTableExpirationYearDDL = "ddlYear";
+	String id_ReceiveMoneyFirstTableCVVNo = "txtCvvNumber";
+	String id_ReceiveMoneyDisclaimerPopup = "divdisclamerBluePay";
+	String id_ReceiveMoneyDisclaimerPopupCancelButton = "btnCanceldisclamerBluePay";
+	String id_ReceiveMoneyDisclaimerPopupCheckBox = "btndisclamerBluePay";
+	String id_ReceiveMoneyAccountTypeDDL = "ddlAccountType";
+	String id_ReceiveMoneyRoutingNumber = "txtAchRoutingNumber";
+	String id_ReceiveMoneyAccountNumber = "txtAchAccountNumber";
+	String id_ReceiveMoneySaveAndNewButton = "btnSaveNextTenantPayment";
+	String id_ReceiveMoneySaveButton = "btnSaveTenantPayment";
+	String id_ReceiveMoneyReAllocateButton = "btnReallocate";
+	String id_EditInvoiceInvoiceDate = "txtConsolidateInvoiceDate_Edit";
+	
+	String class_ReceiveMoneySeconfTablePayCheckbox = "chkPay";
+	String class_NewInvoiceToastPopup = "toast-item-wrapper";
+	
+	String xpath_RecievePaymentSecndTable = "//*[@id='divChargeGrid']//table";
+	
+	//-----------------------------------------------
+	
+	String value_InvoiceNewInvoice="New Invoice";
+	String value_InvoiceReceiveMoney="Receive Money";
+	String value_InvoiceEmail="Email";
+	String value_InvoicePrint="Print";
+	String value_InvoiceDelete="Delete";
+	String value_NewInvoiceTenatTextboxWatermark="Click here to Select a Tenant";
+	String value_NewInvoiceOwnerTextboxWatermark="Click here to Select an Owner";
+	String value_NewInvoiceOtherTextboxNumeric="123456";
+	String value_NewInvoiceOtherTextboxAlphabets="Testing name";
+	String value_NewInvoiceOtherTextboxSpecialCharacters="!@#$%^&*()~_+<>/?";
+	String value_NewInvoiceOtherTextboxCombo="Testing@123";
+	String value_NewInvoiceGridProp="Property";
+	String value_NewInvoiceGridUnit="Unit";
+	String value_NewInvoiceGridChargeCode="Charge Code";
+	String value_NewInvoiceGridDesc="Description";
+	String value_NewInvoiceGridAmt="Amount(US$)";
+	String value_NewInvoiceGridCrossIcon="Remove";
+	String value_NewInvoicePopupText1 = "Atleast one charge code is required to generate invoice.";
+	String value_ReceiveMoneyFirstTable = "Name,Payment Type,Check #,Ref #,Date,Memo,Amount,Overpay/Underpay";
+	String value_ReceiveMoneySecondTable = "Date,Description,Charge Code,Original Amount,Amount Paid,Amount Due,Amount Waived Off,Waive Off Comment,Waive off Amount,Current Payment,Priority,Pay";
+	String value_ReceiveMoneyFirstTablePaymentTypeOptions = "Check,Cash,Debit Card,MO,EFT,ACH";
+	String value_ReceiveMoneyDebitCardSection = "Card Type,Credit Card Number,Card Holder Name,Expiration Month,Expiration Year,CVV No.";
+	String value_ReceiveMoneyCardTypeOptions = "Select,Visa,MasterCard,Discover,American Express";
+	String value_ReceiveMoneyFirstTableCreditCardNumberMorethan16 = "43434343434343420012";
+	String value_Alphanumeric = "Harinder1234";
+	String valiMsg_PaymentSavedSuccessfully = "The Payment saved successfully.";
+	
+	//-----------------------------------------------
+	
+	String xpath_NewInvoiceInvoiceTo="//*[@id='divNewConsolidatedInvoice']/div/div[2]/div[1]/div[1]/div[1]/label";
+	String xpath_NewInvoiceInvoiceDate="//*[@id='divNewConsolidatedInvoice']/div/div[2]/div[1]/div[2]/div[1]/label";
+	String xpath_NewInvoiceLateDate="//*[@id='divNewConsolidatedInvoice']/div/div[2]/div[1]/div[2]/div[2]/label";
+	String xpath_NewInvoiceEmail="//*[@id='divNewConsolidatedInvoice']/div/div[2]/div[1]/div[2]/div[3]/label";
+	String xpath_NewInvoiceNoLate="//*[@id='divNewConsolidatedInvoice']/div/div[2]/div[1]/div[2]/div[4]/label";
+	String xpath_NewInvoiceTenant="//*[@id='divNewConsolidatedInvoice']/div/div[2]/div[1]/div[1]/div[2]/label/div";
+	String xpath_NewInvoiceOwner="//*[@id='divNewConsolidatedInvoice']/div/div[2]/div[1]/div[1]/div[4]/label/div";
+	String xpath_NewInvoiceOther="//*[@id='divNewConsolidatedInvoice']/div/div[2]/div[1]/div[1]/div[6]/label/div";
+	String xpath_NewInvoiceGridProp="//*[@id='tbodyNewConsolidateInvoiceCharges']/tr[1]/th[1]";
+	String xpath_NewInvoiceGridUnit="//*[@id='tbodyNewConsolidateInvoiceCharges']/tr[1]/th[2]";
+	String xpath_NewInvoiceGridChargeCode="//*[@id='tbodyNewConsolidateInvoiceCharges']/tr[1]/th[3]";
+	String xpath_NewInvoiceGridDesc="//*[@id='tbodyNewConsolidateInvoiceCharges']/tr[1]/th[4]";
+	String xpath_NewInvoiceGridAmt="//*[@id='tbodyNewConsolidateInvoiceCharges']/tr[1]/th[5]";
+
+
+}

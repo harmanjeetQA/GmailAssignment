@@ -1,0 +1,88 @@
+package p2M6.Accounting.objectRepositry;
+
+public interface Admin_PeopleTab {
+
+	public String id_PeopleTab ="lnk0People";
+	public String id_PeopleVendorsTab ="ancVendors";
+	public String id_PeopleAddVendorFirstName ="txtFirstName";
+	public String id_PeopleAddVendorLastName ="txtLastName";
+	public String id_PeopleAddVendorAddress1 ="txtAddress1";
+	public String id_NewVendorTBEmail="txtEmail_1";
+	public String id_NewVendorDDLPhoneType = "NumberType";
+	public String id_NewVendorDDLCarrier="Carrier";
+	public String id_NewVendorTBPhoneNum="Number1";
+	public String id_NewVendorCBCompanyNameOnCheck="chkCompanyNameCheck";
+	public String id_NewVendorTBCompanyName="txtCompanyName";
+	public String id_NewVendorTBNameOnCheck="txtCompanyNameCheck";
+	public String id_NewVendorDDLVendorType = "ddlVendorType";
+	public String id_NewVendorDDLConsolidateChecks="ddlConsolidateChecks";
+	public String id_NewVendorDDLDefaultGLExpenseAccount="ddlGlAccount";
+	public String id_NewVendorTBOrderLimit="txtOrderLimit";
+	public String id_NewVendorNotes="txtVendorNotes";
+	public String id_NewVendorButtonSave="btnSaveNewVendor";
+	public String id_NewVendorButtonCancel="btnCancelNewVendor";
+	public String id_PayBillNewVendorButtonSave="btnSaveNewPopVendor";
+	public String id_PayBillNewVendorVendorID="VendorIdNew_AG";
+	public String id_PayBillNewVendorFirstName="txtNewFirstName";
+	public String id_PayBillNewVendorLastName="txtNewLastName";
+	public String id_PayBillNewVendorSaveButton="btnSaveNewPopVendor";
+
+	
+	
+	
+	public String xpath_PeopleVendorsGrid="//*[@id='tblVendorListingGrid']/tbody";
+	public String xpath_NewVendorButtonAddFiles="//*[@id='actions']/div[1]/span";
+	public String xpath_PaybillAddNewVendorAlertText="//*[@class='msgBoxContainer']/div[2]/p/span";
+	public String xpath_PaybillAddNewVendorAlertNoOption="//*[@class='msgBoxButtons']/input[2]";
+	public String xpath_PaybillNewVendorField1=".//*[@id='tab3']/div/div[2]/div/div[1]/div[1]/label";
+	public String xpath_PaybillNewVendorField2="//*[@id='tab3']/div/div[2]/div/div[1]/div[2]/label";
+	public String xpath_PaybillNewVendorField3="//*[@id='tab3']/div/div[2]/div/div[1]/div[3]/label";
+	public String xpath_PaybillNewVendorField4="//*[@id='tab3']/div/div[2]/div/div[1]/div[4]/label";
+	public String xpath_PaybillNewVendorField5="//*[@id='tab3']/div/div[2]/div/div[1]/div[5]/label";
+	public String xpath_PaybillNewVendorField6="//*[@id='tab3']/div/div[2]/div/div[1]/div[6]/label";
+	public String xpath_PaybillNewVendorField7="//*[@id='tab3']/div/div[2]/div/div[1]/div[7]/label";
+	public String xpath_PaybillNewVendorField8="//*[@id='tab3']/div/div[2]/div/div[1]/div[9]/label";
+	public String xpath_PaybillNewVendorField9="//*[@id='tab3']/div/div[2]/div/div[1]/div[10]/label";
+	public String xpath_PaybillNewVendorField10="//*[@id='tab3']/div/div[2]/div/div[1]/div[11]/label";
+	public String xpath_PaybillNewVendorField11="//*[@id='tab3']/div/div[2]/div/div[1]/div[12]/label";
+	public String xpath_PaybillNewVendorField12="//*[@id='tab3']/div/div[2]/div/div[1]/div[13]/label";
+	public String xpath_PaybillNewVendorField13="//*[@id='tab3']/div/div[2]/div/div[1]/div[14]/label";
+	public String xpath_PaybillNewVendorField14="//*[@id='tab3']/div/div[2]/div/div[1]/div[15]/label";
+	public String xpath_PaybillNewVendorField15="//*[@id='tab3']/div/div[2]/div/div[1]/div[16]/label";
+	public String xpath_PaybillNewVendorField16="//*[@id='tab3']/div/div[2]/div/div[1]/div[17]/label";
+	public String xpath_PaybillNewVendorField17="//*[@id='tab3']/div/div[2]/div/div[1]/div[18]/label";
+	public String xpath_PaybillNewVendorField18="//*[@id='tab3']/div/div[2]/div/div[1]/div[19]/label";
+	public String xpath_PaybillNewVendorField19="//*[@id='tab3']/div/div[2]/div/div[1]/div[20]/label";
+	public String xpath_PayBillNewVendorSaveConfirmationMsg="//*[@class='toast-item-wrapper']/div/p";
+
+	
+	
+	
+	
+	
+	/*******************************New Vendor*************************************/
+	
+	
+	String valueNewVendorTBFirstName= "Harinder";
+	String valueNewVendorTBLastName="Kaur";
+	String valueNewVendorDDLGender="Female";
+	String valueNewVendorTBCompanyName="Seasia";
+	String valueNewVendorTBNameOnCheck="Seasiatest";
+	String valueNewVendorTBDiscountPercentage="10";
+	String valueNewVendorTBDaysToPay= "15";
+	String valueNewVendorTBNetDayToPay= "20";
+	String valueNewVendorTBOrderLimit= "50";
+	String valueNewVendorTBAddress1= "#123";
+	String valueNewVendorTBAddress2= "#345";
+	String valueNewVendorTBAddress3= "#266";
+	String valueNewVendorTBPhoneNum= "9856932147";
+	String valueNewVendorTBPhoneNum1= "9857415963";
+	String valueNewVendorDDLCarrier= "Bell Mobility";
+	String valueNewVendorTBEmail1= "vendor@yopmail.com";
+	String valueNewVendorTBEmail2= "vendor1@yopmail.com";
+	String valueVendorListingActionRBCheck= "Run Background Check";
+	String valueVendorListingActionNewBill = "New Bill";
+
+	String valueNewVendorDDLNoticePeriod= "1 Months";
+	String msgForCompanyNameTBOnChecKingCB= "*Please type in Company Name";
+}

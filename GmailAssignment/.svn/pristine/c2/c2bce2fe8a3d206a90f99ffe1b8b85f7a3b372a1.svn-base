@@ -1,0 +1,361 @@
+package p2M5.vendorPortal;
+
+/*import static frameworkGlobals.BrowserSelection.driver;*/
+
+import java.awt.AWTException;
+import java.awt.Robot;
+import java.awt.event.KeyEvent;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Keys;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
+import org.testng.Assert;
+
+import com.relevantcodes.extentreports.LogStatus;
+
+import frameworkGlobals.BrowserSelection;
+/*import commonClassesReusable.ByID;
+import commonClassesReusable.ByXpath;
+import commonClassesReusable.LogClass;
+import commonClassesReusable.;
+import frameworkGlobals.BrowserSelection;*/
+import objectRepository.ApexLinkGlobalComponents;
+import objectRepository.IManageBill;
+
+public class VendorPortalCommons extends BrowserSelection implements IManageBill, ApexLinkGlobalComponents {
+
+	public static List<Object> getWebElementsByIds(String[] arr) {
+		List<Object> li = new ArrayList<>();
+		for (String getId : arr) {
+			WebElement we = getDriver().findElement(By.id(getId));
+			li.add(we);
+		}
+		return li;
+	}
+
+	public static void SelectPrevDateFromTodaysDate() {
+		if (getDriver().findElements(By.xpath("//*[@class='" + class_CalendarTable
+				+ "']//tr[1]//td//a[contains(@class,'" + class_CalendarContainsActiveDate + "')][text()='1']"))
+				.size() > 0) {
+			byXpath.click("//*[@title='" + title_CalendarPrevIcon + "']", "Click on 'Prev' Icon");
+			if (getDriver().findElement(By.xpath("//*[@class='" + class_CalendarTable
+					+ "']//tr[last()]//td[contains(@class,'ui-state-disabled')][1]")).isDisplayed()) {
+				byXpath.click(
+						"//*[@class='" + class_CalendarTable
+								+ "']//tr[last()]//td[contains(@class,'ui-state-disabled')][1]//preceding-sibling::td[1]",
+						"Click on Last date of Previous month");
+			} else {
+				byXpath.click("//*[@class='" + class_CalendarTable + "']//tr[last()]//td[last()]",
+						"Click on Last date of Previous month");
+			}
+		} else {
+			byXpath.click("//*[contains(@class,'" + class_CalendarContainsHighlight
+					+ "')]//parent::td//preceding-sibling::td[1]", " Click on Back Date from Todays Date");
+		}
+	}
+
+	public static void SelectNextDateFromTodaysDate() {
+		if (getDriver().findElements(By.xpath("//*[@class='" + class_CalendarTable+"']//tr[last()]//td[contains(@class,'" + class_CalendarTodaysDate + "')]")).size() < 1) {
+			byXpath.click("//*[contains(@class,'" + class_CalendarContainsHighlight+ "')]//parent::td//following-sibling::td[1]", " Click on future date from Todays Date");
+			
+		} else {
+			byXpath.click("//*[@title='" + title_CalendarNextIcon + "']", "Click on 'Next' Icon");
+			byXpath.click("//*[@class='" + class_CalendarTable + "']//tr[1]//td//a[text()='1']",
+					"Click on First date of Next month");
+		}
+	}
+
+	public static List<String> AddMultipleValuesInList(String values) {
+		String[] arr = values.split(",");
+		List<String> list = new ArrayList<>();
+		for (String value : arr) {
+			list.add(value);
+		}
+		return list;
+	}
+	
+	public static List<String> getValuesByIds(String[] ids) {
+		List<String> list = new ArrayList<>();
+		try {			
+			for (String id : ids) {
+				String val = byId.getAttribute(id, "value", "get value");
+				list.add(val);
+			}
+		} catch (Exception e) {
+			Assert.assertEquals(false, true);
+			// TODO: handle exception
+		}
+		return list;
+	}
+
+	public static List<Object> NewBill(String amount, String selectTerm_B, String reference_B, String Portfolio,
+			String memo_B, String property, String chargeTo_B, String tenantNameOrOthersText_B, String buildingName_B,
+			String unitNo_B, String account_B, String SplitBill_Amount, String Notes_B, String filePath_B)
+			throws InterruptedException {
+		List<Object> list = new ArrayList<>();
+		extentTest.log(LogStatus.INFO, "VendorPortalCommons.NewBill() starts");
+		byId.click(id_ManageBillNewBillButton, "Click on 'New Bill' button");
+		String getBillDate = byId.getAttribute(id_NewBillBillDate, "value", "get Default date from 'Bill Date' field");
+		list.add(getBillDate);
+		byId.clearThenSetText(id_NewBillAmount, amount, " Enter Amount in Amount field");
+		list.add(byId.getText(id_NewBillAmount, "get Entered Amount"));
+		if (!selectTerm_B.equals("") && !selectTerm_B.equals(null)) {
+			byId.selectByVisibleText(id_NewBillSelectTerm, selectTerm_B, "Select 'Term' from 'Select Term' DDL");
+		}
+		String getDefaultSelectTerm = byId.getFirstSelectedOption(id_NewBillSelectTerm,
+				"get Default Term from 'Select Term' DDL");
+		list.add(getDefaultSelectTerm);
+		if (!reference_B.equals("") && !reference_B.equals(null)) {
+			byId.clearThenSetText(id_NewBillReference, reference_B, "Enter Reference# in 'Referecne#' field");
+			list.add(reference_B);
+		}
+		String getDueDate = byId.getAttribute(id_NewBillDueDate, "value", "get Default date from 'Due Date' field");
+		list.add(getDueDate);
+		Thread.sleep(2000);
+		JavascriptExecutor jse = (JavascriptExecutor) getDriver();
+		byId.selectByVisibleText(id_NewBillPortfolio, Portfolio, "Select Portfolio");
+		if (!memo_B.equals("") && !memo_B.equals(null)) {
+			byId.clearThenSetText(id_NewBillMemo, memo_B, "Enter Memo in 'Memo' field");
+		}
+		Thread.sleep(2000);
+		//byId.click(id_NewBillSplitBillProperty, "Enter Property from Property DDL in 'Add Items' Section");
+		byId.setText(id_NewBillSplitBillProperty,property, "Enter Property from Property DDL in 'Add Items' Section");
+		Thread.sleep(2000);
+		//byXpath.click("//*[@id='ui-id-1']//li[contains(.,'"+property+"')]", "Select Property");
+		getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ARROW_DOWN);
+		getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ARROW_DOWN);
+		getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ENTER);
+		Actions act = new Actions(getDriver());
+		act.moveToElement(getDriver().findElement(By.id(id_NewBillChargeToTenantCheckBox))).perform();
+		if (!chargeTo_B.equals("") && !chargeTo_B.equals(null)) {
+			if (chargeTo_B.equals("Tenant") && chargeTo_B.equals("tenant")) {
+				byId.click(id_NewBillChargeToTenantCheckBox, "Check 'Tenant' CheckBox");
+				if (!tenantNameOrOthersText_B.equals("") && chargeTo_B.equals(null))
+					byId.clearThenSetText(id_NewBillChargeToTenantTextBox, tenantNameOrOthersText_B,
+							"Enter Tenant name");
+				getDriver().findElement(By.id(id_NewBillChargeToTenantTextBox)).sendKeys(Keys.ARROW_DOWN);
+				getDriver().findElement(By.id(id_NewBillChargeToTenantTextBox)).sendKeys(Keys.ARROW_DOWN);
+				getDriver().findElement(By.id(id_NewBillChargeToTenantTextBox)).sendKeys(Keys.ENTER);
+			} else {
+				byId.click(id_NewBillChargeToOthersCheckbox, "Check 'Others' CheckBox");
+				if (!tenantNameOrOthersText_B.equals("") && chargeTo_B.equals(null))
+					byId.clearThenSetText(id_NewBillChargeToOthersTextBox, tenantNameOrOthersText_B,
+							"Enter data in Others Textbox");
+			}
+		}
+		String getBuildingName = byId.getFirstSelectedOption(id_AddItemsSectionBuildingDDL, "get selected value");
+		if (getBuildingName.equals("Select") && !buildingName_B.equals("") && !buildingName_B.equals(null)) {
+			byId.selectByVisibleText(id_AddItemsSectionBuildingDDL, buildingName_B, "Select Building name");
+		} else {
+			byId.selectByIndex(id_AddItemsSectionBuildingDDL, 1, "Select Building by Index");
+		}
+		getBuildingName = byId.getFirstSelectedOption(id_AddItemsSectionBuildingDDL, "get selected value");
+		list.add(getBuildingName);
+		String getUnitNum = byId.getFirstSelectedOption(id_NewBillAddItemsUnit, "Get Selected unit No");
+		if (getUnitNum.equals("Select")) {
+			/*
+			 * byId.click(id_NewBillSplitBillUnit, "Click on Unit DDL");
+			 * byXpath.click("//*[@class='"+class_NewBillUnitPopupUnitsCheckBox+
+			 * "'][1]//input", "Check the checkbox to select Unit");
+			 * byId.click("btnInvoiceUnitSave", "Click on Save button");
+			 */
+			if (unitNo_B.equals("") || unitNo_B.equals(null)) {
+				byId.selectByIndex(id_NewBillAddItemsUnit, 1, "Select Unit by Index");
+			} else {
+				byId.selectByVisibleText(id_NewBillAddItemsUnit, unitNo_B, "Select Unit No by visible text");
+			}
+			getUnitNum = byId.getFirstSelectedOption(id_NewBillAddItemsUnit, "Get Selected unit No");
+		}
+		list.add(getUnitNum);
+		if (!account_B.equals("") && !account_B.equals(null)) {
+			byId.selectByVisibleText(id_NewBillAddItemsAccount, account_B, "Select Account");
+		} else {
+			byId.selectByIndex(id_NewBillAddItemsAccount, 1, "Select Account by Index");
+			String getAccountName = byId.getFirstSelectedOption(id_NewBillAddItemsAccount, "Get Selected Account");
+			list.add(getAccountName);
+		}
+		byId.clearThenSetText(id_NewBillAddItemsAmount, SplitBill_Amount, "Enter Amount in add items section");
+		list.add(byId.getAttribute(id_NewBillAddItemsAmount, "value", "get Amount from add items Section"));
+		Actions actions = new Actions(getDriver());
+		actions.moveToElement(getDriver().findElement(By.id(id_NewBillAddItemsDescription))).click().perform();
+
+		if (!Notes_B.equals("") && !Notes_B.equals(null)) {
+			byId.clearThenSetText(id_NewBillNotes, Notes_B, "Enter Notes in Notes Section");
+		}
+		if (!filePath_B.equals("") && !filePath_B.equals(null)) {
+			byXpath.click("//*[@id='" + id_NewBillFileLibrarySection + "']/div[1]/span", "Click Add Files button");
+			utility.uploadFiles(System.getProperty("user.dir") + filePath_B);
+		}
+		byId.click(id_NewBillSaveButton, "Click on Save Button");
+		extentTest.log(LogStatus.INFO, "VendorPortalCommons.NewBill() ends");
+		return list;
+	}
+
+	public static List<String> newTenant_SelectPropertyTab(String propertyName, String buildingName, String unitNo, String tenant_FirstName,
+			String tenant_LastName, String emailId_B, String phoneNum_B) throws IOException, InterruptedException {
+		Short i = 1;
+		String getBuildingName;
+		String getUnitName;
+
+		List<String> li = new ArrayList<>();
+
+		byId.click(id_peopleMenu_newTenant_button,"clicking on new tenant button");
+		Thread.sleep(2000);
+		byId.clearThenSetText(id_peopleMenu_newTenant_propertyName_ddl, propertyName,"selecting property name");
+		Thread.sleep(2000);
+		getDriver().findElement(By.id(id_peopleMenu_newTenant_propertyName_ddl)).sendKeys(Keys.ARROW_DOWN);
+		getDriver().findElement(By.id(id_peopleMenu_newTenant_propertyName_ddl)).sendKeys(Keys.ENTER);
+		
+		//byId.click(id_peopleMenu_newTenant_buildingName_ddl, " Click on Select Building DDL");
+
+		/*getBuildingName = byId.getAttribute(id_peopleMenu_newTenant_buildingName_ddl, "title", " get selected value from Select Building DDL");
+		if(getBuildingName.equals("") && getBuildingName.equals(null))
+		{*/
+		//byXpath.click(xpathNewTenantDDLSelectBuildingList + "[" + i + "]//a"," Select Buildind ");
+
+		if (!buildingName.equals("") && !buildingName.equals(null)) {
+			byId.click(id_peopleMenu_newTenant_buildingName_ddl, " Click on Select Building DDL");
+			Thread.sleep(2000);
+			byXpath.click(xpathNewTenantDDLSelectBuildingList + "//a[contains(.,'"+buildingName+"')]", " Select Buildind by visible text");
+		}
+		
+		getBuildingName = byId.getAttribute(id_peopleMenu_newTenant_buildingName_ddl, "title", " get selected value from Select Building DDL");
+		if (getBuildingName.equals("Select")) {
+			i = (short) (i + 1);
+			byId.click(id_peopleMenu_newTenant_buildingName_ddl, " Click on Select Building DDL");
+			Thread.sleep(2000);
+			byXpath.click(xpathNewTenantDDLSelectBuildingList + "[" + i + "]//a", " Select first Building from list");
+			getBuildingName = byId.getAttribute(id_peopleMenu_newTenant_buildingName_ddl, "title"," get selected value from Select Building DDL");
+		}
+		
+		if (!unitNo.equals("") && !unitNo.equals(null)) {
+			byId.click( id_peopleMenu_newTenant_unitName_ddl, " Click on Select Unit DDL");
+			Thread.sleep(1000);
+			byXpath.click(xpathNewTenantDDLSelectUnitList + "//a[contains(.,'"+unitNo+"')]", " Select Unit by visible text");
+			}
+		
+		getUnitName = byId.getAttribute(id_peopleMenu_newTenant_unitName_ddl, "title", " get selected value from Select Unit DDL");
+
+		if (getUnitName.equals("Select")) {
+			i = (short) (i + 1);
+			byId.click( id_peopleMenu_newTenant_unitName_ddl, " Click on Select Unit DDL");
+			Thread.sleep(1000);
+			System.out.println(xpathNewTenantDDLSelectUnitList+"[" + i + "]//a");
+			byXpath.click(xpathNewTenantDDLSelectUnitList +"[" + i + "]//a", " Select first Unit in list");
+			getUnitName = byId.getAttribute( id_peopleMenu_newTenant_unitName_ddl, "value", " get selected value from Select Unit DDL");
+		}
+		li.add(getBuildingName);
+		li.add(getUnitName);
+
+		byId.clearThenSetText( id_peopleMenu_newTenant_firstName_textbox, tenant_FirstName, "entering first name");
+		byId.clearThenSetText(id_peopleMenu_newTenant_lastName_textbox, tenant_LastName, "entering last name");
+		byId.clearThenSetText(id_peopleMenu_newTenant_emailID_textbox, emailId_B, "entering email id");
+		byId.clearThenSetText(id_peopleMenu_newTenant_phoneNumber_textbox, phoneNum_B, "entering phone number");
+		byId.click(idNewTenantSelectPropertyTabButtonNext, "Clicking on Next button");
+		return li;
+
+	}
+
+	public static List<String> newTenant_LeaseDetailsTab(String leaseTerm_B, String monthYears_B, String noticePeriod_B,
+			String rentAmount_B, String camAmount_B, String securityDeposit_B)
+			throws IOException, InterruptedException {
+
+		String moveInDate;
+		String leaseEndDate;
+		String leaseStartDate;
+		String noticeDate;
+		String rntAmt;
+		String securityDeposit;
+		String leaseTerm;
+		String period;
+		String leasePeriod;
+		List<String> li = new ArrayList<>();
+		moveInDate = byId.getAttribute(id_peopleMenu_newTenant_Leases_MoveInDate, "value", " Get value of Move In date TextBox");
+		li.add(moveInDate);
+		byId.click(id_peopleMenu_newTenant_Leases_LeaseStartDate, " Click on Lease Start Date TextBox");
+		byXpath.click(xpathNewTenantLeaseDetaulsTabLeaseStartDateCalendar, " Select Lease Start date");
+		leaseStartDate = byId.getAttribute(id_peopleMenu_newTenant_Leases_LeaseStartDate, "value"," Get value of Lease Start date TextBox");
+		li.add(leaseStartDate);
+		if (!leaseTerm_B.equals(""))
+		byId.clearThenSetText(id_peopleMenu_newTenant_Leases_LeaseTerm, leaseTerm_B, " Enter Lease Terms");
+		leaseTerm = byId.getAttribute(id_peopleMenu_newTenant_Leases_LeaseTerm, "value", " get Lease Term Value");
+		li.add(leaseTerm);
+		if (!monthYears_B.equals(""))
+		byId.selectByVisibleText(idNewTenantLeaseDetailsTabDDLMonthYear, monthYears_B, " Select Duration");
+		period = byId.getFirstSelectedOption(idNewTenantLeaseDetailsTabDDLMonthYear, " get Value");
+		li.add(period);
+
+		leaseEndDate = byId.getAttribute(id_peopleMenu_newTenant_Leases_LeaseEndDate, "value", " Get value of Lease end date TextBox");
+		li.add(leaseEndDate);
+		if (!noticePeriod_B.equals(""))
+		byId.selectByVisibleText(id_peopleMenu_newTenant_Leases_NoticePeriod, noticePeriod_B, " Select Notice Period");
+		leasePeriod =byId.getFirstSelectedOption(id_peopleMenu_newTenant_Leases_NoticePeriod, " get Notice Period selected Value");
+		li.add(leasePeriod);
+		noticeDate = byId.getAttribute(idNewTenantLeaseDetailsTabTBNoticeDate, "value", " Get value of Notice Date TextBox");
+		li.add(noticeDate);
+		if (!rentAmount_B.equals(""))
+		byId.clearThenSetText(id_peopleMenu_newTenant_Leases_RentAmount, rentAmount_B, "");
+		rntAmt = byId.getAttribute(id_peopleMenu_newTenant_Leases_RentAmount, "value", " get Rent Amount value");
+		li.add(rntAmt);
+		if (!camAmount_B.equals(""))
+		byId.clearThenSetText(id_peopleMenu_newTenant_Leases_CAMAmount,camAmount_B, "Enter data ");
+		// li.add(leaseTerm);
+		if (!securityDeposit_B.equals(""))
+		byId.clearThenSetText(id_peopleMenu_newTenant_Leases_SecurityDeposit, securityDeposit_B, "");
+		securityDeposit = byId.getAttribute(id_peopleMenu_newTenant_Leases_SecurityDeposit, "value"," get Security deposit value");
+		li.add(securityDeposit);
+		Thread.sleep(5000);
+		byId.click(id_peopleMenu_newTenant_Leases_SaveLeasebutton, " Click on Next Button in Lease Details Tab");
+		return li;
+	}
+
+	public static String newTenant_ChargesAndMoveInTabWithoutParams()
+			throws IOException, InterruptedException, AWTException {
+		byId.click(id_peopleMenu_newTenant_Charges_Save, "Clicking on save charges button");
+		setLogs.info("User navigate on generate lease tab");
+
+		// Go to Generate leases
+		byId.click(id_peopleMenu_newTenant_GenerateLeaseDetail_GenerateLeaseDetailButton,
+				"Clicking on generate leases button");
+		Thread.sleep(5000);
+		// byId.click("id_peopleMenu_newTenant_GenerateLeaseDetail_ConfirmationMsg_OKOption,
+		// "Clicking on Ok of generate lease cofnfirmation message");
+		byXpath.click("//html/body//input[@id='btnOKLeasePopUp']", " Click on 'Ok' Button");
+
+		/*
+		 * Thread.sleep(6000); byId.click(
+		 * 
+		 * "id_peopleMenu_newTenant_GenerateLeaseDetail_ConfirmationMsg_OKOption"
+		 * ), "Clicking on yes of generate lease cofnfirmation message");
+		 */
+
+		Thread.sleep(5000);
+		Robot robot = new Robot();
+		// robot.keyPress(KeyEvent.VK_ENTER);
+		// robot.keyRelease(KeyEvent.VK_ENTER);
+		robot.keyPress(java.awt.event.KeyEvent.VK_ESCAPE);
+		robot.keyRelease(java.awt.event.KeyEvent.VK_ESCAPE);
+		Thread.sleep(5000);
+		robot.keyPress(KeyEvent.VK_ALT);
+		robot.keyPress(KeyEvent.VK_SPACE);
+		robot.keyPress(KeyEvent.VK_C);
+		robot.keyRelease(KeyEvent.VK_ALT);
+		robot.keyRelease(KeyEvent.VK_SPACE);
+		robot.keyRelease(KeyEvent.VK_C);
+		Thread.sleep(5000);
+		robot.keyPress(KeyEvent.VK_ENTER);
+		robot.keyRelease(KeyEvent.VK_ENTER);
+		Thread.sleep(3000);
+		// Move In
+		byXpath.click(xpath_peopleMenu_newTenant_GenerateLeaseDetail_MoveInConfirmation_YesOption, "Clicking on yes of Move In cofnfirmation message");
+		String getProratedRent = byId.getAttribute(id_peopleMenu_newTenant_MoveIn_ProratedRent, "value", "Get Prorated Rent Amount");
+		byId.click(id_peopleMenu_newTenant_MoveIn_MoveInButton, "Clicking on Move In Button");
+		return getProratedRent;
+	}
+
+}

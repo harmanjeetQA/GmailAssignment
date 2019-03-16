@@ -1,0 +1,13 @@
+package p2M6.Accounting.objectRepositry;
+
+public interface Admin_MasterSetup {
+
+	String class_SettingLink = "clssettings";
+	String class_SettingTableBottomLeft = "ui-paging-info";
+	String class_SettingTablePaginationDDL = "ui-pg-selbox";
+	
+	String id_SettingTable = "tblGrid";
+	String id_SettingChargeCodeStatusFilter = "ddlChargeCodeStatusFilter";
+	
+	String xpath_MasterSetupLNP = "//*[@id='ulLeftMenu']//li//ul//li";
+}

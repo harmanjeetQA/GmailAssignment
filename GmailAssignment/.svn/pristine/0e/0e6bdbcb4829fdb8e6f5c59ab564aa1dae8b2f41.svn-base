@@ -1,0 +1,137 @@
+package p2M7;
+
+import java.util.Arrays;
+import java.util.List;
+import utilities.Utility;
+
+public interface Ip2M7 {
+	
+	
+	//---------------- Login URL and Credentials ------------------------
+	
+	
+	
+	
+	
+	String id_PeopleTab1 = "lnk0People";
+	String id_LeaseTab = "lnk0Leases";
+	String id_PeopleOwnersTab = "ancOwners";
+	String id_PeopleVendorTab = "ancVendors";
+	String id_PeopleContactTab = "ancContacts";
+	String id_LeaseRentalAppTab = "ancRentalApp";
+	String id_Lease_LeaseSubTab = "ancLease";
+	
+	
+	String id_PeopleTabNewTenantButton = "btnNewTenant";
+	String id_PeopleTabNewOwnerButton = "btnNewOwner";
+	String id_PeopleTabNewVendorButton = "dvVendorListingNewVendor";
+	String id_PeopleTabNewContactButton = "btnNewContact";
+	String id_LeaseTabNewGuestCardButton = "btnNewGuestCard";
+	String id_LeaseTabNewRentalAppButton = "btnAddNewApplication";
+	String id_LeaseTabNewLeaseButton = "btnNewLease";
+	
+	
+	//---------------------------------------------------------------------------
+	
+	String id_SSNSINIDTextField = "AddSSNSINIDVal_1";
+	String id_SSNSINIDTextField_PlusIcon = "imgAddSSNSINID";
+	String id_SSNSINID_ExpandField = "AddSSNSINIDVal_2";
+	String class_SSNSINID_ExpandFieldCrossIcon = "imgRemoveSSNSINID";
+
+//--------------------------------------------------------------------
+
+	String id_EthnicityDDLField = "txtEthnicity1";
+	String xpath_EthnicityDDL_SelectAllOptions = ".//*[@id='txtEthnicity1']//following-sibling::div/div/ul/bii[1]";
+	String id_EthnicityDDL_PlusIcon = "btnEthnicityPlus";
+	String xpath_AddNewEthnicityPopup = ".//*[@id='divEthnicity']/div/div/div/h4";
+	String id_AddNewEthnicityTextField = "txtEthnicity";
+	String id_AddNewEthnicitySaveButton = "btnEthnicitySave";
+	String id_AddNewEthnicityCancelButton = "btnCancelEthnicity";
+	String EthnicityList[] = {"American Indian/Alaskan Native","Asian", "Black (not Hispanic or Latino)", "Hispanic or Latino",
+			"Native Hawaiian / Pacific Islander", "Two or More Races (not Hispanic or Latino)","White (not Hispanic or Latino)",
+			"Not Sure","Other"};
+
+//--------------------------------------------------------------------
+	
+	String id_MaritalStatusDDLField = "txtMaritalStatus1"; //(Get first selected option)
+    String id_MaritalStatusDDLPlusIcon = "btnMaritalStatusPlus";
+	String xpath_AddNewMaritalStatusPopup = ".//*[@id='divMaritalStatus']/div/div/div[1]/h4";
+	String id_AddNewMaritalTextField = "txtMaritalStatus";
+	String id_AddNewMaritalSaveButton = "btnMaritalStatusSave";
+	String id_AddNewMaritalCancelButton = "btnCancelMaritalStatus";
+	String xpath_AddNewMaritalValidationMsg = ".//*[@id='txtMaritalStatus']//following-sibling::div";
+
+//--------------------------------------------------------------------------
+	
+	String id_HobbiesDDLField = "txtHobbies1"; //(Get first selected option)
+	String xpath_HobbiesDDLField1 = "//*[@id='txtHobbies1']//following-sibling::div/button";
+	String xpath_HobbiesHobbiesDDLFieldOptions = ".//*[@id='txtHobbies1']/option";
+	String xpath_HobbiesDDLSelectAllOptions = ".//*[@id='txtHobbies1']//following-sibling::div/div/ul/bii[1]//input";
+	String xpath_HobbiesAllSelectedText = ".//*[@class='ms-choice']/span[text()='All selected']";
+	String id_HobbiesDDLPlusIcon = "btnHobbiesPlus";
+	String xpath_AddNewHobbiesPopup = ".//*[@id='divHobbies']/div/div/div[1]/h4";
+	String id_AddNewHobbiesTextField = "txtHobbies";
+	String id_AddNewHobbiesSaveButton = "btnHobbiesSave";
+	String id_AddNewHobbiesCancelButton = "btnCancelHobbies";
+	String xpath_AddNewHobbiesValidationMsg = ".//*[@id='txtHobbies']//following-sibling::div";
+	String  []List_Hobbiestocompare = {"Animal Care","Beach","Bicycling","Billiards","Boating",
+			"Bowling","Camping","Church Activities","Computer","Cooking","Crafts","Dancing",
+			"Dating Online","Eating Out","Entertaining","Exercise","Family Time",
+			"Fishing","Gardening","Going to Movies","Golf","Hiking","Horseback Riding","Housework",
+			"Hunting","Listening to Music","Motorcycling","Painting","Playing Cards","Playing Music","Reading",
+			"Relaxing","Renting Movies","Sewing","Shopping","Skiing","Sleeping","Socializing",
+			"Swimming","Team Sports","Tennis","Theater","Traveling","Running","Walking","Watching Sports","Watching TV",
+			"Working on Cars","Writing","Volunteer Work"};
+	
+	//-----------------------------------------------------------------------------------------------------------------------
+
+	String id_VeteranStatusDDLField = "txtVeteranStatus1"; //(Get first selected option)
+	String xpath_VeteranStatusDDLFieldOptions = ".//*[@id='txtVeteranStatus1']/option";
+	String xpath_VeteranStatusDDLSelectOption = ".//*[@id='txtVeteranStatus1']/option[2]";
+	String id_VeteranStatusDDLPlusIcon = "btnVeteranStatusPlus";
+	String xpathAddNewVeteranStatusPopup = ".//*[@id='divVeteranStatus']/div/div/div[1]/h4";
+	String id_AddNewVeteranStatusTextField = "txtVeteranStatus";
+	String id_AddNewVeteranStatusSaveButton = "btnVeteranStatusSave";
+	String id_AddNewVeteranStatusCancelButton = "btnCancelVeteranStatus";
+	String xpath_AddNewVeteranStatusValidationMsg = ".//*[@id='txtVeteranStatus']//following-sibling::div";
+	String VeteranHardCodedValues[] = {"Newly Separated Veteran", "Other Protected Veterans","Special Disabled Veteran"
+			,"Veteran","Veteran of Vietnam Era"};
+	
+	//------------------JITENDER-----------------------------------------------------------------------------------------------
+	
+	String id_PeopleTenants= "ancTenants";
+	String xpath_ApexLinkLogo= "//div[@class= 'logo']/a/img";
+	String xpath_EthnicityDDLTxtFld= "//*[@id='tabSelectProperty']/div[2]/div[2]/div[8]/span/div/button";
+	String xpath_EthnicityDDLAllOptions= "//*[@id='txtEthnicity1']//following-sibling::div/div//ul/bii/label";
+	String xpath_EthnicityAddedSuccess= "html/body/div[23]/p/div/div/p";
+	String xpath_AddMartialSuccessMessage= "html/body/div[22]/p/div/div/p";
+	String xpath_CommonOwnerSucessMessage= "html/body/div[22]/p/div/div/p";
+	String xpath_CommonContactSucessMessage= "html/body/div[7]/p/div/div/p";
+	String xpath_CommonGuestCardSucessMessage= "html/body/div[26]/p/div/div/p";
+	                              
+	//------------------------------------------ Values ------------------------------------------------------
+	
+	String value_SSNSINIDTextField = "1234567890123456789012345678901234567890123456789012345678901234567890";
+	String value_EthnicityTxtFld= "All selected";
+	String value_StringOf55Char= "1234567890123456789012345678901234567890123456789012345";
+	//String value_EthnicityNameToCompare= value_EthnicityTestName;
+	String value_MartialOption= "S(Single)";
+	String value_AddMartialValidation= "* This field is required";
+	String value_AddMartialSuccessMessage= "This record saved successfully.";
+	
+	List<String> list_ethnicitytocompare = Arrays.asList("American Indian/Alaskan Native", "Asian", "Black (not Hispanic or Latino)", "Hispanic or Latino", "Native Hawaiian / Pacific Islander", "Two or More Races (not Hispanic or Latino)", "White (not Hispanic or Latino)", "Not Sure", "Other");
+	
+	//------- People >> Following values should be change before execution ----------
+	
+	/*String value_HobbieName = "HobbieTesting007";
+	String value_VeteranStatus = "VeteranTesting007";
+	String value_VeteranStatus1 = "VeteranTesting007";
+	String value_EthnicityTestName= "EthnicityTesting007";
+	String value_AddMartialTestName= "MartialTesting007";*/
+	
+	String value_PortfolioName = "Testing";
+	
+
+	
+	
+}

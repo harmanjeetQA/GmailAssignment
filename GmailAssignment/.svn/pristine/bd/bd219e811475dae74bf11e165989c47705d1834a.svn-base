@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="VendorP2M7Suite">
+	<!-- <suite-files>
+        <suite-file path="suite1.xml" />  
+        <suite-file path="suite2.xml" />      
+    </suite-files> -->
+ 
+  <test name="P2M7Test">
+  <!--   <groups>
+      <run>
+        <include name="Jasmeet"/>
+        <include name="Deepak"/>
+        <include name="Jasmeet"/>
+        <include name="Harman"/>
+      </run>
+    </groups> -->
+  
+   <classes>
+  
+ 	<!-- <class name="p2M7.People"/>
+  	<class name="p2M7.Owner"/>
+  	<class name="p2M7.Contact"/>
+    <class name="p2M7.Vendor"/>
+  	<class name="p2M7.GuestCard"/>
+  	<class name="p2M7.RentalApplication"/>
+    <class name="p2M7.Lease"/> 
+    <class name="p2M5.vendorPortal.FileLibrary"/> -->
+    	<!-- <class name="p2M5.vendorPortal.ManageBill"/>
+    	<class name="p2M5.vendorPortal.MyAccount"/>
+    	<class name="p2M5.vendorPortal.WorkOrder"/> -->
+    	<class name="p2M6.Accounting.Admin_NewBill"/>
+   		<!-- <class name="p2M6.Accounting.Invoice"/>
+    	<class name="p2M6.Accounting.PayBills"/>
+    	<class name="p2M6.Accounting.RecurringBill"/> -->
+    	</classes>
+  </test> 
+</suite>
+
+

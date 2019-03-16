@@ -1,0 +1,320 @@
+package p2M5.vendorPortal;
+
+
+import java.util.Set;
+
+import org.openqa.selenium.JavascriptExecutor;
+import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
+
+import com.relevantcodes.extentreports.LogStatus;
+
+import common.ApexCommon;
+import objectRepository.VendorPortal;
+import utilities.Utility;
+
+ public class FileLibrary extends ApexCommon implements VendorPortal {
+	
+	@BeforeClass(alwaysRun = true, enabled = true, groups = { "Smoke", "Regression", "Jasmeet" })
+	public void login() throws InterruptedException {
+		login(null, userName, password);
+	}
+		
+	@Test(priority = 0, enabled = true, groups ={ "Smoke", "Jasmeet"})
+
+	public void VNDR_P2M5_001() throws InterruptedException {
+		extentTest = extentReport.startTest(" *H6:VNDR_P2M5_001",
+				" Verify on entering valid URL Vendor Portal Login page should get opened");
+		// byId.click(id_LogoutButton, "Click on logout button");
+		getDriver().get(vendorURL);
+		int sizeButton = byId.getSize(id_LoginButton, "Login button of vendor portal page.");
+		Assert.assertTrue(sizeButton == 1, "Vendor Portal login page do not open");
+		login();
+	}
+		
+		@Test(priority = 1, enabled = true, groups ={ "Smoke", "Jasmeet"})
+	public void VNDR_P2M5_043() {
+		extentTest = extentReport.startTest("VNDR_P2M5_043",
+				"H6: Verify Vendor Portal >> First Screen >> elements present");
+		
+        int sizeMyAccountButton = byId.getSize(id_MyAccountButton, "My account button.");
+        sizeMyAccountButton += byId.getSize(id_WorkOrderButton, "Work order button");
+        sizeMyAccountButton += byId.getSize(id_TransactionsButton, "Trasactions button");
+        sizeMyAccountButton += byId.getSize(id_FileLibraryButton, "File library button");
+        sizeMyAccountButton += byId.getSize(id_VendorInsuranceButton, "Vendor Insurace button");
+        sizeMyAccountButton += byId.getSize(id_ManageBillButton, "ManageBill button");
+        sizeMyAccountButton += byId.getSize(id_MyReportingButton, "MyReporting button");
+        sizeMyAccountButton += byXpath.getSize(xpath_NameofVendor, "Vendor name link");
+        //Calender is curently removed, May exist in future
+        //sizeMyAccountButton += byId.getSize(id_Calendar, "Calendar");
+        sizeMyAccountButton += byXpath.getSize(xpath_Help, "Help link");
+        sizeMyAccountButton += byXpath.getSize(xpath_Notification, "Notification link");
+        sizeMyAccountButton += byId.getSize(id_LogoutButton, "Logout button");
+		Assert.assertEquals(sizeMyAccountButton , 11, "Required fields are not present there");
+	}
+		
+		@Test(priority = 2, enabled = true, groups ={ "Smoke", "Jasmeet"})
+	public void VNDR_P2M5_136() {
+		extentTest = extentReport.startTest(" *H6:VNDR_P2M5_136",
+				" Verify on entering invalid password , Vendor Portal should not able to login ");
+		getDriver().get(vendorURL);
+		byId.clearThenSetText(id_LoginEmailField, userName, "Enter username");
+		byId.clearThenSetText(id_LoginPasswordField, id_LoginButton, "Enter password");
+		byId.click(id_LoginButton, "Click on login button");
+		int sizeButton = byId.getSize(id_LoginButton, "Login button of vendor portal page.");
+		Assert.assertTrue(sizeButton == 1, "Vendor Portal login page do not open");
+	}
+
+	@Test(priority = 3, enabled = true, groups ={ "Smoke", "Jasmeet"})
+	public void VNDR_P2M5_137() {
+		extentTest = extentReport.startTest(" *H6:VNDR_P2M5_137",
+				" Verify on entering valid password , Vendor Portal should be able to login ");
+		getDriver().get(vendorURL);
+		byId.clearThenSetText(id_LoginEmailField, userName, "Enter username");
+		byId.clearThenSetText(id_LoginPasswordField, password, "Enter password");
+		byId.click(id_LoginButton, "Click on login button");
+		int sizeButton = byId.getSize(id_LoginButton, "Login button of vendor portal page.");
+		Assert.assertTrue(sizeButton == 0, "Vendor Portal login page do not open");
+	}
+
+	@Test(priority = 4, enabled = true, groups ={ "Smoke", "Jasmeet"})
+	public void VNDR_P2M5_193() {
+		extentTest = extentReport.startTest(" *H6:VNDR_P2M5_193",
+				" Vendor Portal >> File Library ");
+		byId.click(id_FileLibraryButton, "File library");
+		int sizeSaveButton = byId.getSize(id_FileLibrarySaveButton, "Save button");
+		int sizeAddFiles = byXpath.getSize(xpath_FileLibraryAddFilesButton, "Add files button");
+		int sizeRemoveAll = byXpath.getSize(xpath_FileLibraryRemoveAllButton, "Remove All button");
+		int sizeListing = byXpath.getSize(xpath_FileLibraryListing, "Listing link");
+		Assert.assertTrue(sizeSaveButton == 1 && sizeAddFiles == 1
+				&& sizeRemoveAll == 1 && sizeListing == 1,
+				"required fields are not present there");
+	}
+
+	@Test(priority = 5, enabled = true, groups ={ "Smoke", "Jasmeet"})
+	public void VNDR_P2M5_194() {
+		extentTest = extentReport.startTest(" *H6:VNDR_P2M5_194",
+				" Vendor Portal >> File Library - Add Files");
+		byId.click(id_FileLibraryButton, "Clicking on file library");
+		String firstWindow = getDriver().getWindowHandle();
+		byXpath.click(xpath_FileLibraryAddFilesButton, "Clicking on add files button");
+		Set<String> windowFileMgr = getDriver().getWindowHandles();
+		Assert.assertNotEquals(firstWindow, windowFileMgr);
+	}
+	
+	@Test(priority = 6, enabled = true, groups ={ "Smoke", "Jasmeet"})
+	public void VNDR_P2M5_195() throws InterruptedException {
+		extentTest = extentReport.startTest("VNDR_P2M5_195",
+				"H6: Vendor Portal >> File Library - Add Files - Checks");
+		byId.click(id_FileLibraryButton, "Clicking on file library");
+		byXpath.click(xpath_FileLibraryAddFilesButton, "Clicking on add files button");
+		Utility.uploadFiles(System.getProperty("user.dir") + value_FileLibraryXlsFilepath);
+		byXpath.click(xpath_FileLibraryAddFilesButton, "Clicking on add files button");
+		Utility.uploadFiles(System.getProperty("user.dir") + value_FileLibraryXlsxFilepath);
+		byXpath.click(xpath_FileLibraryAddFilesButton, "Clicking on add files button");
+		Utility.uploadFiles(System.getProperty("user.dir") + value_FileLibraryDocFilepath);
+		byXpath.click(xpath_FileLibraryAddFilesButton, "Clicking on add files button");
+		Utility.uploadFiles(System.getProperty("user.dir") + value_FileLibraryDocxFilepath);
+		byXpath.click(xpath_FileLibraryAddFilesButton, "Clicking on add files button");
+		Utility.uploadFiles(System.getProperty("user.dir") + value_FileLibraryPDFFilepath);
+		byXpath.click(xpath_FileLibraryAddFilesButton, "Clicking on add files button");
+		Utility.uploadFiles(System.getProperty("user.dir") + value_FileLibraryLargerSizeFilepath);
+		String textErrorPDF = byXpath.getText(xpath_FileLibraryPDFFilepath, "Error of pdf file");
+		String textErrorXls = byXpath.getText(xpath_FileLibraryXlsFilepath, "Error of xls file");
+		String textErrorXlsx = byXpath.getText(xpath_FileLibraryXlsxFilepath, "Error of xlsx file");
+		String textErrorDoc = byXpath.getText(xpath_FileLibraryDocFilepath, "Error of doc file");
+		String textErrorDocs = byXpath.getText(xpath_FileLibraryDocxFilepath, "Error of docx file");
+		JavascriptExecutor jse = (JavascriptExecutor) getDriver();
+		jse.executeScript("window.scrollBy(0,250)", "");
+		String ErrorLargerFile = byXpath.getText(xpath_FileLibraryLargerSizeFilepath,
+				"getting text for error of larger size file");
+		System.out.println("error 1 is =" + ErrorLargerFile);
+		Assert.assertTrue(
+				ErrorLargerFile.equals(value_FileLibraryUploadLargeFileError)
+						&& textErrorPDF.equals(value_FileLibraryUploadFileCorrectFormatError)
+						&& textErrorXls.equals(value_FileLibraryUploadFileCorrectFormatError)
+						&& textErrorXlsx.equals(value_FileLibraryUploadFileCorrectFormatError)
+						&& textErrorDoc.equals(value_FileLibraryUploadFileCorrectFormatError)
+						&& textErrorDocs.equals(value_FileLibraryUploadFileCorrectFormatError),
+				"Required files should gets uploaded without error only");
+	}
+
+	@Test(priority = 7, enabled = true, groups ={ "Smoke", "Jasmeet"})
+	public void VNDR_P2M5_196() throws InterruptedException {
+		extentTest = extentReport.startTest(" *H6:VNDR_P2M5_196",
+				" Vendor Portal >> File Library - Add Multiple Files");
+		byId.click(id_FileLibraryButton, "File library");
+		byXpath.click(xpath_FileLibraryAddFilesButton, "Add files button");
+		Utility.uploadFiles(System.getProperty("user.dir") + value_FileLibraryXlsxFilepath);
+		byXpath.click(xpath_FileLibraryAddFilesButton, "Clicking on add files button");
+		Utility.uploadFiles(System.getProperty("user.dir") + value_FileLibraryDocFilepath);
+		String nameFileXlsx = byXpath.getText(xpath_FileLibraryUploadedFile1Name,
+				"getting text for first added file name");
+		JavascriptExecutor jse = (JavascriptExecutor) getDriver();
+		jse.executeScript("window.scrollBy(0,250)", "");
+		String nameFileDoc = byXpath.getText(xpath_FileLibraryUploadedFile2Name,
+				"getting text for second added file name");
+		Assert.assertTrue(
+				nameFileXlsx.equals(value_FileLibraryUploadedFile1Name)
+						&& nameFileDoc.equals(value_FileLibraryUploadedFile2Name),
+				"multiple files not getting uploaded ");
+	}
+	
+	@Test(priority = 8, enabled = true, groups ={ "Smoke", "Jasmeet"})
+	public void VNDR_P2M5_197() throws InterruptedException {
+		extentTest = extentReport.startTest("VNDR_P2M5_197",
+				"H6: Vendor Portal >> File Library - Add Files - "
+				+ "uploaded files should be displayed with Cancel Button.");
+		byId.click(id_FileLibraryButton, "File library");
+		byXpath.click(xpath_FileLibraryAddFilesButton, "Add files button");
+		Utility.uploadFiles(System.getProperty("user.dir") + value_FileLibraryXlsxFilepath);
+		Thread.sleep(3000);
+		String textCancelButton = byXpath.getText(xpath_FileLibraryUploadedFileCancelButton,
+				"getting text for cancel button");
+		Assert.assertEquals(textCancelButton, value_FileLibraryUploadedFileCancelButton);
+	}
+	
+	@Test(priority = 9, enabled = true, groups ={ "Smoke", "Jasmeet"})
+	public void VNDR_P2M5_198() throws InterruptedException {
+		extentTest = extentReport.startTest(" *H6:VNDR_P2M5_198",
+				" Vendor Portal >> File Library - Add Files - click Cancel Button -"
+				+ " should allow vendors to cancel the uploaded file.");
+		byId.click(id_FileLibraryButton, "File library");
+		byXpath.click(xpath_FileLibraryAddFilesButton, "Add files button");
+		Utility.uploadFiles(System.getProperty("user.dir") + value_FileLibraryLargerSizeFilepath);
+
+	
+		int valueFileImg1 = byXpath.getSize(xpath_FileLibraryUploadedFileImg,
+				"Size of image of file");
+		Thread.sleep(10000);
+		byXpath.click(xpath_FileLibraryUploadedFileCancelButton, "Cancel button");
+
+		int valueFileImg2 = byXpath.getSize(xpath_FileLibraryUploadedFileImg,
+				"Size of image of file");
+		Assert.assertNotEquals(valueFileImg1, valueFileImg2);
+		getDriver().navigate().refresh();
+	}
+	
+	@Test(priority = 10, enabled = true, groups ={ "Smoke", "Jasmeet"})
+	public void VNDR_P2M5_199() throws InterruptedException {
+		extentTest = extentReport.startTest("VNDR_P2M5_199",
+				"H6: Vendor Portal >> File Library - Remove All");
+		byId.click(id_FileLibraryButton, "File library");
+		byXpath.click(xpath_FileLibraryAddFilesButton, "Add files button");
+		Utility.uploadFiles(System.getProperty("user.dir") + value_FileLibraryXlsxFilepath);
+		byXpath.click(xpath_FileLibraryAddFilesButton, "Clicking on add files button");
+		Utility.uploadFiles(System.getProperty("user.dir") + value_FileLibraryDocFilepath);
+		byXpath.click(xpath_FileLibraryRemoveAll, "Clicking on remove all button");
+		Thread.sleep(5000);
+		byClassName.click(classname_FileLibraryRemoveAllYesOption,
+				"Yes option of remove all popup");
+		int valueFileImg1 = byXpath.getSize(xpath_FileLibraryUploadedFileImg, "Image of file 1");
+		int valueFileImg2 = byXpath.getSize(xpath_FileLibraryUploadedFileImg2, "Image of file 2");
+		Assert.assertTrue(valueFileImg1 == 0 && valueFileImg2 == 0,
+				"Remove all do not removed all files");
+	}
+	
+	@Test(priority = 11, enabled = true, groups ={ "Smoke", "Jasmeet"})
+	public void VNDR_P2M5_200() throws InterruptedException {
+		extentTest = extentReport.startTest(" *H6:VNDR_P2M5_200",
+				" Vendor Portal >> File Library - Save");
+		byId.click(id_FileLibraryButton, "File library");
+		byXpath.click(xpath_FileLibraryAddFilesButton, "Add files button");
+		Utility.uploadFiles(System.getProperty("user.dir") + value_FileLibraryXlsxFilepath);
+		byId.click(id_FileLibrarySaveButton, "Clicking on save button");
+		String nameFile = byXpath.getText(xpath_FileLibraryGridFirstRecord, "Name of file 1");
+		Assert.assertTrue(nameFile.equals(value_FileLibraryUploadedFile1Name),
+				"save button do not save uploaded files");
+	}
+	
+	@Test(priority = 12, enabled = true, groups ={ "Smoke", "Jasmeet"})
+	public void VNDR_P2M5_201() throws InterruptedException {
+		extentTest = extentReport.startTest(" *H6:VNDR_P2M5_201",
+				" Vendor Portal >> File Library - List of Vendor Files Grid ");
+		byId.click(id_FileLibraryButton, "File library");
+		byXpath.click(xpath_FileLibraryAddFilesButton, "Add files button");
+		Utility.uploadFiles(System.getProperty("user.dir") + value_FileLibraryXlsxFilepath);
+		byId.click(id_FileLibrarySaveButton, "Clicking on save button");
+		String nameCol1 = byId.getText(id_FileLibraryGridFirstCol, "Name of col 1");
+		String nameCol2 = byId.getText(id_FileLibraryGridSecCol, "Name of col 2");
+		String nameCol3 = byId.getText(id_FileLibraryGridThirdCol, "Name of col 3");
+		Assert.assertTrue(
+				nameCol1.equals(value_FileLibraryGridFirstCol) &&
+				nameCol2.equals(value_FileLibraryGridSecCol)
+						&& nameCol3.equals(value_FileLibraryGridThirdCol),
+				"files grid do not displaying required columns");
+	}
+	
+	@Test(priority = 13, enabled = true, groups ={ "Smoke", "Jasmeet"})
+	public void VNDR_P2M5_202() throws InterruptedException {
+		extentTest = extentReport.startTest(" *H6:VNDR_P2M5_202",
+				" Vendor Portal >> File Library Grid - File Col -"
+				+ " Name of the file should be displayed here");
+		byId.click(id_FileLibraryButton, "Clicking on file library");
+		byXpath.click(xpath_FileLibraryAddFilesButton, "Clicking on add files button");
+		Utility.uploadFiles(System.getProperty("user.dir") + value_FileLibraryXlsxFilepath);
+		byId.click(id_FileLibrarySaveButton, "Clicking on save button");
+		String nameFile = byXpath.getText(xpath_FileLibraryGridFirstRecord, "Name of file 1");
+		Assert.assertTrue(nameFile.equals(value_FileLibraryUploadedFile1Name),
+				"save button do not save uploaded files");
+	}
+	
+	@Test(priority = 14, enabled = true, groups ={ "Smoke", "Jasmeet"})
+	public void VNDR_P2M5_216() {
+		extentTest = extentReport.startTest(" *H6:VNDR_P2M5_216", " Vendor Portal >> Vendor Insurance ");
+		byId.click(id_FileLibraryButton, "Clicking on file library");
+		int valueName = byId.getSize(id_VendorInsuranceButton, "getting size of Vendor Insurance tab");
+		Assert.assertTrue(valueName == 1, "required tab not present there");
+}
+	
+	@Test(priority = 15, enabled = true, groups ={ "Smoke", "Jasmeet"})
+	public void VNDR_P2M5_351() {
+		extentTest = extentReport.startTest(" *H6:VNDR_P2M5_351", " Vendor Portal >> Calculator ");
+		byId.click(id_FileLibraryButton, "Clicking on file library");
+		int valueName = byXpath.getSize(xpath_Calculator, "getting size of calculator");
+		Assert.assertTrue(valueName == 1, "required element not present there");
+}
+
+	@Test(priority = 16, enabled = true, groups ={ "Smoke", "Jasmeet"})
+	public void VNDR_P2M5_352() {
+		extentTest = extentReport.startTest(" *H6:VNDR_P2M5_352", " Vendor Portal >> Company logo");
+		byId.click(id_FileLibraryButton, "Clicking on file library");
+		//int valueName = byId.getSize(id_Companylogo, "getting size of Company logo");
+		//
+		int valueName = byXpath.getSize(xpath_Companylogo, "getting size of Company logo");
+		System.out.println("size is =" +valueName);
+		Assert.assertTrue(valueName == 1, "Company logo not present there");
+	}
+
+	@Test(priority = 17, enabled = true, groups ={ "Smoke", "Jasmeet"})
+	public void VNDR_P2M5_353() {
+		extentTest = extentReport.startTest(" *H6:VNDR_P2M5_353", " Vendor Portal >> Notifications");
+		byId.click(id_FileLibraryButton, "Clicking on file library");
+		int valueName = byXpath.getSize(xpath_Notifications, "getting size of Notifications");
+		Assert.assertTrue(valueName == 1, "Notifications not present there");
+		extentTest.log(LogStatus.INFO, "Verified that Notifications present there");
+	}
+	
+	@Test(priority = 18, enabled = true, groups ={ "Smoke", "Jasmeet"})
+	public void VNDR_P2M5_354() {
+		extentTest = extentReport.startTest(" *H6:VNDR_P2M5_354", " Vendor Portal >> Logout");
+		byId.click(id_FileLibraryButton, "Clicking on file library");
+		int valueName = byId.getSize(id_LogoutButton, "getting size of Logout button");
+		byId.getText(id_LogoutButton, "getting size of Logout button");
+		Assert.assertTrue(valueName == 1, "Logout button not present there");
+		extentTest.log(LogStatus.INFO, "Verified that Logout button present there");
+	}
+	
+	@Test(priority = 19, enabled = true, groups ={ "Smoke", "Jasmeet"})
+	public void VNDR_P2M5_355() throws InterruptedException {
+		Thread.sleep(3000);
+		extentTest = extentReport.startTest(" *H6:VNDR_P2M5_355", " Vendor Portal >> Click on Logout");
+		byId.click(id_LogoutButton, "Clicking on logout button");
+		int sizeButton = byId.getSize(id_LoginButton, "getting size of login button of vendor portal page.");
+		//int sizeButton = byXpath.getSize(id_LoginButton, "getting size of login button of vendor portal page.");
+Assert.assertTrue(sizeButton == 1, "Vendor Portal login page do not open");
+		extentTest.log(LogStatus.INFO, "Verified that user get logout from vendor portal");
+}
+		
+}

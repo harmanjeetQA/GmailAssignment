@@ -1,0 +1,52 @@
+package p2M6.Accounting.objectRepositry;
+
+public interface Admin_AccountingTab {
+
+	String id_AccountingTab = "lnk0Accounting";
+	String id_AccountingTabRNP = "arrow";
+	
+	/*******************************New Bill*************************************/
+	String id_NewBillFormHeader = "spnHeaderBill";
+	String id_NewBillFormVendorName = "txtWorkOrderVendor";
+	String id_NewBillFormVendorNameListHeaderNameVendorName = "VendorName";
+	String xpath_NewBillFormVendorNameListHeaderNameVendorName = "//div[contains(@class,'cg-comboItem')]";
+	String id_NewBillAddress = "txtAddress";
+	String id_NewBillEditAddressLink = "ancChangeNewBillVendorAddress";
+	String id_NewBillVendorAddressPopup = "dvVendorAdressChange";
+	String ids_NewBillVendorAddressPopupElements = "ZipAdress,CountryNameAdress,StateNameAdress,CityNameAdress,txtchngAddress1,txtchngAddress2,txtchngAddress3,btnUpdateVendorAddress,btnCancelAddress";
+	String id_VendorAddressPopupZipCode = "ZipAdress";
+	String id_NewBillAmountLabel = "lblChangeNewBillAmountCurrency";
+	//String ids_VendorAddressPopupCoStCi = "CountryNameAdress,StateNameAdress";
+	String id_FileLibrarySectionUploadedFilesSection = "previews";
+	String xpath_AccountingRNPLinks = "//*[@id='links']//div//ul//li//a";
+	
+	String class_CalendarMonthDDL = "ui-datepicker-month";
+	String class_CalendarYearDDL = "ui-datepicker-year";
+	
+	
+	String value_ZipCode = "10002";
+	String value_CoStCi = "United States,NY,New York";
+	String value_VendorAddressPopupPlaceHolderAdd1 = "Eg: Street address 1";
+	String value_VendorAddressPopupPlaceHolderAdd2 = "Eg: Street address 2";
+	String value_VendorAddressPopupPlaceHolderAdd3 = "Eg: Street address 3";
+	String value_SpecialCharcters = "!@#$%^&";
+	String value_validationMsgForAmount = "* Minimum value is 1";
+	
+	
+	String Path_UploadablesFiles = "\\AppData\\HardCodedValues\\";
+	String TestingPngFile = "TestingPngFile.png";
+	String TestingJPGFile = "TestingJPGFile.jpg";
+	String TestingJPEGFile = "TestingJPEGFile.jpeg";
+	String TestingBMPFile = "TestingBMPFile.bmp";
+	String TestingGIFFile = "TestingGIFFile.gif";
+	String TestingPDFFile = "test.pdf";
+	String TestingDOCFile = "File2.doc";
+	String TestingDOCXFile = "owner_testing2.docx";
+	String TestingXLSXFile = "File1.xlsx";
+	String TestingTXTFile = "TestingTXTFile.txt";
+	
+	/*******************************Bill Register*************************************/
+	
+	String id_BillRegisterSearchVendorTB = "ddlRegisterVendorName";
+
+}

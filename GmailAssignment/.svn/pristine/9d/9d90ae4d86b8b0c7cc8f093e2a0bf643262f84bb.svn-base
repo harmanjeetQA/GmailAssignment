@@ -1,0 +1,474 @@
+package p2M7;
+
+import java.util.List;
+import org.testng.Assert;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
+import org.testng.asserts.SoftAssert;
+
+import com.relevantcodes.extentreports.LogStatus;
+
+import common.ApexCommon;
+
+public class RentalApplication extends ApexCommon implements Ip2M7 {
+	
+	String value_HobbieName = "HobbieTesting"+utility.uniqueString();
+	String value_VeteranStatus = "VeteranTesting"+utility.uniqueString();
+	String value_VeteranStatus1 = "VeteranTesting"+utility.uniqueString();
+	String value_EthnicityTestName= "EthnicityTesting"+utility.uniqueString();
+	String value_AddMartialTestName= "MartialTesting"+utility.uniqueString();
+
+	@BeforeClass(alwaysRun = true, enabled = true, groups = { "Smoke", "Regression", "Deepak" })
+	public void Login() throws InterruptedException {
+		login("", adminEmail, password);
+	}   
+	@BeforeMethod
+	public void GoToLease_RentalApp() throws InterruptedException {
+		byId.click(id_LeaseTab, "Click on lease tab");
+		byId.click(id_LeaseRentalAppTab, "Click on Rental Application sub tab");
+		byId.click(id_LeaseTabNewRentalAppButton, "Click on new rental app button");
+		Thread.sleep(3000);
+	}
+	// -------------------------------------------------------------------------------------
+	@Test(priority = 0, enabled = true, groups = { "Smoke", "Deepak" })
+	public void P2M7_393() {
+		extentTest = extentReport.startTest("P2M7_393",
+				"Leases>>Rental Application>>New Rental Applications>>  Ensure that SSN/SIN/ID field should be displayed after Move-In date field.");
+		int getSize = byId.getSize(id_SSNSINIDTextField, "Getting the size of SSNSINID Text Field");
+		System.out.println(getSize);
+		Assert.assertTrue(getSize > 0, "SSNSINID Text Field is not displaying ");
+		extentTest.log(LogStatus.INFO, "Verified that SSN/SIN/ID field should be displayed after Move-In date field.");
+	}
+
+	@Test(priority = 1, enabled = true, groups = { "Smoke", "Deepak" })
+	public void P2M7_394() {
+		extentTest = extentReport.startTest("P2M7_394",
+				"Leases>>Rental Application>>New Rental Applications>>  Ensure that field SSN/SIN/ID should be a text field with maximum length upto 50 characters.");
+		byId.clearThenSetText(id_SSNSINIDTextField, value_SSNSINIDTextField,
+				"Enter more than 50 numbers (70) under the field");
+		String getMax = byId.getAttribute(id_SSNSINIDTextField, "value", "Getting max length");
+		int getlength = getMax.length();
+		Assert.assertTrue(getlength == 50, "Maximum length is not 50");
+		extentTest.log(LogStatus.INFO,
+				"Verified that field SSN/SIN/ID should be a text field with maximum length upto 50 characters.");
+	}
+
+	@Test(priority = 2, enabled = true, groups = { "Smoke", "Deepak" })
+	public void P2M7_400() {
+		extentTest = extentReport.startTest("P2M7_400",
+				"Leases>>Rental Application>>New Rental Applications>>  Enusre that when click on + sign the text box should be displayed with cross icon(red in color). With + user should able to add multiple SSN/SIN/ID fields");
+		byId.click(id_SSNSINIDTextField_PlusIcon, "Click on plus icon for SSNSINID Text Field");
+		int getfieldSize = byId.getSize(id_SSNSINID_ExpandField, "Getting size of new expended field");
+		Assert.assertTrue(getfieldSize > 0, "No new field is expended");
+		int getCrossIcon = byClassName.getSize(class_SSNSINID_ExpandFieldCrossIcon,
+				"Getting size of new expended field's cross icon");
+		Assert.assertTrue(getCrossIcon > 0, "No red cross icon is displaying for new expanded field.");
+		extentTest.log(LogStatus.INFO,
+				"Verified that when click on + sign the text box should be displayed with cross icon(red in color). With + user should able to add multiple SSN/SIN/ID fields");
+	}
+
+	@Test(priority = 3, enabled = true, groups = { "Smoke", "Deepak" })
+	public void P2M7_401() {
+		extentTest = extentReport.startTest("P2M7_401",
+				"Leases>>Rental Application>>New Rental Applications>>   SSN/SIN/ID Field> Click on + icon> The field should be dissappeared on clicking on cross button.");
+		byId.click(id_SSNSINIDTextField, "Click on SSN/SIN/ID text field");
+		byId.click(id_SSNSINIDTextField_PlusIcon, "Click on Plus icon of SSN/SIN/ID text field");
+		byClassName.click(class_SSNSINID_ExpandFieldCrossIcon,
+				"Click on Cross icon of expanded field of SSN/SIN/ID field");
+		int fieldsize = byId.getSize(id_SSNSINID_ExpandField, "Getting size of SSNSINID expanded text field");
+		Assert.assertEquals(fieldsize, 0);
+		extentTest.log(LogStatus.INFO,
+				"Verified that the expanded text field of SSN/SIN/ID field has been dissappeared on clickin on cross icon");
+	}
+
+	@Test(priority = 4, enabled = true, groups = { "Smoke", "Deepak" })
+	public void P2M7_402() throws InterruptedException {
+		extentTest = extentReport.startTest("P2M7_402",
+				"Leases>>Rental Application>>New Rental Applications>>   Verify that the Ethnicity field is present on screen");
+		int ethnicityfieldsize = byId.getSize(id_EthnicityDDLField, "Getting size of ethinicity DDL field");
+		System.out.println(ethnicityfieldsize);
+		Assert.assertEquals(ethnicityfieldsize, 1);
+		extentTest.log(LogStatus.INFO, "Verified that the Ehinicity drop down field is present on this page");
+	}
+
+	@Test(priority = 5, enabled = true, groups = { "Smoke", "Deepak" })
+	public void P2M7_403() {
+		extentTest = extentReport.startTest("P2M7_403",
+				"Leases>>Rental Application>>New Rental Applications>>  Ethnicity DDL> Getting all hardcoded values of DDL");
+		String option = byId.getText(id_EthnicityDDLField, "Getting all options from DDL");
+		for (String value : EthnicityList) {
+			Assert.assertTrue(option.contains(value));
+		}
+	}
+
+	/*@Test(priority = 6, enabled = true, groups = { "Smoke", "Deepak" })
+	public void P2M7_404() {
+		extentTest = extentReport.startTest("P2M7_404",
+				"Leases>>Rental Application>>New Rental Applications>>   Ensure that by default 'Select' should be displayed");
+		String getBydefaultOption = byId.getFirstSelectedOption(id_EthnicityDDLField, "Getting First Selected option");
+		Assert.assertEquals(getBydefaultOption, "Select");
+		extentTest.log(LogStatus.INFO, "Verified that by default 'Select' should be displayed");
+	}*/
+
+	
+	@Test(priority = 7, enabled = true, groups = { "Smoke", "Deepak" })
+	public void P2M7_406() {
+		extentTest = extentReport.startTest("P2M7_406",
+				"Leases>>Rental Application>>New Rental Applications>>   Ethnicity DDL> Popup of Add New Ethnicity should be displayed");
+		byId.click(id_EthnicityDDL_PlusIcon, "Plus icon of Add Ethnicity clicked");
+		int savebutton = byId.getSize(id_AddNewEthnicitySaveButton, "Getting size of save button");
+		Assert.assertEquals(savebutton, 1);
+	}
+
+	@Test(priority = 8, enabled = true, groups = { "Smoke", "Deepak" })
+	public void P2M7_407() {
+		extentTest = extentReport.startTest("P2M7_407",
+				"Leases>>Rental Application>>New Rental Applications>>   Ethnicity DDL> Popup of Add New Ethnicity should be displayed with a text field, Save button and a Cancel button in it");
+		byId.click(id_EthnicityDDL_PlusIcon, "Plus icon of Add Ethnicity clicked");
+		int savebutton = byId.getSize(id_AddNewEthnicitySaveButton, "Getting size of save button");
+		int cancelbutton = byId.getSize(id_AddNewEthnicityCancelButton, "Getting size of cancel button");
+		int textfield = byId.getSize(id_AddNewEthnicityTextField, "Getting size of text field");
+		int total = savebutton + cancelbutton + textfield;
+		Assert.assertEquals(total, 3);
+	}
+
+	@Test(priority = 9, enabled = true, groups = { "Smoke", "Deepak" })
+	public void P2M7_408() {
+		extentTest = extentReport.startTest("P2M7_408",
+				"Leases>>Rental Application>>New Rental Applications>>   Ethnicity DDL> Popup's text field should only accepts maximum 50 characters");
+		byId.click(id_EthnicityDDL_PlusIcon, "Plus icon of Add Ethnicity clicked");
+		byId.setText(id_AddNewEthnicityTextField, value_StringOf55Char, "Value entered in Add Ethnicity");
+		String size = byId.getAttribute(id_AddNewEthnicityTextField, "value", "Getting size of Add Ethnicity text");
+		byId.getAttribute(id_AddNewEthnicityTextField, "value", "Getting size of Add Ethnicity text");
+		int stringlength = size.length();
+		Assert.assertEquals(stringlength, 50);
+	}
+
+	@Test(priority = 10, enabled = true, groups = { "Smoke", "Deepak" })
+	public void P2M7_414() {
+		extentTest = extentReport.startTest("P2M7_414",
+				"Leases>>Rental Application>>New Rental Applications>>   Ethnicity DDL> Verify that the entered Ethnicity should be saved");
+		byId.click(id_EthnicityDDL_PlusIcon, "Plus icon clicked");
+		byId.setText(id_AddNewEthnicityTextField, value_EthnicityTestName, "Value entered in text field");
+		byId.click(id_AddNewEthnicitySaveButton, "Click on Save button");
+		int popup = byXpath.getSize(xpath_CommonOwnerSucessMessage, "Ehnicity added popup appeared");
+		Assert.assertEquals(popup, 1);
+		String option = byId.getText(id_EthnicityDDLField, "Getting all options from DDL");
+		Assert.assertTrue(option.contains(value_EthnicityTestName));
+	}
+
+	@Test(priority = 11, enabled = true, groups = { "Smoke", "Deepak" })
+	public void P2M7_419() {
+		extentTest = extentReport.startTest("P2M7_419",
+				"Leases>>Rental Application>>New Rental Applications>>   Ethnicity DDL> Verify that Marital field is on the screen right after Ethnicity");
+		int maritalsize = byId.getSize(id_MaritalStatusDDLField, "Getting size of Merital DDL field");
+		Assert.assertEquals(maritalsize, 1);
+	}
+
+	@Test(priority = 12, enabled = true, groups = { "Smoke", "Deepak" })
+	public void P2M7_420() {
+		extentTest = extentReport.startTest("P2M7_420",
+				"Leases>>Rental Application>>New Rental Applications>>   Ethnicity DDL> Verify that Select is by default selected in Marital field");
+		String maritaltext = byId.getFirstSelectedOption(id_MaritalStatusDDLField, "getting selected option");
+		Assert.assertEquals(maritaltext, "Select");
+	}
+
+	@Test(priority = 13, enabled = true, groups = { "Smoke", "Deepak"})
+	public void P2M7_421() {
+		extentTest = extentReport.startTest("P2M7_421",
+				"Leases>>Rental Application>>New Rental Applications>>   Ethnicity DDL> Verify that some hardcoded values are present in Marital field's DDL");
+		String options = byId.getText(id_MaritalStatusDDLField, "Getting all option of DDL");
+		Assert.assertTrue(options.contains("S(Single)"));
+		System.out.println("single option present");
+		Assert.assertTrue(options.contains("M(Married)"));
+		System.out.println("married option present");
+	}
+
+	@Test(priority = 14, enabled = true, groups = { "Smoke", "Deepak" })
+	public void P2M7_422() {
+		extentTest = extentReport.startTest("P2M7_422",
+				"Leases>>Rental Application>>New Rental Applications>>   Ethnicity DDL> Verify that the user is able to select one value in Marital field");
+		byId.selectByVisibleText(id_MaritalStatusDDLField, value_MartialOption, "Selected Single option");
+		String selected = byId.getFirstSelectedOption(id_MaritalStatusDDLField, "Getting selected option");
+		Assert.assertEquals(selected, value_MartialOption);
+	}
+
+	@Test(priority = 15, enabled = true, groups = { "Smoke", "Deepak" })
+	public void P2M7_423() {
+		extentTest = extentReport.startTest("P2M7_423",
+				"Leases>>Rental Application>>New Rental Applications>>   Ethnicity DDL> Verify that the Add New Marital popup should be appeared");
+		byId.click(id_MaritalStatusDDLPlusIcon, "clicking on + icon");
+		int popupsize = byXpath.getSize(xpath_AddNewMaritalStatusPopup, "Getting size of opened popup");
+		Assert.assertEquals(popupsize, 1);
+	}
+
+	@Test(priority = 16, enabled = true, groups = { "Smoke", "Deepak" })
+	public void P2M7_424() {
+		extentTest = extentReport.startTest("P2M7_424",
+				"Leases>>Rental Application>>New Rental Applications>>   Verify that the Add New Marital popup should have Save and Cancel button in it");
+		byId.click(id_MaritalStatusDDLPlusIcon, "clicking on + icon");
+		int savebutton = byId.getSize(id_AddNewMaritalSaveButton, "Getting size of save button");
+		int cancelbutton = byId.getSize(id_AddNewMaritalCancelButton, "Getting size of cancel button");
+		int total = savebutton + cancelbutton;
+		Assert.assertEquals(total, 2);
+	}
+
+	@Test(priority = 17, enabled = true, groups = { "Smoke", "Deepak" })
+	public void P2M7_425() {
+		extentTest = extentReport.startTest("P2M7_425",
+				"Leases>>Rental Application>>New Rental Applications>>   Verify that the Add New Marital popup text field accepts maximum 50 char.");
+		byId.click(id_MaritalStatusDDLPlusIcon, "clicking on + icon");
+		byId.setText(id_AddNewMaritalTextField, value_StringOf55Char, "Entered more than 50 char");
+		String value = byId.getAttribute(id_AddNewMaritalTextField, "value", "Getting entered value in text field");
+		System.out.println(value);
+		int stringlength = value.length();
+		Assert.assertEquals(stringlength, 50);
+	}
+
+	@Test(priority = 18, enabled = true, groups = { "Smoke", "Deepak" })
+	public void P2M7_430() {
+		extentTest = extentReport.startTest("P2M7_430",
+				"Leases>>Rental Application>>New Rental Applications>>   Ensure that validation messge should be displayed as this should be a mandatory field.");
+		byId.click(id_MaritalStatusDDLPlusIcon, "clicking on + icon");
+		byId.click(id_AddNewMaritalSaveButton, "Clicked on Save button");
+		String validation = byXpath.getText(xpath_AddNewMaritalValidationMsg, "Getting text of validation");
+		System.out.println(validation);
+		Assert.assertEquals(validation, value_AddMartialValidation);
+	}
+
+	@Test(priority = 19, enabled = true, groups = { "Smoke", "Deepak" })
+	public void P2M7_431() {
+		extentTest = extentReport.startTest("P2M7_431",
+				"Leases>>Rental Application>>New Rental Applications>>   Verify that the user is able to add the martial status");
+		byId.click(id_MaritalStatusDDLPlusIcon, "clicking on + icon");
+		byId.setText(id_AddNewMaritalTextField, value_AddMartialTestName, "Test martial name entered");
+		byId.click(id_AddNewMaritalSaveButton, "Clicked on Save button");
+		String success = byXpath.getText(xpath_CommonOwnerSucessMessage, "Getting success message");
+		System.out.println(success);
+		Assert.assertEquals(success, value_AddMartialSuccessMessage);
+		System.out.println("First assertion passed");
+		String ddloptions = byId.getText(id_MaritalStatusDDLField, "Getting options in ddl");
+		Assert.assertTrue(ddloptions.contains(value_AddMartialTestName));
+		System.out.println("Second assertion passed");
+	}
+
+	@Test(priority = 20, enabled = true, groups = { "Smoke", "Deepak" })
+	public void P2M7_436() {
+		extentTest = extentReport.startTest("P2M7_436",
+				"Leases>>Rental Application>>New Rental Applications>>   Verify that the Hobbies DDL is displayed");
+		int hobbiescount = byId.getSize(id_HobbiesDDLField, "Getting size of hobbies DDL field");
+		Assert.assertEquals(hobbiescount, 1);
+	}
+
+	
+	@Test(priority = 21, enabled = true, groups = { "Smoke", "Deepak" })
+	public void P2M7_438() {
+		extentTest = extentReport.startTest("P2M7_438",
+				"Leases>>Rental Application>>New Rental Applications>>   Verify that the mentioned hardcoded values should be displayed in Hobbies DDL");
+		String option = byId.getText(id_HobbiesDDLField, "All options");
+		for (String value : List_Hobbiestocompare) {
+			Assert.assertTrue(option.contains(value));
+		}
+	}
+
+	@Test(priority = 22, enabled = true, groups = { "Smoke", "Deepak" })
+	public void P2M7_439() {
+		extentTest = extentReport.startTest("P2M7_439",
+				"Leases>>Rental Application>>New Rental Applications>>  Ensure that user should be able to select multiple option from the list.");
+		byXpath.click(xpath_HobbiesDDLField1, "Click on Hobbies DDL");
+		byXpath.click(xpath_HobbiesDDLSelectAllOptions, "Click on select all option");
+		String getText = byXpath.getText(xpath_HobbiesAllSelectedText, "Getting selected text");
+		Assert.assertEquals(getText, "All selected");
+	}
+
+	@Test(priority = 23, enabled = true, groups = { "Smoke", "Deepak" })
+	public void P2M7_440() {
+		extentTest = extentReport.startTest("P2M7_440", "Leases>>Rental Application>>New Rental Applications>>  Ensure that popup ' Add New Hobbies' should be displayed.");
+		byXpath.click(xpath_HobbiesDDLField1, "Click on Hobbies DDL");
+		byId.click(id_HobbiesDDLPlusIcon, "Click on plus icon");
+		String GetHeading = byXpath.getText(xpath_AddNewHobbiesPopup, "Getting text of popup");
+		Assert.assertEquals(GetHeading, "Add New Hobbies");
+	}
+
+	@Test(priority = 24, enabled = true, groups = { "Smoke", "Deepak" })
+	public void P2M7_441() {
+		extentTest = extentReport.startTest("P2M7_441",
+				"Leases>>Rental Application>>New Rental Applications>>  Ensure that popup ' Add New Hobbies' should have following fields:1. New Hobbies2. Save 3. Cancel.");
+		byId.click(id_HobbiesDDLPlusIcon, "Click on plus icon");
+		SoftAssert soft = new SoftAssert();
+		int getTextFieldSize = byId.getSize(id_AddNewHobbiesTextField, "Getting Size of text field");
+		int getSaveBtnSize = byId.getSize(id_AddNewHobbiesSaveButton, "Getting Size of save button");
+		int getCanclBtnSize = byId.getSize(id_AddNewHobbiesCancelButton, "Getting Size of cancel button");
+		soft.assertTrue(getTextFieldSize > 0, "Enable to getting the size of text field");
+		soft.assertTrue(getSaveBtnSize > 0, "Enable to getting the size of save button");
+		soft.assertTrue(getCanclBtnSize > 0, "Enable to getting the size of cancel button");
+	}
+
+	@Test(priority = 25, enabled = true, groups = { "Smoke", "Deepak" })
+	public void P2M7_442() {
+		extentTest = extentReport.startTest("P2M7_442",
+				"Leases>>Rental Application>>New Rental Applications>>  Ensure that field New Hobbie should be a text field with maximum length upto 50 characters.");
+		byId.click(id_HobbiesDDLPlusIcon, "Click on plus icon");
+		byId.clearThenSetText(id_AddNewHobbiesTextField, value_SSNSINIDTextField,
+				"Enter more than 50 numbers (70) under the field");
+		String getMax = byId.getAttribute(id_AddNewHobbiesTextField, "value", "Getting max length");
+		int getlength = getMax.length();
+		Assert.assertTrue(getlength == 50, "Maximum length is not 50");
+	}
+
+	@Test(priority = 26, enabled = true, groups = { "Smoke", "Deepak" })
+	public void P2M7_447() {
+		extentTest = extentReport.startTest("P2M7_447",
+				"Leases>>Rental Application>>New Rental Applications>>  Ensure that validation messge should be displayed as this should be a mandatory field.");
+		byId.click(id_HobbiesDDLPlusIcon, "Click on plus icon");
+		byId.click(id_AddNewHobbiesSaveButton, "Click on save button");
+		String getValidation = byXpath.getText(xpath_AddNewHobbiesValidationMsg, "Getting validation message");
+		Assert.assertEquals(getValidation, "* This field is required");
+	}
+
+	@Test(priority = 27, enabled = true, groups = { "Smoke", "Deepak" })
+	public void P2M7_448() throws InterruptedException {
+		extentTest = extentReport.startTest("P2M7_448",
+				"Leases>>Rental Application>>New Rental Applications>>  Ensure that data entered should be saved and confirmation message should be displayed. And the added new Hobbie option should be displayed in Hobbies DDL.");
+		byId.click(id_HobbiesDDLPlusIcon, "Click on plus icon");
+		byId.clearThenSetText(id_AddNewHobbiesTextField, value_HobbieName, "Enter text under the field");
+		byId.click(id_AddNewHobbiesSaveButton, "Click on save button");
+		String getConfrmtionMsg = byXpath.getText(xpath_CommonOwnerSucessMessage, "Getting confirmation message");
+		Assert.assertEquals(getConfrmtionMsg, "This record saved successfully.");
+		Thread.sleep(5000);
+		String option = byId.getText(id_HobbiesDDLField, "All options");
+		Assert.assertTrue(option.contains(value_HobbieName));
+	}
+
+	@Test(priority = 28, enabled = true, groups = { "Smoke", "Deepak" })
+	public void P2M7_453() throws InterruptedException {
+		extentTest = extentReport.startTest("P2M7_453",
+				"Leases>>Rental Application>>New Rental Applications>>  Ensure that there should be a Veteran Status field after Hobbies field");
+		int getSize = byId.getSize(id_VeteranStatusDDLField, "Getting size of VeteranStatusDDLField");
+		Assert.assertTrue(getSize > 0, "Veteran Status DDL Field not presented");
+	}
+
+	@Test(priority = 29, enabled = true, groups = { "Smoke", "Deepak" })
+	public void P2M7_454() throws InterruptedException {
+		extentTest = extentReport.startTest("P2M7_454", "Leases>>Rental Application>>New Rental Applications>>  Ensure that by default 'Select' should be displayed");
+		String getFirstOption = byId.getFirstSelectedOption(id_VeteranStatusDDLField, "Getting first selected option");
+		Assert.assertEquals(getFirstOption, "Select");
+	}
+
+	@Test(priority = 30, enabled = true, groups = { "Smoke", "Deepak" })
+	public void P2M7_455() throws InterruptedException {
+		extentTest = extentReport.startTest("P2M7_455",
+				"Leases>>Rental Application>>New Rental Applications>>  Ensure that following Hardcoded values should be displayed in DDL:Newly Separated Veteran, Other Protected Veterans "
+						+ "Special Disabled Veteran, Veteran, Veteran of Vietnam Era");
+		List<String> getValues = byId.getOptions(id_VeteranStatusDDLField, "Getting all DDL option");
+		for (String value : VeteranHardCodedValues) {
+			System.out.println(value);
+			Assert.assertTrue(getValues.contains(value));
+		}
+	}
+
+	@Test(priority = 31, enabled = true, groups = { "Smoke", "Deepak" })
+	public void P2M7_456() throws InterruptedException {
+		extentTest = extentReport.startTest("P2M7_456",
+				"Leases>>Rental Application>>New Rental Applications>>  Ensure that user should be able to select only one option from the list.");
+		byId.selectByVisibleText(id_VeteranStatusDDLField, "Newly Separated Veteran", "Select any option");
+		String getOption = byId.getFirstSelectedOption(id_VeteranStatusDDLField, "Getting first selected value");
+		Assert.assertEquals(getOption, "Newly Separated Veteran", "More than 1 value selected");
+	}
+
+	@Test(priority = 32, enabled = true, groups = { "Smoke", "Deepak" })
+	public void P2M7_457() throws InterruptedException {
+		extentTest = extentReport.startTest("P2M7_457",
+				"Leases>>Rental Application>>New Rental Applications>>  Ensure that popup ' Add New Veteran Status' should be displayed.");
+		byId.click(id_VeteranStatusDDLPlusIcon, "Click on plus icon for VeteranStatus");
+		String GetHeading = byXpath.getText(xpathAddNewVeteranStatusPopup, "Getting text of popup");
+		Assert.assertEquals(GetHeading, "Add New VeteranStatus", "Popup not opened");
+	}
+
+	@Test(priority = 33, enabled = true, groups = { "Smoke", "Deepak" })
+	public void P2M7_458() {
+		extentTest = extentReport.startTest("P2M7_458",
+				"Leases>>Rental Application>>New Rental Applications>>  Ensure that popup 'VeteranStatus' should have following fields:1. Add New VeteranStatus 2. Save 3. Cancel.");
+		byId.click(id_VeteranStatusDDLPlusIcon, "Click on plus icon for VeteranStatus");
+		SoftAssert soft = new SoftAssert();
+		int getTextFieldSize = byId.getSize(id_AddNewVeteranStatusTextField, "Getting Size of text field");
+		int getSaveBtnSize = byId.getSize(id_AddNewVeteranStatusSaveButton, "Getting Size of save button");
+		int getCanclBtnSize = byId.getSize(id_AddNewVeteranStatusCancelButton, "Getting Size of cancel button");
+		soft.assertTrue(getTextFieldSize > 0, "Enable to getting the size of text field");
+		soft.assertTrue(getSaveBtnSize > 0, "Enable to getting the size of save button");
+		soft.assertTrue(getCanclBtnSize > 0, "Enable to getting the size of cancel button");
+	}
+
+	@Test(priority = 34, enabled = true, groups = { "Smoke", "Deepak" })
+	public void P2M7_459() {
+		extentTest = extentReport.startTest("P2M7_459",
+				"Leases>>Rental Application>>New Rental Applications>>  Ensure that field Add New VeteranStatus should be a text field with maximum length upto 50 characters.");
+		byId.click(id_VeteranStatusDDLPlusIcon, "Click on plus icon");
+		byId.clearThenSetText(id_AddNewVeteranStatusTextField, value_SSNSINIDTextField,
+				"Enter more than 50 numbers (70) under the field");
+		String getMax = byId.getAttribute(id_AddNewVeteranStatusTextField, "value", "Getting max length");
+		int getlength = getMax.length();
+		Assert.assertTrue(getlength == 50, "Maximum length is not 50");
+	}
+
+	@Test(priority = 35, enabled = true, groups = { "Smoke", "Deepak" })
+	public void P2M7_464() {
+		extentTest = extentReport.startTest("P2M7_464",
+				"Leases>>Rental Application>>New Rental Applications>>  Ensure that validation messge should be displayed as this should be a mandatory field.");
+		byId.click(id_VeteranStatusDDLPlusIcon, "Click on plus icon");
+		byId.click(id_AddNewVeteranStatusSaveButton, "Click on save button");
+		String getValidation = byXpath.getText(xpath_AddNewVeteranStatusValidationMsg, "Getting validation message");
+		Assert.assertEquals(getValidation, "* This field is required");
+	}
+
+	@Test(priority = 36, enabled = true, groups = { "Smoke", "Deepak" })
+	public void P2M7_465() throws InterruptedException {
+		extentTest = extentReport.startTest("P2M7_465",
+				"Leases>>Rental Application>>New Rental Applications>>  Ensure that data entered should be saved and confirmation message should be displayed. And the added NewVeteranStatus option should be displayed in DL.");
+		byId.click(id_VeteranStatusDDLPlusIcon, "Click on plus icon");
+		byId.clearThenSetText(id_AddNewVeteranStatusTextField, value_VeteranStatus1, "Enter text under the field");
+		byId.click(id_AddNewVeteranStatusSaveButton, "Click on save button");
+		String getConfrmtionMsg = byXpath.getText(xpath_CommonOwnerSucessMessage, "Getting confirmation message");
+		Assert.assertEquals(getConfrmtionMsg, "This record saved successfully.");
+		Thread.sleep(5000);
+		String option = byId.getText(id_VeteranStatusDDLField, "All options");
+		Assert.assertTrue(option.contains(value_VeteranStatus1));
+	}
+	
+	//-------------------- In this TC already existing rental app used.-----------------------------
+	@Test(priority = 37, enabled = true, groups = { "Smoke", "Deepak" })
+	public void P2M7_418_435_452_469() throws InterruptedException {
+		extentTest = extentReport.startTest("P2M7_418_435_452_469",
+				"Ensure that Ethnicity, SSN/SIN no.,MaritalStatus,VeteranStatus,Hobbies should be displayed in General section. ");
+		byId.click(id_LeaseRentalAppTab, "Click on Rental Application sub tab");
+		byXpath.click(".//*[@id='tblRentalApplicationGrid']/tbody/tr/td/span[text()='AAMDEVOPS JENKIN']", "Click on name");
+		byId.click("UnitInfo", "Click on edit button");
+		byId.clearThenSetText(id_SSNSINIDTextField, "SSINT"+utility.uniqueString(), "Enter SSIN no.");
+		byId.selectByVisibleText(id_EthnicityDDLField, "Native Hawaiian / Pacific Islander", "Select text from DDl");
+		byId.selectByVisibleText(id_MaritalStatusDDLField, value_MartialOption, "Select text from DDL");
+		byXpath.click(xpath_HobbiesDDLField1, "Click on hobbies ");
+		byXpath.click(".//*[@id='txtHobbies1']//following-sibling::div/div/ul/bii[2]//input", "Click on first option");
+		byId.selectByVisibleText(id_VeteranStatusDDLField, VeteranHardCodedValues[1], "Select from DDL");
+		byId.click("btnSaveRentalApplication", "Click on save button");
+		Thread.sleep(3000);
+		SoftAssert se = new SoftAssert();
+		String getSSNno = byId.getText("lblSSN", "Getting SSN no.");
+		String getEthnicity = byId.getText("lblEthnicity", "Getting Ethnicity");
+		String getHobbies = byId.getText("lblHobbies", "Getting Hobbies");
+		String getMaritalStatus= byId.getText("lblMaritalStatus", "Getting MaritalStatus");
+		String getVeteranStatus= byId.getText("lblVeteranStatus", "Getting VeteranStatus");
+		se.assertTrue(getSSNno!="N/A", "N/A text is displaying.");
+		se.assertTrue(getEthnicity!="N/A", "N/A text is displaying.");
+		se.assertTrue(getHobbies!="N/A", "N/A text is displaying.");
+		se.assertTrue(getMaritalStatus!="N/A", "N/A text is displaying.");
+		se.assertTrue(getVeteranStatus!="N/A", "N/A text is displaying.");
+	}
+
+	@AfterMethod
+	public void ClickOnLogo() {
+		byXpath.click(xpath_ApexLinkLogo, "Clicked on Apex Link Logo");
+	}
+
+}

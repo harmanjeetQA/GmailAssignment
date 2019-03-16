@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testng-results skipped="0" failed="0" ignored="1" total="2" passed="1">
+  <reporter-output>
+  </reporter-output>
+  <suite name="Default suite" duration-ms="66582" started-at="2019-03-16T02:49:31Z" finished-at="2019-03-16T02:50:38Z">
+    <groups>
+    </groups>
+    <test name="Default test" duration-ms="66582" started-at="2019-03-16T02:49:31Z" finished-at="2019-03-16T02:50:38Z">
+      <class name="com.packages.student.AssignmentTest">
+        <test-method status="PASS" signature="launchBrowser()[pri:0, instance:com.packages.student.AssignmentTest@a74868d]" name="launchBrowser" is-config="true" duration-ms="6881" started-at="2019-03-16T02:49:31Z" finished-at="2019-03-16T02:49:38Z">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- launchBrowser -->
+        <test-method status="PASS" signature="TestCase2()[pri:0, instance:com.packages.student.AssignmentTest@a74868d]" name="TestCase2" duration-ms="59639" started-at="2019-03-16T02:49:38Z" finished-at="2019-03-16T02:50:38Z">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- TestCase2 -->
+      </class> <!-- com.packages.student.AssignmentTest -->
+    </test> <!-- Default test -->
+  </suite> <!-- Default suite -->
+</testng-results>

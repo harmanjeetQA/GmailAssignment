@@ -1,0 +1,586 @@
+package p2M5.vendorPortal;
+
+import java.io.IOException;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import utilities.*;
+
+import org.openqa.selenium.WebElement;
+import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
+
+import com.relevantcodes.extentreports.LogStatus;
+
+import common.ApexCommon;
+import interfaces.GlobalComponents;
+import objectRepository.Accounts;
+
+
+public class MyAccount extends ApexCommon implements Accounts{
+	
+	@BeforeClass(alwaysRun = true, enabled = true, groups = {"Smoke", "Regression", "Deepak"})
+	public void vendorLogin() throws InterruptedException{
+		login(URL_VendorLogin, userName, GlobalComponents.password);
+	}
+		
+		@Test(enabled = true, groups={"Smoke", "Regression", "Deepak"})
+		public void VNDR_P2M5_044(){
+			extentTest = extentReport.startTest("VNDR_P2M5_044", 
+					" Verify under my account vendors should be able to view the general info at the top header (fixed),Vendor Name,Vendor ID,Total Payables,YTD Payments,Open Work Orders,Phone");
+			String[] getVendorInfo = id_MyAccountInfoVendorAccountInfoSection.split(",");
+			int getVendorsSize = getVendorInfo.length;
+			for(int i=1; i<getVendorsSize;i++){
+				String info = byId.getText(getVendorInfo[i].trim(), "Getting "+i+" info.");
+				if(info.length()>0){
+					continue;	
+				}
+				else{	
+					Assert.fail("Field with" + getVendorInfo[i] + "id, does not have text");
+				}
+			}
+			Assert.assertTrue(getVendorsSize == 6, "All information is not displaying");
+			extentTest.log(LogStatus.INFO, "Verified under my account vendors should be able to view the general info at the top header (fixed),Vendor Name,Vendor ID,Total Payables,YTD Payments,Open Work Orders,Phone");
+		}
+	
+	//---------------------------------------------------------------------------------------------------------
+		
+      @Test(enabled = true, groups={"Smoke", "Regression", "Deepak"})
+		public void VNDR_P2M5_045(){
+			extentTest = extentReport.startTest("VNDR_P2M5_045", 
+					"Ensure that Vendor Name should be displayed in  front of Vendor  Name Field");
+			String getNameAndLabel = byXpath.getText(xpath_VendorAccountInfoSectionVendorNameLabel, "Getting name and label");
+			System.out.println(getNameAndLabel);
+			String getLabel = getNameAndLabel.substring(0, 13);
+			Assert.assertEquals(getLabel, "Vendor Name :");
+			String getVendorName = getNameAndLabel.substring(14);
+			System.out.println("getVendorName");
+			Assert.assertTrue(getVendorName.length()>0, "Vendor name is not displaying");
+			extentTest.log(LogStatus.INFO, "Verified that Vendor Name should be displayed in  front of Vendor  Name Field");
+      }
+			
+	//---------------------------------------------------------------------------------------------------------
+			
+      @Test(enabled = true, groups={"Smoke", "Regression", "Deepak"})
+		public void VNDR_P2M5_046(){
+			extentTest = extentReport.startTest("VNDR_P2M5_046", 
+					"Ensure that Vendor ID should be displayed in  front of Vendor  ID Field");
+			String getIdAndLabel = byXpath.getText(xpath_VendorAccountInfoSectionVendorIdLabel, "Getting ID and label");
+			System.out.println(getIdAndLabel);
+			String getLabel = getIdAndLabel.substring(0, 11);
+			Assert.assertEquals(getLabel, "Vendor ID :");
+			String getVendorId = getIdAndLabel.substring(12);
+			Assert.assertTrue(getVendorId.length()>0, "Vendor ID not displaying");
+			extentTest.log(LogStatus.INFO, "Verified that Vendor ID should be displayed in  front of Vendor  ID Field");
+    }
+    //---------------------------------------------------------------------------------------------------------
+		
+      @Test(enabled = true, groups={"Smoke", "Regression", "Deepak"})
+		public void VNDR_P2M5_047(){
+			extentTest = extentReport.startTest("VNDR_P2M5_047", 
+					"Ensure that Total Payables should be displayed in  front of Total Payables Field");
+			String getIdAndLabel = byXpath.getText(xpath_VendorAccountInfoSectionTotalPayableLabel, "Getting Total payable and label");
+			System.out.println(getIdAndLabel);
+			String getLabel = getIdAndLabel.substring(0, 16);
+			Assert.assertEquals(getLabel, "Total Payables :");
+			String getTotalPayable = getIdAndLabel.substring(17);
+			Assert.assertTrue(getTotalPayable.length()>0, "Payable not displaying");
+			extentTest.log(LogStatus.INFO, "Verified that Total Payables should be displayed in  front of Total Payables Field");
+    }
+
+    //---------------------------------------------------------------------------------------------------------
+		
+      @Test(enabled = true, groups={"Smoke", "Regression", "Deepak"})
+		public void VNDR_P2M5_048(){
+    	  extentTest = extentReport.startTest("VNDR_P2M5_048", 
+					"Ensure that YTD Payments should be displayed in  front of YTD Payments Field");
+			String getIdAndLabel = byXpath.getText(xpath_VendorAccountInfoSectionYTDPaymentLabel, "Getting YTD payment and label");
+			System.out.println(getIdAndLabel);
+			String getLabel = getIdAndLabel.substring(0, 13);
+			Assert.assertEquals(getLabel, "YTD Payment :");
+			String getYTDPayment = getIdAndLabel.substring(14);
+			Assert.assertTrue(getYTDPayment.length()>0, "YTD payment not displaying");
+			extentTest.log(LogStatus.INFO, "Verified that YTD Payments should be displayed in  front of YTD Payments Field");
+    }
+	
+    //---------------------------------------------------------------------------------------------------------
+		
+      @Test(enabled = true, groups={"Smoke", "Regression", "Deepak"})
+		public void VNDR_P2M5_049(){
+			extentTest = extentReport.startTest("VNDR_P2M5_049", 
+					"Ensure that Open Work Orders should be displayed in  front of Open Work Orders Field");
+			String getIdAndLabel = byXpath.getText(xpath_VendorAccountInfoSectionOpenworkOrderLabel, "Getting OpenWorkOrder and label");
+			System.out.println(getIdAndLabel);
+			String getLabel = getIdAndLabel.substring(0, 18);
+			Assert.assertEquals(getLabel, "Open Work Orders :");
+			String getYTDPayment = getIdAndLabel.substring(19);
+			Assert.assertTrue(getYTDPayment.length()>0, "No work order display");
+			extentTest.log(LogStatus.INFO, "Verified that Open Work Orders should be displayed in  front of Open Work Orders Field");
+    }
+	
+    //---------------------------------------------------------------------------------------------------------
+		
+      @Test(enabled = true, groups={"Smoke", "Regression", "Deepak"})
+		public void VNDR_P2M5_050(){
+			extentTest = extentReport.startTest("VNDR_P2M5_050", 
+					"Ensure that Phone should be displayed in  front of Phone");
+			String getIdAndLabel = byXpath.getText(xpath_VendorAccountInfoSectionPhoneLabel, "Getting PhoneNo. and label");
+			System.out.println(getIdAndLabel);
+			String getLabel = getIdAndLabel.substring(0, 7);
+			Assert.assertEquals(getLabel, "Phone :");
+			String getPhone = getIdAndLabel.substring(8);
+			Assert.assertTrue(getPhone.length()>0, "Phone no. not displaying");
+			extentTest.log(LogStatus.INFO, "Verified that Phone should be displayed in  front of Phone");
+    }
+      
+    //---------------------------------------------------------------------------------------------------------
+		
+      @Test(enabled = true, groups={"Smoke", "Regression", "Deepak"})
+		public void VNDR_P2M5_051(){
+			extentTest = extentReport.startTest("VNDR_P2M5_051", 
+					"Verify Following sub-menus should be available at the bottom in My Account Tab:(1.General, 2.Payables, 3.Ledger, 4.Payment Settings, 5.Notes & History, 6.Conversation, 7.Change Password)");
+			List<String> lst = new ArrayList<>();
+			int getTotalTabs = byXpath.getSize(".//ul[@class='tabs']/li", "Getting total no. of tabs");
+			for (int i=1; i<=getTotalTabs; i++){
+				String getTabs = byXpath.getText(".//ul[@class='tabs']/li["+i+"]", "Getting "+i+" tab");
+				lst.add(getTabs);
+				System.out.println(lst);
+			}
+				List<String> list = new ArrayList<>();
+				list.add("General");
+				list.add("Ledger");
+				list.add("Payment Settings");
+				list.add("Notes & History");
+				list.add("Conversation");
+				list.add("Change Password");
+				Assert.assertEquals(lst, list);
+			extentTest.log(LogStatus.INFO, "Verified Following sub-menus should be available at the bottom in My Account Tab:(1.General, 2.Payables, 3.Ledger, 4.Payment Settings, 5.Notes & History, 6.Conversation, 7.Change Password)");
+    } 
+      
+    //---------------------------------------------------------------------------------------------------------
+		
+      @Test(enabled = true, groups={"Smoke", "Regression", "Deepak"})
+		public void VNDR_P2M5_052(){
+			extentTest = extentReport.startTest("VNDR_P2M5_052", 
+					"Verify General tab should displayed General & Contact Information about the Vendor and following are the options displayed in General Information:-");
+            int getLeftSectionSize = byXpath.getSize(".//*[@id='VendorViewGeneral']/div[1]/div[2]/div[1]/div/label", "Geeting left section option count");
+            System.out.println(getLeftSectionSize);	
+			List<String> lst = new ArrayList<>();
+			for(int i=1; i<=2; i++){
+				for (int j=1;j<=getLeftSectionSize;j++){
+					String getOptions = byXpath.getText(".//*[@id='VendorViewGeneral']/div[1]/div[2]/div["+i+"]/div["+j+"]/label", "Getting all options");
+					lst.add(getOptions);
+					System.out.println(lst);
+				}
+				getLeftSectionSize = getLeftSectionSize-1;		
+			}
+            List<String> list = new ArrayList<>();
+            list.add("Salutation :"); list.add("Middle Name :"); list.add("Maiden Name :"); list.add("Gender :"); list.add("Entity/Company Name :");
+            list.add("Vendor ID :"); list.add("First Name :"); list.add("Last Name :"); list.add("Nick Name :"); list.add("Name on Check :");
+            list.add("Vendor Type :");
+            Assert.assertEquals(lst, list);	
+			extentTest.log(LogStatus.INFO, "Verified General tab should displayed General & Contact Information about the Vendor and following are the options displayed in General Information:-");
+    }
+      
+    //---------------------------------------------------------------------------------------------------------
+		
+      @Test(enabled = true, groups={"Smoke", "Regression", "Deepak"})
+		public void VNDR_P2M5_053(){
+			extentTest = extentReport.startTest("VNDR_P2M5_053", 
+					"Ensure that following options should be displayed in Contact Information:1. Zip/Postal code ,2. Country,3. State / Province ,4. City,5. Address,6. Website,7. Email,8. Phone");
+            int getSize = byXpath.getSize(".//*[@id='VendorViewGeneral']/div[2]/div[2]/div[1]/div/label", "Getting Size");
+            System.out.println(getSize);	
+			List<String> lst = new ArrayList<>();
+			for(int i=1; i<=2; i++){
+				for (int j=1;j<=getSize;j++){
+					String getOptions = byXpath.getText(".//*[@id='VendorViewGeneral']/div[2]/div[2]/div["+i+"]/div["+j+"]/label", "Getting all options");
+					lst.add(getOptions);
+					System.out.println(lst);
+				}	
+			}
+            List<String> list = new ArrayList<>();
+            list.add("Zip / Postal Code :"); list.add("State / Province :"); list.add("Address :"); list.add("Email :");
+            list.add("Country :"); list.add("City :"); list.add("Website :"); list.add("Phone :");
+            Assert.assertEquals(lst, list);
+			extentTest.log(LogStatus.INFO, "Verified Ensure that following options should be displayed in Contact Information:1. Zip/Postal code ,2. Country,3. State / Province ,4. City,5. Address,6. Website,7. Email,8. Phone");
+    }
+      
+    //---------------------------------------------------------------------------------------------------------
+		
+      @Test(enabled = true, groups={"Smoke", "Regression", "Deepak"})
+		
+		public void VNDR_P2M5_054(){
+			extentTest = extentReport.startTest("VNDR_P2M5_054", 
+					"Ensure that following attributes are displayed in Ledger:- 1. Start Date,2. End Date,3. Search,4. Grid,5. Print,6. Downlaod,7. Email,8. Export to Excel");
+			byXpath.click(xpath_VendorAccountInfoSectionLedgerTab, "Click on ledger tab");
+			List<String> lst = new ArrayList<>();
+            for(int i=1;i<=2;i++){
+            String getAttributes = byXpath.getText(".//*[@id='vendor-ledger']/div/div[2]/div["+i+"]", "Getting Attribute");
+            lst.add(getAttributes);
+            System.out.println(lst);
+            }
+            List<String> list = new ArrayList<>();
+            list.add("Start Date");
+            list.add("End Date");
+			Assert.assertEquals(lst, list);
+			// Two items verified
+			String getSearchButton = byId.getAttribute(id_VendorAccountInfoSectionLedgerSearchButton, "value", "Getting Search button");
+            Assert.assertEquals(getSearchButton, "Search");
+			extentTest.log(LogStatus.INFO, "Verified Ensure that following attributes are displayed in Ledger:- 1. Start Date,2. End Date,3. Search,4. Grid,5. Print,6. Downlaod,7. Email,8. Export to Excel");
+           //  Third Item verified
+			int getGridColumns = byXpath.getSize(xpath_VendorAccountInfoSectionLedgerTabLedgerGrid, "Getting size of columns");
+            Assert.assertEquals(getGridColumns, 5);
+            // fourth item verified
+            int getIconsSize = byXpath.getSize(xpath_VendorAccountInfoSectionLedgerTabLedgericons, "Getting the size of icons");
+           List<String> lst1 = new ArrayList<>();
+           for(int i=1; i<=getIconsSize;i++){
+        	   String getIconsTitle = byXpath.getAttribute(".//*[@class='ledger-icon']/a["+i+"]", "title", "Getting "+i+" attribute");
+        	   lst1.add(getIconsTitle);  
+           }
+            List<String> ls = new ArrayList<>();
+            ls.add("Print");
+            ls.add("Download");
+            ls.add("Email");
+            ls.add("ExportToExcel");
+            Assert.assertEquals(lst1, ls);
+            extentTest.log(LogStatus.INFO, "Ensure that following attributes are displayed in Ledger:- 1. Start Date,2. End Date,3. Search,4. Grid,5. Print,6. Downlaod,7. Email,8. Export to Excel");
+          }
+	
+      //---------------------------------------------------------------------------------------------------------
+		
+      @Test(enabled = true, groups={"Smoke", "Regression", "Deepak"})
+		public void VNDR_P2M5_055() throws InterruptedException, ParseException{
+			extentTest = extentReport.startTest("VNDR_P2M5_055", 
+					"Start date >> Ensure that date picker calendar should be displayed and user should be able to select current date and back date from current date.");
+			byXpath.click(xpath_VendorAccountInfoSectionLedgerTab, "Click on ledger tab");
+			byId.click(id_VendorAccountLedgerTabStartDateField, "Click under start date field");
+			int getCalendarSize = byId.getSize(id_VendorAccountLedgerTabStartDateCalendar, "Getting size of cal");
+			Assert.assertTrue(getCalendarSize > 0, "Calendar not displaying");
+			byXpath.click(xpath_VendorAccountLedgerTabStartDateCurrentDate, "Select current date");
+			getDriver().navigate().refresh();
+			byXpath.click(xpath_VendorAccountInfoSectionLedgerTab, "Click on ledger tab");
+			byId.click(id_VendorAccountLedgerTabStartDateField, "Again click under start date field");
+			VendorPortalCommons.SelectPrevDateFromTodaysDate();
+			extentTest.log(LogStatus.INFO, "Verified that 'Start' date picker calendar should be displayed and user should be able to select current date and back date from current date.");
+      }
+      
+    //---------------------------------------------------------------------------------------------------------
+		
+      @Test(enabled = true, groups={"Smoke", "Regression", "Deepak"})
+		public void VNDR_P2M5_056() {
+			extentTest = extentReport.startTest("VNDR_P2M5_056", 
+					"End date >> Ensure that date picker calendar should be displayed and user should be able to select current date and back date from current date.");
+			byXpath.click(xpath_VendorAccountInfoSectionLedgerTab, "Click on ledger tab");
+			byId.click(id_VendorAccountLedgerTabEndDateField, "Click under start date field");
+			int getCalendarSize = byId.getSize(id_VendorAccountLedgerTabEndDateCalendar, "Getting size of calendar");
+			Assert.assertTrue(getCalendarSize > 0, "Calendar not displaying");
+            byXpath.click(xpath_VendorAccountLedgerTabStartDateCurrentDate, "Select current date for end date field");
+			getDriver().navigate().refresh();
+			byXpath.click(xpath_VendorAccountInfoSectionLedgerTab, "Click on ledger tab");
+			byId.click(id_VendorAccountLedgerTabStartDateField, "Again click under end date field");
+			VendorPortalCommons.SelectPrevDateFromTodaysDate();
+			extentTest.log(LogStatus.INFO, "Verified that 'End' date picker calendar should be displayed and user should be able to select current date and back date from current date.");
+      }
+      
+    //---------------------------------------------------------------------------------------------------------
+		
+      @Test(enabled = true, groups={"Smoke", "Regression", "Deepak"})
+		public void VNDR_P2M5_057() {
+			extentTest = extentReport.startTest("VNDR_P2M5_057", 
+					"Ensure that Search button should be displayed and clickable.");
+			byXpath.click(xpath_VendorAccountInfoSectionLedgerTab, "Click on ledger tab");
+		    WebElement btn = byId.getElement(id_VendorAccountInfoSectionLedgerSearchButton, "Getting button presence");
+		    boolean srchBtn = btn.isDisplayed();
+			Assert.assertTrue(srchBtn);
+			// Now verify button clickable or not
+			int getGridCount1 = byXpath.getSize(xpath_VendorAccountInfoSectionLedgerTabLedgerGridData, "Getting count of grid rows");
+			byId.click(id_VendorAccountLedgerTabStartDateField, "Click under start date field");
+			byXpath.selectByValue(xpath_VendorAccountLedgerTabStartDateCalendarMonthDDL, "0", "Select first month");
+			byXpath.click(xpath_VendorAccountLedgerTabStartDateCalendarDate, "Select first date");
+			byId.click(id_VendorAccountInfoSectionLedgerSearchButton, "Click on 'Search' button");
+			int getGridCount2 = byXpath.getSize(xpath_VendorAccountInfoSectionLedgerTabLedgerGridData, "Getting count of grid rows");
+			int pp= getGridCount2-1;
+			System.out.println(pp);
+			if(getGridCount1 == getGridCount2-1){
+				System.out.println("Testcase pass");
+			}
+			else{
+				System.out.println("Fail");
+			}	
+			extentTest.log(LogStatus.INFO, "Verified that Search button should be displayed and clickable.");
+      }
+      
+    //--------------------------------------------------------------------------------------------------------------
+		
+      @Test(enabled = true, groups={"Smoke", "Regression", "Deepak"})
+		public void VNDR_P2M5_058() {
+			extentTest = extentReport.startTest("VNDR_P2M5_058", 
+					"Ensure that data should be displayed according to the selected Start Date and End date.");
+			byXpath.click(xpath_VendorAccountInfoSectionLedgerTab, "Click on ledger tab");
+		    WebElement btn = byId.getElement(id_VendorAccountInfoSectionLedgerSearchButton, "Getting button presence");
+		    boolean srchBtn = btn.isDisplayed();
+			Assert.assertTrue(srchBtn);
+			// Now verify button clickable or not
+			int getGridCount1 = byXpath.getSize(xpath_VendorAccountInfoSectionLedgerTabLedgerGridData, "Getting count of grid rows");
+			byId.click(id_VendorAccountLedgerTabStartDateField, "Click under start date field");
+			byXpath.selectByValue(xpath_VendorAccountLedgerTabStartDateCalendarMonthDDL, "0", "Select first month");
+			byXpath.click(xpath_VendorAccountLedgerTabStartDateCalendarDate, "Select first date");
+			byId.click(id_VendorAccountInfoSectionLedgerSearchButton, "Click on 'Search' button");
+			int getGridCount2 = byXpath.getSize(xpath_VendorAccountInfoSectionLedgerTabLedgerGridData, "Getting count of grid rows");
+			int pp= getGridCount2-1;
+			System.out.println(pp);
+			if(getGridCount1 == getGridCount2-1){
+				System.out.println("Testcase pass");
+			}
+			else{
+				System.out.println("Fail");
+			}
+			extentTest.log(LogStatus.INFO, "Verified that data should be displayed according to the selected Start Date and End date.");
+      }
+      
+    //--------------------------------------------------------------------------------------------------------------
+		
+      @Test(enabled = true, groups={"Smoke", "Regression", "Deepak"})
+		public void VNDR_P2M5_072() {
+		extentTest = extentReport.startTest("VNDR_P2M5_072", 
+					" Ensure payables section should be dispalyed");
+      String getPaymentButton = byXpath.getText(xpath_VendorAccountInfoSectionPaymentSettingTab, "Getting button text");
+      System.out.println(getPaymentButton);
+      Assert.assertEquals(getPaymentButton, "Payment Settings");
+			extentTest.log(LogStatus.INFO, "Verified payables section should be dispalyed");
+      }
+      
+    //--------------------------------------------------------------------------------------------------------------
+		
+      @Test(enabled = true, groups={"Smoke", "Regression", "Deepak"})
+		public void VNDR_P2M5_074() {
+		extentTest = extentReport.startTest("VNDR_P2M5_074", 
+					"Ensure that when user click on Payment Setting tab it should be clickable and follwing sections are displayed:- 1. Tax Information, 2. Payments Settings, 3. Bank Account Information");
+      byXpath.click(xpath_VendorAccountInfoSectionPaymentSettingTab, "Click on Payment setting button");
+      String get1stSection = byXpath.getText(xpath_VendorAccountPaymentSettingTabTaxInformationSection, "Getting 1st text");
+      String get2ndSection = byXpath.getText(xpath_VendorAccountPaymentSettingTabPaymentSettingSection, "Getting 2nd text");
+      String get3rdSection = byXpath.getText(xpath_VendorAccountPaymentSettingTabBankAccInfoSection, "Getting 3rd text");
+      Assert.assertEquals(get1stSection, "Tax Information");
+      Assert.assertEquals(get2ndSection, "Payment Settings");
+      Assert.assertEquals(get3rdSection, "Bank Account Information");
+	  extentTest.log(LogStatus.INFO, "Verified that when user click on Payment Setting tab it should be clickable and follwing sections are displayed:- 1. Tax Information, 2. Payments Settings, 3. Bank Account Information");
+      }
+      
+    //--------------------------------------------------------------------------------------------------------------
+		
+      @Test(enabled = true, groups={"Smoke", "Regression", "Deepak"})
+		public void VNDR_P2M5_094() {
+			extentTest = extentReport.startTest("VNDR_P2M5_094", 
+					"Ensure that a new section 'New Conversation' should be displayed with following fields:-(1. Property Manager, 2. Problem Category, 3. Description, 4. Send, 5. Cancel)");
+           byXpath.click(xpath_VendorAccountInfoSectionConversationTab, "Click on coversation tab");
+           byId.click(id_VendorAccountInfoSectionConversationTabNewConversationLink, "Click on new coversation link");
+           String getAllFields[] = id_VendorAccountConversationTabNewConversationSectionFields.split(",");
+           List<Integer> list = new LinkedList<>();
+           for(String getId: getAllFields){
+        	   int getSize = byId.getSize(getId, "Getting size of elements");
+        	   list.add(getSize); 
+           }
+           System.out.println(list); 
+           int listSize = list.size();
+           Assert.assertEquals(listSize, 5);
+			extentTest.log(LogStatus.INFO, "Verified Ensure that a new section 'New Conversation' should be displayed with following fields:-(1. Property Manager, 2. Problem Category, 3. Description, 4. Send, 5. Cancel)");
+      }
+      
+    //--------------------------------------------------------------------------------------------------------------
+		
+     @Test(enabled = true, groups={"Smoke", "Regression", "Deepak"})
+		public void VNDR_P2M5_095() throws IOException, InterruptedException {
+			extentTest = extentReport.startTest("VNDR_P2M5_095", 
+					"Ensure that Property Manager Dropdown should displayed all Property Managers. It should be a Mandatory Field");
+           byXpath.click(xpath_VendorAccountInfoSectionConversationTab, "Click on coversation tab");
+           byId.click(id_VendorAccountInfoSectionConversationTabNewConversationLink, "Click on new coversation link");
+          String [] getDropdown = id_VendorAccountConversationTabNewConversationSectionFields.split(",");
+          List<String> get1stDDLoption =   byId.getOptions(getDropdown[0], "Getting count of property managers");
+          int getOptionsCount = get1stDDLoption.size();
+          int getCount = getOptionsCount-1;
+          System.out.println(getCount);
+          // Open simple login
+          privateBrowser();
+          ApexCommon.login("", adminEmail, GlobalComponents.password);
+          byClassName.click(class_AdminPortalSettingsLink, "click on settings link");
+          Thread.sleep(3000);
+          byXpath.click(xpath_AdminPortalLeftPanelUsersTab, "Click on users tab");
+          byXpath.click(xpath_AdminPortalLeftPanelManageUsers, "click on manager users tab");
+          byId.selectByValue(id_AdminPortalManageUsersGridRoleTypeDDL, "2", "Select property manager option");
+          int getGridCount = byXpath.getSize(xpath_AdminPortalManageUsersGrid, "Getting size of grid");
+          int getsCount = getGridCount-1;
+          getDriver().close();
+          driverFlag = true;
+          System.out.println(getCount);
+          System.out.println(getsCount);
+          if (getCount==getsCount){
+        	  Assert.assertEquals(getCount, getsCount);
+          }
+          else
+          { 
+        	  Assert.fail("Managers are not matched :( ");
+          }
+			extentTest.log(LogStatus.INFO, "Verified that Property Manager Dropdown should displayed all Property Managers. It should be a Mandatory Field");
+      }
+      
+    //--------------------------------------------------------------------------------------------------------------
+		
+      @Test(enabled = true, groups={"Smoke", "Regression", "Deepak"})
+		public void VNDR_P2M5_096() throws IOException, InterruptedException {
+			extentTest = extentReport.startTest("VNDR_P2M5_096", 
+					"Ensure that user should be able to select the 'Property Manager' from the dropdown");
+           byXpath.click(xpath_VendorAccountInfoSectionConversationTab, "Click on coversation tab");
+           byId.click(id_VendorAccountInfoSectionConversationTabNewConversationLink, "Click on new coversation link");
+           String [] getDropdown = id_VendorAccountConversationTabNewConversationSectionFields.split(",");
+          byId.selectByIndex(getDropdown[0], 1, "Select option from manager dropdown");
+          String getFirstText = byId.getFirstSelectedOption(getDropdown[0], "Getting first option from DDL");
+          System.out.println(getFirstText);
+          List<String> getAllOptions = byId.getOptions(getDropdown[0], "Getting all options");
+          System.out.println(getAllOptions); 
+          byte i=1;
+          for (String string : getAllOptions) {
+        	  if(string.equals(getFirstText)){
+        		 System.out.println("pass");
+        		 break;
+        	  }
+        	  else{
+        		  System.out.println(i +" time not matched");
+        		  i++;
+        	  }
+		}
+          Assert.assertTrue(i <= getAllOptions.size(),"String not matched");
+			extentTest.log(LogStatus.INFO, "Verified that user should be able to select the 'Property Manager' from the dropdown");
+      }
+    //--------------------------------------------------------------------------------------------------------------
+		
+      @Test(enabled = true, groups={"Smoke", "Regression", "Deepak"})
+		public void VNDR_P2M5_098() throws IOException, InterruptedException {
+			extentTest = extentReport.startTest("VNDR_P2M5_098", 
+					"Ensure that validation message should be fired");
+           byXpath.click(xpath_VendorAccountInfoSectionConversationTab, "Click on coversation tab");
+           byId.click(id_VendorAccountInfoSectionConversationTabNewConversationLink, "Click on new coversation link");
+           String [] getDropdown = id_VendorAccountConversationTabNewConversationSectionFields.split(",");
+           byId.click(getDropdown[3], "Click on send button");
+           String getError = byXpath.getText(xpath_NewConversationSectionValidationErrorMsg1Field, "getting validation text message");
+          Assert.assertEquals(getError, "* This field is required");
+			extentTest.log(LogStatus.INFO, "Verified that validation message should be fired");
+      }
+    //--------------------------------------------------------------------------------------------------------------
+		
+      @Test(enabled = true, groups={"Smoke", "Regression", "Deepak"})
+		public void VNDR_P2M5_097() throws IOException, InterruptedException {
+			extentTest = extentReport.startTest("VNDR_P2M5_097", 
+					"Ensure that when user select any option from 'Property Manager' dropdown and click on Send button validation message should not be fired");
+           byXpath.click(xpath_VendorAccountInfoSectionConversationTab, "Click on coversation tab");
+           byId.click(id_VendorAccountInfoSectionConversationTabNewConversationLink, "Click on new coversation link");
+           String [] getDropdown = id_VendorAccountConversationTabNewConversationSectionFields.split(",");
+           byId.selectByIndex(getDropdown[0], 1, "Select any option from DDl");
+           byId.click(getDropdown[3], "Click on send button");
+           int getSizeOfErrrMsg =byXpath.getSize(xpath_NewConversationSectionValidationErrorMsg1Field, "Getting size of eror msg");
+          Assert.assertTrue(getSizeOfErrrMsg==0, "Validation message is still displaying");
+		extentTest.log(LogStatus.INFO, "Verified that when user select any option from 'Property Manager' dropdown and click on Send button validation message should not be fired");
+      }
+      
+      
+    //--------------------------------------------------------------------------------------------------------------
+		
+        @Test(enabled = true, groups={"Smoke", "Regression", "Deepak"})
+		public void VNDR_P2M5_108() throws IOException, InterruptedException {
+			extentTest = extentReport.startTest("VNDR_P2M5_108", 
+					"Ensure that Validation message should be fired");
+           byXpath.click(xpath_VendorAccountInfoSectionConversationTab, "Click on coversation tab");
+           byId.click(id_VendorAccountInfoSectionConversationTabNewConversationLink, "Click on new coversation link");
+           String [] getDropdown = id_VendorAccountConversationTabNewConversationSectionFields.split(",");
+           byId.click(getDropdown[3], "Click on send button");
+           String getError3 = byXpath.getText(xpath_NewConversationSectionValidationErrorMsg3Field, "getting validation text message for description field");
+           Assert.assertEquals(getError3, "* This field is required");
+			extentTest.log(LogStatus.INFO, "Verified that Validation message should be fired");
+      }
+      
+      //--------------------------------------------------------------------------------------------------------------
+		
+        @Test(enabled = true, groups={"Smoke", "Regression", "Deepak"})
+		public void VNDR_P2M5_110() throws IOException, InterruptedException {
+			extentTest = extentReport.startTest("VNDR_P2M5_110", 
+					"Ensure that validation message should be fired against all mandatory fields.");
+           byXpath.click(xpath_VendorAccountInfoSectionConversationTab, "Click on coversation tab");
+           byId.click(id_VendorAccountInfoSectionConversationTabNewConversationLink, "Click on new coversation link");
+           String [] getDropdown = id_VendorAccountConversationTabNewConversationSectionFields.split(",");
+           byId.click(getDropdown[3], "Click on send button");
+           String getError4 = byXpath.getText(xpath_NewConversationSectionValidationErrorMsg2Field, "getting validation text message for description field");
+           Assert.assertEquals(getError4, "* This field is required");
+		extentTest.log(LogStatus.INFO, "Verified that validation message should be fired against all mandatory fields.");
+      }
+      
+    //--------------------------------------------------------------------------------------------------------------
+		
+      @Test(enabled = true, groups={"Smoke", "Regression", "Deepak"})
+		public void VNDR_P2M5_109() throws IOException, InterruptedException {
+			extentTest = extentReport.startTest("VNDR_P2M5_109", 
+					"Ensure that conversation should be sent to the selected Property manager and message 'This record saved successfully' should be displayed.And message displayed in "
+					+ "'Conversation' section with Vendor Name and Property Manager name.");
+           byXpath.click(xpath_VendorAccountInfoSectionConversationTab, "Click on coversation tab");
+           byId.click(id_VendorAccountInfoSectionConversationTabNewConversationLink, "Click on new coversation link");
+           String [] getDropdown = id_VendorAccountConversationTabNewConversationSectionFields.split(",");
+           byId.selectByIndex(getDropdown[0], 1, "Select option from DDL");
+           byId.selectByIndex(getDropdown[1], 1, "Select option from DDL");
+           String description = "This is dummy text"+utility.uniqueString();
+           byId.clearThenSetText(getDropdown[2], description, "Enter description");
+           byId.click(getDropdown[3], "Click on send button");
+           String getConfirmationText = byXpath.getText(xpath_SendConversationToastMessage, "Getting Confirmation Message");
+           Assert.assertEquals(getConfirmationText, "This record saved successfully.");
+           int getTextSize = byXpath.getSize(".//*[@id='divMainConversation']/div/div[2][text()='"+description+"']", "Getting size of text");
+           System.out.println(getTextSize);
+           Assert.assertTrue(getTextSize > 0, "No data display for it");
+			extentTest.log(LogStatus.INFO, "Verified that conversation should be sent to the selected Property manager and message 'This record saved successfully' should be displayed.And message displayed in "
+					+ "'Conversation' section with Vendor Name and Property Manager name.");
+      }
+      
+    //--------------------------------------------------------------------------------------------------------------
+		
+      @Test(enabled = true, groups={"Smoke", "Regression", "Deepak"})
+		public void VNDR_P2M5_134() throws IOException, InterruptedException {
+			extentTest = extentReport.startTest("VNDR_P2M5_134", 
+					"Ensure that validation messages should be fired");
+           byXpath.click(xpath_VendorAccountInfoSectionChangePWDTab, "Click on change password tab");
+           byId.click(id_ChangePWDTabSaveButton, "Click on save button");
+           String getTextMsg = byClassName.getText(class_ChangePWDTabValidationMessages, "Getting validation messages");
+           System.out.println(getTextMsg);
+           int getMsgCount = byClassName.getSize(class_ChangePWDTabValidationMessages, "Getting count of messages");
+           System.out.println(getMsgCount);
+           Assert.assertTrue(getMsgCount>=3, "Not getting all validation messages");
+		extentTest.log(LogStatus.INFO, "Verified that validation messages should be fired");
+      }
+      
+    //--------------------------------------------------------------------------------------------------------------
+		
+      @Test(enabled = true, groups={"Smoke", "Regression", "Deepak"})
+		public void VNDR_P2M5_133() throws IOException, InterruptedException {
+			extentTest = extentReport.startTest("VNDR_P2M5_133", 
+					"Ensure that confirmation message should be displayed");
+           byXpath.click(xpath_VendorAccountInfoSectionChangePWDTab, "Click on change password tab");
+           String [] ChangePwdField = id_ChangePWDTabAllFields.split(",");
+           byId.clearThenSetText(ChangePwdField[0], "mind@123", "Enter old password");
+           byId.clearThenSetText(ChangePwdField[1], "mind@123", "Enter new password");
+           byId.clearThenSetText(ChangePwdField[2], "mind@123", "Enter confirm new password");
+           byId.click(id_ChangePWDTabSaveButton, "Click on save button");
+           String getConfirmMsg = byXpath.getText(xpath_SendConversationToastMessage, "Getting the success message");
+           Assert.assertEquals(getConfirmMsg, "The record updated successfully.");
+           byId.click(id_ChangePWDTabSaveButton, "Click on save button");
+			extentTest.log(LogStatus.INFO, "Verified that confirmation message should be displayed");
+      }
+      
+    //--------------------------------------------------------------------------------------------------------------
+		
+      @Test(enabled = true, groups={"Smoke", "Regression", "Deepak"})
+		public void VNDR_P2M5_135() throws IOException, InterruptedException {
+			extentTest = extentReport.startTest("VNDR_P2M5_135", 
+					"Ensure that user should be logout from the application.");
+			byId.click(id_VendorPortalLogoutLink, "Click on logout button");
+           String getButton = byId.getAttribute(id_VendorPortalLoginButton, "type", "getting login button");
+           Assert.assertEquals(getButton, "button");
+           extentTest.log(LogStatus.INFO, "Verified that user should be logout from the application.");
+      } 
+}

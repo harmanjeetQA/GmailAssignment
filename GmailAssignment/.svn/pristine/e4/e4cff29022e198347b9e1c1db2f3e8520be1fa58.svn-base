@@ -1,0 +1,33 @@
+package objectRepository;
+
+public interface IWorkOrder {
+	String email = "singhjasmeet@yopmail.com";
+	
+	
+	
+	String id_CompanyLogo = "imgCompanyMainLogo";
+	String id_WorkOrderTab = "ancWorkOrders";
+	String id_OpenTabWorkOrder = "aOpen";
+	String id_ClosedTabWorkOrder = "aClosed";
+	String id_OneTimeRadioBtnWorkOrder = "rdbOneTimeWorkListing";
+	String id_ReoccuringRadioBtnWorkOrder = "rdbRecurringWorkListing";
+	String id_ListingFrequencyDDLWorkOrder = "ddlWorkOrderListingFrequency";
+	String id_ListingTableWorkOrder = "tblWorkOrderGrid";
+	String id_VendorName = "hdnTenantName";
+	String id_CancelBtnWorkOrderEdit = "btnWorkOrderCancel";
+	
+	String xpath_ClosedTabWorkOrder = "//div[@class='white-btn-outer']//input";
+	String xpath_TblRowsListWorkOrder = "//table[@id='tblWorkOrderGrid']//tbody//tr";
+	String xpath_BackBtnWorkOrderEdit = "//div[@id='dvWorkorderHeader']/a";
+	
+	String class_WorkOrderTableTitle = "ui-jqgrid-title";
+	String class_WorkOrderGridLabels = "ui-jqgrid-labels";
+	
+	String []ddlOptionsValue = {"Select", "Daily", "Weekly", "Bi-Weekly", "Monthly",
+			"Quarterly", "Half Yearly", "Annually"};
+	String []value_ArrayColoumnsWorkOrderGrid = {"Work Order Number", "Work Order Category",
+			"Vendor", "Property", "Created On", "Caller/RequestedBy", "Amount",
+			"Priority", "Status", "Action"};
+	
+	
+}

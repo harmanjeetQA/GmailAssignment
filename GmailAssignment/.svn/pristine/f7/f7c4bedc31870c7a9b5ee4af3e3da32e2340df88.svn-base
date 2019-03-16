@@ -1,0 +1,1 @@
+ControlCommand('[CLASS:#32770]','','ComboBox2',"SelectString", 'All Files (*.*)')

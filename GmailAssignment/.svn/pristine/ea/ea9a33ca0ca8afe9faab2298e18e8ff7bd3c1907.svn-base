@@ -1,0 +1,1569 @@
+package p2M6.Accounting;
+
+import java.awt.AWTException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.poi.hssf.record.PageBreakRecord.Break;
+import org.openqa.selenium.By;
+import org.openqa.selenium.By.ByXPath;
+import org.openqa.selenium.Keys;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
+import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
+import org.testng.asserts.SoftAssert;
+
+import com.ibm.icu.text.DecimalFormat;
+import com.relevantcodes.extentreports.LogStatus;
+
+import common.ApexCommon;
+import objectRepository.IManageBill;
+import p2M5.vendorPortal.VendorPortalCommons;
+import p2M6.Accounting.objectRepositry.ACTG_Invoice;
+import p2M6.Accounting.objectRepositry.Admin_MasterSetup;
+import p2M6.Accounting.objectRepositry.Admin_PeopleTab;
+
+public class Invoice extends ApexCommon implements ACTG_Invoice, Admin_PeopleTab, IManageBill, Admin_MasterSetup {
+	SoftAssert se = new SoftAssert();
+	String getSystemDate = utility.getCurrentDate("dd/MM/YYYY");
+	String getSystemDay = utility.getCurrentDate("("+"EEE"+".)");
+	String tenantName;
+	List<String> building;
+	String[] arr;
+	String unitName;
+	String portfolioName;
+	String ProratedRent;
+	
+	@BeforeClass(groups = {"Smoke", "Regression", "Jasmeet"})
+	public void login() throws InterruptedException, IOException, AWTException {
+		login("", adminEmail, password);
+		/*setLogs.info("Add Portfolio");
+		portfolioName = addPortfolio("H");
+		setLogs.info("Add Bank and attach portolio to it");
+		String getUniqueNumber = utility.getCurrentDateTime("ddMMYYYYss");
+		addBank(portfolioName, value_BankName, getUniqueNumber,
+				getUniqueNumber, getUniqueNumber, value_BankIntialAmount,
+				getUniqueNumber, "Active", "");
+		setLogs.info("Add Property");
+		byId.click(id_PropertiesTab, "Click on Properties Tab");
+		byId.click(id_NewPropertyBTN, "Click on 'New Property' button");
+		arr = addProperty(value_PropertyName, portfolioName, "", "", "", "1", "1");
+		byName.click(class_PopupYesButton, "'Yes' button on Popup");
+		building = addBuilding(value_PropertyName, "1", value_Address);
+		byName.click(class_PopupYesButton, "'Yes' button on Popup");
+		unitName = addUnit("", "", "1", "A", value_UnitNoStart, "", "",
+				"", "", "", value_RentAmount, value_RentAmount, "", "");
+		byId.click(id_AdminPortalPeopleTab, "Click on People Tab");
+		tenantName = value_TenantFirstName+utility.uniqueString();
+		VendorPortalCommons.newTenant_SelectPropertyTab(arr[0], building.get(0),"", tenantName, value_TenantLastName,tenantName+value_DomainName , value_PhoneNumber);
+		VendorPortalCommons.newTenant_LeaseDetailsTab("", "", "", "", "", "");
+		ProratedRent = VendorPortalCommons.newTenant_ChargesAndMoveInTabWithoutParams();*/
+	}
+
+	@BeforeMethod(groups = {"Smoke", "Regression", "Jasmeet"})
+	public void DefaultPage() {
+		byId.click(id_Accounting, "Accounting");
+		byId.click(id_Invoices, "Invoices");
+	}
+
+	@Test(priority = 0, enabled = true, groups = { "Smoke", "Jasmeet" })
+	public void P2M6_149() throws InterruptedException {
+		extentTest = extentReport.startTest(" *H6:P2M6_149", "Accounting>>Invoices");
+		String label_NewInvoice = byId.getAttribute(id_InvoiceNewInvoice, "value",
+				"getting text of new invoice button");
+		String label_ReceiveMoney = byId.getAttribute(id_InvoiceReceiveMoney, "value",
+				"getting text of Receive Money button");
+		String label_Email = byId.getAttribute(id_InvoiceEmail, "value", "Email button");
+		String label_Print = byId.getAttribute(id_InvoicePrint, "value", "Print button");
+		String label_Delete = byId.getAttribute(id_InvoiceDelete, "value", "Delete button");
+		se.assertEquals(label_NewInvoice, value_InvoiceNewInvoice);
+		se.assertEquals(label_ReceiveMoney, value_InvoiceReceiveMoney);
+		se.assertEquals(label_Email, value_InvoiceEmail);
+		se.assertEquals(label_Print, value_InvoicePrint);
+		se.assertEquals(label_Delete, value_InvoiceDelete);
+		se.assertAll();
+		extentTest.log(LogStatus.INFO, "Test P2M6_130 Pass");
+	}
+
+	@Test(priority = 1, enabled = true, groups = { "Smoke", "Jasmeet" })
+	public void P2M6_150() throws InterruptedException {
+		extentTest = extentReport.startTest(" *H6:P2M6_150", "Accounting>>Invoices - New Invoice");
+		byId.click(id_InvoiceNewInvoice, "clicking on new invoice");
+		int sizeInvoiceTo = byXpath.getSize(xpath_NewInvoiceInvoiceTo, "gettig size of invoice to field");
+		Assert.assertTrue(sizeInvoiceTo == 1, "user not navigated to new invoice page");
+		extentTest.log(LogStatus.INFO, "Test P2M6_131 Pass");
+	}
+
+	@Test(priority = 2, enabled = true, groups = { "Smoke", "Jasmeet" })
+	public void P2M6_151() throws InterruptedException {
+		extentTest = extentReport.startTest(" *H6:P2M6_151", "Accounting>>Invoices - New Invoice");
+		byId.click(id_InvoiceNewInvoice, "clicking on new invoice");
+		int sizeInvoiceTo = byXpath.getSize(xpath_NewInvoiceInvoiceTo, "gettig size of invoice to field");
+		int sizeInvoiceDate = byXpath.getSize(xpath_NewInvoiceInvoiceDate, "gettig size of invoice Date field");
+		int sizeLateDate = byXpath.getSize(xpath_NewInvoiceLateDate, "gettig size of Late Date field");
+		int sizeInvoiceEmail = byXpath.getSize(xpath_NewInvoiceEmail, "gettig size of Email field");
+		int sizeInvoiceNoLate = byXpath.getSize(xpath_NewInvoiceNoLate, "gettig size of No Late field");
+		se.assertTrue(sizeInvoiceTo == 1, "not getting field invoice to");
+		se.assertTrue(sizeInvoiceDate == 1, "not getting field invoice Date");
+		se.assertTrue(sizeLateDate == 1, "not getting field Late Date");
+		se.assertTrue(sizeInvoiceEmail == 1, "not getting field Email");
+		se.assertTrue(sizeInvoiceNoLate == 1, "not getting field  No Late");
+		se.assertAll();
+		extentTest.log(LogStatus.INFO, "Test P2M6_132 Pass");
+	}
+
+	@Test(priority = 3, enabled = true, groups = { "Smoke", "Jasmeet" })
+	public void P2M6_152() throws InterruptedException {
+		extentTest = extentReport.startTest(" *H6:P2M6_152", "Accounting>>Invoices - New Invoice");
+		byId.click(id_InvoiceNewInvoice, "clicking on new invoice");
+		int sizeTenant = byXpath.getSize(xpath_NewInvoiceTenant, "gettig size of Tenant field");
+		int sizeOwner = byXpath.getSize(xpath_NewInvoiceOwner, "gettig size of owner field");
+		int sizeOther = byXpath.getSize(xpath_NewInvoiceOther, "gettig size of Other field");
+		se.assertTrue(sizeTenant == 1, "not getting field Tenant");
+		se.assertTrue(sizeOwner == 1, "not getting field Owner");
+		se.assertTrue(sizeOther == 1, "not getting field Other");
+		se.assertAll();
+		extentTest.log(LogStatus.INFO, "Test P2M6_133 Pass");
+	}
+
+	@Test(priority = 4, enabled = true, groups = { "Smoke", "Jasmeet" })
+	public void P2M6_153() throws InterruptedException {
+		extentTest = extentReport.startTest(" *H6:P2M6_153", "Accounting>>Invoices - New Invoice - Invoice To");
+		byId.click(id_InvoiceNewInvoice, "clicking on new invoice");
+		boolean getVal = byId.isSelected(id_InvoiceInvoiceToTenatRadioButton, "checking radio button of tenant field");
+		int sizeTenant = byId.getSize(id_NewInvoiceTenatTextbox, "gettig size of Tenant search box");
+		se.assertTrue(sizeTenant == 1, "not getting field Tenant search box");
+		se.assertTrue(getVal == true, "radio button for tenant is not selected by dafault");
+		se.assertAll();
+		extentTest.log(LogStatus.INFO, "Test P2M6_134 Pass");
+	}
+
+	@Test(priority = 5, enabled = true, groups = { "Smoke", "Jasmeet" })
+	public void P2M6_154() throws InterruptedException {
+		extentTest = extentReport.startTest("P2M6_154",
+				"H6: Accounting>>Invoices - New Invoice - Invoice To - Tenant");
+		byId.click(id_InvoiceNewInvoice, "New invoice");
+		byId.click(id_InvoiceInvoiceToTenatRadioButton, "Radio button to select tenant");
+		String getText = byId.getAttribute(id_NewInvoiceTenatTextbox,
+				"placeholder", "Placeholder text");
+		byId.setText(id_NewInvoiceTenatTextbox, " ", "Tenant textbox");
+		byId.click(id_NewInvoiceTenatTextbox, "Tenant textbox");
+		byId.clearThenSetText(id_NewInvoiceTenatTextbox, tenantName, "Enter Tenant name in textbox");
+		Thread.sleep(3000);
+		getDriver().findElement(By.id(id_NewInvoiceTenatTextbox)).sendKeys(Keys.ENTER);
+		String getVal = byId.getAttribute(id_NewInvoiceTenatTextbox, "value", "Tenant name");
+		se.assertEquals(getText, value_NewInvoiceTenatTextboxWatermark, "Place holder 'Click here to Select a Tenant' is not displaying");
+		se.assertNotEquals(getVal.concat(tenantName)," user is not able to select tenant name");
+		se.assertAll();
+		extentTest.log(LogStatus.INFO, "Test P2M6_135 Pass");
+	}
+
+	@Test(priority = 6, enabled = true, groups = { "Smoke", "Jasmeet" })
+	public void P2M6_155() throws InterruptedException {
+		extentTest = extentReport.startTest("P2M6_155",
+				"H6: Accounting>>Invoices - New Invoice - Invoice To - Tenant");
+		byId.click(id_InvoiceNewInvoice, "clicking on new invoice");
+		byId.click(id_InvoiceInvoiceToTenatRadioButton, "Radio button to select tenant");
+		byId.setText(id_NewInvoiceTenatTextbox, " ", "Tenant textbox");
+		byId.click(id_NewInvoiceTenatTextbox, "Tenant textbox");
+		byId.clearThenSetText(id_NewInvoiceTenatTextbox, "HennryAbZNpy", "Enter Tenant name in textbox");
+		Thread.sleep(3000);
+		getDriver().findElement(By.id(id_NewInvoiceTenatTextbox)).sendKeys(Keys.ENTER);
+		String getVal = byId.getAttribute(id_NewInvoiceTenatTextbox,
+				"value", "Tenant name");
+		if (getVal != "") {
+			String getProp = byId.getAttribute(id_NewInvoiceTenatProperty+"1",
+					"value", "Property name");
+			String getUnit = byId.getAttribute(id_NewInvoiceTenatUnit+"1",
+					"value", "Unit name");
+			se.assertNotEquals(getProp, "");
+			se.assertNotEquals(getUnit, "");
+			se.assertAll();
+			extentTest.log(LogStatus.INFO, "Test P2M6_155 Pass");
+
+		} else {
+			extentTest.log(LogStatus.INFO, "Tenant is not there to select");
+			Assert.fail();
+		}
+	}
+
+	@Test(priority = 7, enabled = true, groups = { "Smoke", "Jasmeet" })
+	public void P2M6_156() throws InterruptedException {
+		extentTest = extentReport.startTest("P2M6_156",
+				"H6: Accounting>>Invoices - New Invoice - Invoice To - Owner");
+		byId.click(id_InvoiceNewInvoice, "New invoice");
+		byId.click(id_InvoiceInvoiceToOwnerRadioButton, "Radio button to select owner");
+		String getText = byId.getAttribute(id_NewInvoiceOwnerTextbox,
+				"placeholder", "Placeholder text");
+		byId.setText(id_NewInvoiceOwnerTextbox, " ", "Owner textbox");
+		byId.click(id_NewInvoiceOwnerTextbox, "Owner textbox");
+		byId.clearThenSetText(id_NewInvoiceOwnerTextbox, "a"+" ", "Enter owner name");
+		Thread.sleep(3000);
+		getDriver().findElement(By.id(id_NewInvoiceOwnerTextbox)).sendKeys(Keys.ENTER);
+		String getVal = byId.getAttribute(id_NewInvoiceOwnerTextbox,
+				"value", "getting owner name");
+		se.assertEquals(getText, value_NewInvoiceOwnerTextboxWatermark);
+		se.assertNotEquals(getVal, "");
+		se.assertAll();
+		extentTest.log(LogStatus.INFO, "Test P2M6_137 Pass");
+	}
+
+	@Test(priority = 8, enabled = true, groups = { "Smoke", "Jasmeet" })
+	public void P2M6_157() throws InterruptedException {
+		extentTest = extentReport.startTest("P2M6_157",
+				"H6: Accounting>>Invoices - New Invoice - Invoice To - Tenant");
+		byId.click(id_InvoiceNewInvoice, "clicking on new invoice");
+		byId.click(id_InvoiceInvoiceToOwnerRadioButton,
+				"clicking on radio button to select Owner");
+		byId.setText(id_NewInvoiceOwnerTextbox, " ", "Tenant textbox");
+		byId.click(id_NewInvoiceOwnerTextbox, "clicking on Owner textbox");
+		byId.clearThenSetText(id_NewInvoiceOwnerTextbox, "a"+" ", "Enter owner name");
+		Thread.sleep(3000);
+		getDriver().findElement(By.id(id_NewInvoiceOwnerTextbox)).sendKeys(Keys.ENTER);
+		String getVal = byId.getAttribute(id_NewInvoiceOwnerTextbox, "value", "Owner name");
+		if (getVal != "") {
+			String getProp = byId.getAttribute(id_NewInvoiceTenatProperty + "1",
+					"value", "Property name");
+			Assert.assertNotEquals(getProp, "");
+		} else {
+			extentTest.log(LogStatus.INFO, "Owner is not there to select");
+			Assert.fail();
+		}
+	}
+
+	@Test(priority = 9, enabled = true, groups = { "Smoke", "Jasmeet" })
+	public void P2M6_158() throws InterruptedException {
+		extentTest = extentReport.startTest("P2M6_158",
+				"H6: Accounting>>Invoices - New Invoice - Invoice To - Other");
+		byId.click(id_InvoiceNewInvoice, "New invoice");
+		byId.click(id_InvoiceInvoiceToOtherRadioButton, "Radio button to select other");
+		boolean getPropState = getDriver().
+				findElement(By.id(id_NewInvoiceTenatProperty+"1")).isEnabled();
+		boolean getUnitState = getDriver().findElement(By.id(id_NewInvoiceTenatUnit+"1")).
+				isEnabled();
+		se.assertTrue(getPropState == false, "property is not disabled");
+		se.assertTrue(getUnitState == false, "unit is not disabled");
+		se.assertAll();
+	}
+
+	@Test(priority = 10, enabled = true, groups = { "Smoke", "Jasmeet" })
+	public void P2M6_159() throws InterruptedException {
+		extentTest = extentReport.startTest(" *H6:P2M6_159", "Accounting>>Invoices - New Invoice - Invoice To - Other");
+		byId.click(id_InvoiceNewInvoice, "clicking on new invoice");
+		byId.click(id_InvoiceInvoiceToOtherRadioButton, "clicking on radio button to select other");
+		byId.setText(id_NewInvoiceOtherTextbox, value_NewInvoiceOtherTextboxNumeric, "entering numerics");
+		String getVal = byId.getAttribute(id_NewInvoiceOtherTextbox, "value", "getting text entered");
+		Assert.assertEquals(getVal, value_NewInvoiceOtherTextboxNumeric);
+		extentTest.log(LogStatus.INFO, "Test P2M6_140 Pass");
+
+	}
+	
+	@Test(priority = 11, enabled = true, groups = { "Smoke", "Jasmeet" })
+	public void P2M6_160() throws InterruptedException {
+		extentTest = extentReport.startTest(" *H6:P2M6_160", "Accounting>>Invoices - New Invoice - Invoice To - Other");
+		byId.click(id_InvoiceNewInvoice, "clicking on new invoice");
+		byId.click(id_InvoiceInvoiceToOtherRadioButton, "clicking on radio button to select other");
+		byId.setText(id_NewInvoiceOtherTextbox, value_NewInvoiceOtherTextboxAlphabets, "entering Alphabets");
+		String getVal = byId.getAttribute(id_NewInvoiceOtherTextbox, "value", "getting text entered");
+		Assert.assertEquals(getVal, value_NewInvoiceOtherTextboxAlphabets);
+		extentTest.log(LogStatus.INFO, "Test P2M6_141 Pass");
+	}
+	
+	@Test(priority = 12, enabled = true, groups = { "Smoke", "Jasmeet" })
+	public void P2M6_161() throws InterruptedException {
+		extentTest = extentReport.startTest(" *H6:P2M6_161", "Accounting>>Invoices - New Invoice - Invoice To - Other");
+		byId.click(id_InvoiceNewInvoice, "clicking on new invoice");
+		byId.click(id_InvoiceInvoiceToOtherRadioButton, "clicking on radio button to select other");
+		byId.setText(id_NewInvoiceOtherTextbox, value_NewInvoiceOtherTextboxAlphabets, "entering Alphabets");
+		String getVal = byId.getAttribute(id_NewInvoiceOtherTextbox, "value", "getting text entered");
+		Assert.assertEquals(getVal, value_NewInvoiceOtherTextboxAlphabets);
+		extentTest.log(LogStatus.INFO, "Test P2M6_142 Pass");
+	}
+
+	@Test(priority = 13, enabled = true, groups = { "Smoke", "Jasmeet" })
+	public void P2M6_162() throws InterruptedException {
+		extentTest = extentReport.startTest(" *H6:P2M6_162", "Accounting>>Invoices - New Invoice - Invoice To - Other");
+		byId.click(id_InvoiceNewInvoice, "clicking on new invoice");
+		byId.click(id_InvoiceInvoiceToOtherRadioButton, "clicking on radio button to select other");
+		byId.setText(id_NewInvoiceOtherTextbox, value_NewInvoiceOtherTextboxCombo, "entering Alphabets");
+		String getVal = byId.getAttribute(id_NewInvoiceOtherTextbox, "value", "getting text entered");
+		Assert.assertEquals(getVal, value_NewInvoiceOtherTextboxCombo);
+		extentTest.log(LogStatus.INFO, "Test P2M6_143 Pass");
+	}
+	
+	@Test(priority = 14, enabled = true, groups = { "Smoke", "Jasmeet" })
+	public void P2M6_163() throws InterruptedException {
+		extentTest = extentReport.startTest("P2M6_163",
+				"H6: Accounting>>Invoices - New Invoice - Invoice To - Tenant/Owner/Other - Grid");
+		byId.click(id_InvoiceNewInvoice, "clicking on new invoice");
+		byId.click(id_InvoiceInvoiceToTenatRadioButton, "clicking on radio button to select tenant");
+		//byId.click(id_NewInvoiceTenatTextbox, "clicking on tenant textbox");
+		byId.clearThenSetText(id_NewInvoiceTenatTextbox, tenantName+" ", "Enter tenant name");
+		Thread.sleep(3000);
+		getDriver().findElement(By.id(id_NewInvoiceTenatTextbox)).sendKeys(Keys.ENTER);
+		String getVal = byId.getAttribute(id_NewInvoiceTenatTextbox, "value", "Tenant name");
+		if (getVal != "") {
+			String tenantGridElm1=	byXpath.getText(xpath_NewInvoiceGridProp,
+					"getting title prop text");
+			String tenantGridElm2=	byXpath.getText(xpath_NewInvoiceGridUnit,
+					"getting title Unit text");
+			String tenantGridElm3=	byXpath.getText(xpath_NewInvoiceGridChargeCode,
+					"getting title ChargeCode text");
+			String tenantGridElm4=	byXpath.getText(xpath_NewInvoiceGridDesc,
+					"getting title Desc text");
+			String tenantGridElm5=	byXpath.getText(xpath_NewInvoiceGridAmt,
+					"getting title Amt text");
+			String tenantGridElm6=	byId.getAttribute(id_NewInvoiceGridCrossIcon+"1",
+					"title", "getting title of cross icon");
+			se.assertEquals(tenantGridElm1, value_NewInvoiceGridProp);
+			se.assertEquals(tenantGridElm2, value_NewInvoiceGridUnit);
+			se.assertEquals(tenantGridElm3, value_NewInvoiceGridChargeCode);
+			se.assertEquals(tenantGridElm4, value_NewInvoiceGridDesc);
+			se.assertEquals(tenantGridElm5, value_NewInvoiceGridAmt);
+			se.assertEquals(tenantGridElm6, value_NewInvoiceGridCrossIcon);	
+		}
+		else {
+			extentTest.log(LogStatus.INFO, "Tenant is not there to select");
+			se.fail();
+		}
+		byId.click(id_InvoiceInvoiceToOwnerRadioButton, "clicking on radio button to select Owner");
+		byId.click(id_NewInvoiceOwnerTextbox, "clicking on Owner textbox");
+		byId.clearThenSetText(id_NewInvoiceOwnerTextbox, "a"+" ", "Enter owner name");
+		Thread.sleep(3000);
+		getDriver().findElement(By.id(id_NewInvoiceOwnerTextbox)).sendKeys(Keys.ENTER);
+		String getVal2 = byId.getAttribute(id_NewInvoiceOwnerTextbox, "value", "getting Owner name");
+		if (getVal2 != "") {
+			String ownerGridElm1=	byXpath.getText(xpath_NewInvoiceGridProp, "Title prop text");
+			String ownerGridElm2=	byXpath.getText(xpath_NewInvoiceGridUnit, "Title Unit text");
+			String ownerGridElm3=	byXpath.getText(xpath_NewInvoiceGridChargeCode, "Title ChargeCode text");
+			String ownerGridElm4=	byXpath.getText(xpath_NewInvoiceGridDesc, "Title Desc text");
+			String ownerGridElm5=	byXpath.getText(xpath_NewInvoiceGridAmt, "Title Amt text");
+			String ownerGridElm6=	byId.getAttribute(id_NewInvoiceGridCrossIcon+"1",
+					"title", "Title of cross icon");
+			se.assertEquals(ownerGridElm1, value_NewInvoiceGridProp);
+			se.assertEquals(ownerGridElm2, value_NewInvoiceGridUnit);
+			se.assertEquals(ownerGridElm3, value_NewInvoiceGridChargeCode);
+			se.assertEquals(ownerGridElm4, value_NewInvoiceGridDesc);
+			se.assertEquals(ownerGridElm5, value_NewInvoiceGridAmt);
+			se.assertEquals(ownerGridElm6, value_NewInvoiceGridCrossIcon);
+			}
+			else {
+				extentTest.log(LogStatus.INFO, "Owner is not there to select");
+				se.fail();
+			}
+			byId.click(id_InvoiceInvoiceToOtherRadioButton, "Radio button to select other");
+			String otherGridElm1=	byXpath.getText(xpath_NewInvoiceGridProp, "Title prop text");
+			String otherGridElm2=	byXpath.getText(xpath_NewInvoiceGridUnit, "Title Unit text");
+			String otherGridElm3=	byXpath.getText(xpath_NewInvoiceGridChargeCode,
+					"Title ChargeCode text");
+			String otherGridElm4=	byXpath.getText(xpath_NewInvoiceGridDesc, "Title Desc text");
+			String otherGridElm5=	byXpath.getText(xpath_NewInvoiceGridAmt, "Title Amt text");
+			String otherGridElm6=	byId.getAttribute(id_NewInvoiceGridCrossIcon+"1",
+					"title", "Title of cross icon");
+			se.assertEquals(otherGridElm1, value_NewInvoiceGridProp);
+			se.assertEquals(otherGridElm2, value_NewInvoiceGridUnit);
+			se.assertEquals(otherGridElm3, value_NewInvoiceGridChargeCode);
+			se.assertEquals(otherGridElm4, value_NewInvoiceGridDesc);
+			se.assertEquals(otherGridElm5, value_NewInvoiceGridAmt);
+			se.assertEquals(otherGridElm6, value_NewInvoiceGridCrossIcon);
+			se.assertAll();
+			extentTest.log(LogStatus.INFO, "Test P2M6_144 Pass");		
+	}
+
+	@Test(priority = 15, enabled = true, groups = { "Smoke", "Jasmeet" })
+	public void P2M6_164() throws InterruptedException {
+		extentTest = extentReport.startTest("P2M6_164",
+				"H6: Accounting>>Invoices - New Invoice - Invoice To - Tenant/Owner/Other - Grid");
+		byId.click(id_InvoiceNewInvoice, "New invoice");
+		byId.click(id_InvoiceInvoiceToTenatRadioButton, "Radio button to select tenant");
+		byId.setText(id_NewInvoiceTenatTextbox, " ", "Tenant textbox");
+		byId.click(id_NewInvoiceTenatTextbox, "Tenant textbox");
+		byId.clearThenSetText(id_NewInvoiceTenatTextbox, tenantName+" ", "Enter tenant name");
+		Thread.sleep(3000);
+		getDriver().findElement(By.id(id_NewInvoiceTenatTextbox)).sendKeys(Keys.ENTER);
+		String getVal = byId.getAttribute(id_NewInvoiceTenatTextbox,
+				"value", "Tenant name");
+		if (getVal != "") {
+			String getProp = byId.getAttribute(id_NewInvoiceTenatProperty+"1",
+					"value", "Property name");
+			String getUnit = byId.getAttribute(id_NewInvoiceTenatUnit+"1",
+					"value", "Unit name");
+			se.assertNotEquals(getProp, "");
+			se.assertNotEquals(getUnit, "");
+		}
+		else {
+			extentTest.log(LogStatus.INFO, "Tenant is not there to select");
+			se.fail();
+		}
+		byId.click(id_InvoiceInvoiceToOwnerRadioButton, "Radio button to select Owner");
+		byId.setText(id_NewInvoiceOwnerTextbox, " ", "Owner textbox");
+		byId.click(id_NewInvoiceOwnerTextbox, "Owner textbox");
+		byId.clearThenSetText(id_NewInvoiceOwnerTextbox, "a"+" ", "Enter owner name");
+		Thread.sleep(3000);
+		getDriver().findElement(By.id(id_NewInvoiceOwnerTextbox)).sendKeys(Keys.ENTER);
+		String getVal2 = byId.getAttribute(id_NewInvoiceOwnerTextbox, 
+				"value", "Owner name");
+		if (getVal2 != "") {
+			String getProp = byId.getAttribute(id_NewInvoiceTenatProperty+"1",
+					"value", "Property name");
+			se.assertNotEquals(getProp, "");
+		}
+		else {
+	extentTest.log(LogStatus.INFO, "Owner is not there to select");
+	se.fail();
+		}
+		byId.click(id_InvoiceInvoiceToOtherRadioButton, "Radio button to select other");
+		boolean getPropState = getDriver().findElement(By.
+				id(id_NewInvoiceTenatProperty+"1")).isEnabled();
+		boolean getUnitState = getDriver().findElement(By.
+				id(id_NewInvoiceTenatUnit+"1")).isEnabled();
+		se.assertTrue(getPropState == false, "property is not disabled");
+		se.assertTrue(getUnitState == false, "unit is not disabled");
+		se.assertAll();
+		extentTest.log(LogStatus.INFO, "Test P2M6_145 Pass");
+	}
+	
+	@Test(priority = 16, enabled = true, groups = { "Smoke", "Harinder" })
+	public void P2M6_165_1() throws InterruptedException {
+		List<WebElement> list = new ArrayList<>();
+		extentTest = extentReport.startTest(" *H7:P2M6_165_1","Accounting >> Invoices"
+				+ " - New Invoice - All charge code(from Setting tab) should "
+				+ "displaying in Charge Code DDL on New Invoice form");
+		byClassName.click(class_SettingLink, "Click on Setting Link");
+		byXpath.click(xpath_MasterSetupLNP+"[contains(.,'Accounting')]", "'Accounting' tab");
+		byXpath.click(xpath_MasterSetupLNP+"//ul//li[contains(.,'Charge Code')]",
+				"'Charge Code' Sub Tab");
+		byId.selectByVisibleText(id_SettingChargeCodeStatusFilter, "Active",
+				"Select Active filter for charge code");
+		
+		String getNumOfRecord = byClassName.getText(class_SettingTableBottomLeft,
+				"Get Number of Record from bottom left of grid");
+		int getIndex = getNumOfRecord.indexOf("f");
+		getIndex = getIndex+2;
+		getNumOfRecord = (getNumOfRecord.substring(getIndex));
+		int getTotalRecords =Integer.parseInt(getNumOfRecord);
+		DefaultPage();
+		byId.click(id_InvoiceNewInvoice, "New invoice");
+		byId.click(id_InvoiceInvoiceToTenatRadioButton, "Radio button to select tenant");
+		byId.click(id_NewInvoiceTenatTextbox, "clicking on tenant textbox");
+		Thread.sleep(3000);
+		byId.clearThenSetText(id_NewInvoiceTenatTextbox, tenantName, "Tenant Name");
+		Thread.sleep(3000);
+		getDriver().findElement(By.id(id_NewInvoiceTenatTextbox)).sendKeys(Keys.ENTER);
+		list = byXpath.getElements("//*[@id='"+id_NewInvoiceChargeCodeDDL+"1']//option",
+				"Get all the elements in Charge code");
+		int listSize = list.size();
+		Assert.assertTrue(getTotalRecords==(listSize-1), "All charge code(from Setting tab)"
+					+ " are displaying in Charge Code DDL on New Invoice form");	
+	}
+	
+	@Test(priority = 17, enabled = true, groups = { "Smoke", "Harinder" })
+	public void P2M6_165_2() throws InterruptedException {
+		extentTest = extentReport.startTest(" *H7:P2M6_165_2","Accounting >> Invoices"
+				+ " - New Invoice - user is able to select Charge Code"
+				+ " from the DDL and should be displayed in DDL");
+		byId.click(id_InvoiceNewInvoice, "New invoice");
+		byId.click(id_InvoiceInvoiceToTenatRadioButton, "Radio button to select tenant");
+		byId.click(id_NewInvoiceTenatTextbox, "Tenant textbox");
+		Thread.sleep(3000);
+		byId.clearThenSetText(id_NewInvoiceTenatTextbox, tenantName, "Tenant Name");
+		Thread.sleep(3000);
+		getDriver().findElement(By.id(id_NewInvoiceTenatTextbox)).sendKeys(Keys.ENTER);
+		byId.selectByIndex(id_NewInvoiceChargeCodeDDL+"1", 1, "Select Charge code");
+		String getSelectedChargeCode = byId.getFirstSelectedOption(id_NewInvoiceChargeCodeDDL+"1",
+				"Get Selected Charge code");
+		Assert.assertFalse(getSelectedChargeCode.equals("Select") || getSelectedChargeCode.equals("") ||
+				getSelectedChargeCode.equals(null), "User is unable to select charge code");
+		/*if(getSelectedChargeCode.equals("Select") || getSelectedChargeCode.equals("") ||
+				getSelectedChargeCode.equals(null))
+		{
+			Assert.fail("User is unable to select charge code");
+		}*/		
+	}
+	
+	@Test(priority = 18, enabled = true, groups = { "Smoke", "Harinder" })
+	public void P2M6_166() throws InterruptedException {
+		extentTest = extentReport.startTest(" *H7:P2M6_166","Accounting>>Invoices - New Invoice - description should be displayed as Charege Code selected");
+		byId.click(id_InvoiceNewInvoice, "clicking on new invoice");
+		byId.click(id_InvoiceInvoiceToTenatRadioButton, "clicking on radio button to select tenant");
+		byId.click(id_NewInvoiceTenatTextbox, "clicking on tenant textbox");
+		Thread.sleep(3000);
+		byId.clearThenSetText(id_NewInvoiceTenatTextbox, tenantName, "Enter Tenant Name");
+		Thread.sleep(3000);
+		getDriver().findElement(By.id(id_NewInvoiceTenatTextbox)).sendKeys(Keys.ENTER);
+		byId.selectByIndex(id_NewInvoiceChargeCodeDDL+"1", 1, "Select Charge code");
+		String getSelectedChargeCode = byId.getFirstSelectedOption(id_NewInvoiceChargeCodeDDL+"1", "Get Selected Charge code");
+		int getIndex = getSelectedChargeCode.indexOf("-");
+		getSelectedChargeCode = getSelectedChargeCode.substring(getIndex+2);
+		String getDescValue = byId.getAttribute(id_NewInvoiceDescription+"1", "value", "Get Description field value");
+		Assert.assertEquals(getSelectedChargeCode, getDescValue,"Deascription is not popuplated with selected Charge code from Charge Code DDL");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that Accounting>>Invoices - New Invoice - description should be displayed as Charege Code selected.");
+	}
+	
+	@Test(priority = 19, enabled = true, groups = { "Smoke", "Harinder" })
+	public void P2M6_167() throws InterruptedException {
+		extentTest = extentReport.startTest(" *H7:P2M6_167","Accounting>>Invoices - New Invoice -  user should able to enter numerics only in Amount field in table");
+		byId.click(id_InvoiceNewInvoice, "clicking on new invoice");
+		byId.click(id_InvoiceInvoiceToTenatRadioButton, "clicking on radio button to select tenant");
+		byId.click(id_NewInvoiceTenatTextbox, "clicking on tenant textbox");
+		Thread.sleep(3000);
+		byId.clearThenSetText(id_NewInvoiceTenatTextbox, tenantName, "Enter Tenant Name");
+		Thread.sleep(3000);
+		getDriver().findElement(By.id(id_NewInvoiceTenatTextbox)).sendKeys(Keys.ENTER);
+		byId.clearThenSetText(id_NewInvoiceAmount+"1", value_ZipCode, "Enter numerics in 'Amount' field on New Invoice form");
+		String getText = byId.getAttribute(id_NewInvoiceAmount+"1", "value", "Get entered value in 'Amount' field on New Invoice form");
+		Assert.assertEquals(getText, value_ZipCode, " 'Amount' Text Field is not allowing to enter numerics");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that Accounting>>Invoices - New Invoice - user is able to enter numerics only in Amount field in table");
+	}
+	
+	@Test(priority = 20, enabled = true, groups = { "Smoke", "Harinder" })
+	public void P2M6_168() throws InterruptedException {
+		extentTest = extentReport.startTest(" *H7:P2M6_168","Accounting>>Invoices - New Invoice -  user should not able to enter alphabets in Amount field in table");
+		byId.click(id_InvoiceNewInvoice, "clicking on new invoice");
+		byId.click(id_InvoiceInvoiceToTenatRadioButton, "clicking on radio button to select tenant");
+		byId.click(id_NewInvoiceTenatTextbox, "clicking on tenant textbox");
+		Thread.sleep(3000);
+		byId.clearThenSetText(id_NewInvoiceTenatTextbox, tenantName, "Enter Tenant Name");
+		Thread.sleep(3000);
+		getDriver().findElement(By.id(id_NewInvoiceTenatTextbox)).sendKeys(Keys.ENTER);
+		byId.clearThenSetText(id_NewInvoiceAmount+"1", id_NewBillFormVendorNameListHeaderNameVendorName, "Enter alphabets in 'Amount' field on New Invoice form");
+		String getText = byId.getAttribute(id_NewInvoiceAmount+"1", "value", "Get entered value in 'Amount' field on New Invoice form");
+		Assert.assertNotEquals(getText, id_NewBillFormVendorNameListHeaderNameVendorName, " 'Amount' Text Field should not allowing to enter alphabets");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that Accounting>>Invoices - New Invoice - user is not able to enter alphabets in Amount field in table");
+	}
+	
+	@Test(priority = 21, enabled = true, groups = { "Smoke", "Harinder" })
+	public void P2M6_169() throws InterruptedException {
+		extentTest = extentReport.startTest(" *H7:P2M6_169","Accounting>>Invoices - New Invoice -  user should not able to enter special Characters in Amount field in table");
+		byId.click(id_InvoiceNewInvoice, "clicking on new invoice");
+		byId.click(id_InvoiceInvoiceToTenatRadioButton, "clicking on radio button to select tenant");
+		byId.click(id_NewInvoiceTenatTextbox, "clicking on tenant textbox");
+		Thread.sleep(3000);
+		byId.clearThenSetText(id_NewInvoiceTenatTextbox, tenantName, "Enter Tenant Name");
+		Thread.sleep(3000);
+		getDriver().findElement(By.id(id_NewInvoiceTenatTextbox)).sendKeys(Keys.ENTER);
+		byId.clearThenSetText(id_NewInvoiceAmount+"1", value_SpecialCharcters, "Enter special Characters in 'Amount' field on New Invoice form");
+		String getText = byId.getAttribute(id_NewInvoiceAmount+"1", "value", "Get entered value in 'Amount' field on New Invoice form");
+		Assert.assertNotEquals(getText, value_SpecialCharcters, " 'Amount' Text Field should not allowing to enter special Characters");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that Accounting>>Invoices - New Invoice - user is not able to enter special Characters in Amount field in table");
+	}
+	
+	@Test(priority = 22, enabled = true, groups = { "Smoke", "Harinder" })
+	public void P2M6_170() throws InterruptedException {
+		extentTest = extentReport.startTest(" *H7:P2M6_170","Accounting >>Invoices - New Invoice -> Enter Nothing in amount field -> validation message 'This field is required'  should be displayed");
+		byId.click(id_InvoiceNewInvoice, "clicking on new invoice");
+		byId.click(id_InvoiceInvoiceToTenatRadioButton, "clicking on radio button to select tenant");
+		byId.click(id_NewInvoiceTenatTextbox, "clicking on tenant textbox");
+		Thread.sleep(3000);
+		byId.clearThenSetText(id_NewInvoiceTenatTextbox, tenantName, "Enter Tenant Name");
+		Thread.sleep(3000);
+		getDriver().findElement(By.id(id_NewInvoiceTenatTextbox)).sendKeys(Keys.ENTER);
+		byId.clearThenSetText(id_NewInvoiceAmount+"1", "","Enter nothing in 'Amount' field on New Invoice form");
+		Actions action = new Actions(getDriver());
+		action.moveToElement(getDriver().findElement(By.id(id_NewInvoiceChargeCodeDDL+"1"))).click().perform();
+		String getValiMsg = byXpath.getText("//*[@id='"+id_NewInvoiceAmount+"1"+"']//following-sibling::div", "Get validation message for 'Amount' field in Table on New Invoice form");
+		Assert.assertEquals(getValiMsg, value_MandatoryfieldsMessage, " 'Amount' Field is not showing any validation message when user leave it blank");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that Accounting>>Invoices - New Invoice -> Enter Nothing in amount field -> validation message 'This field is required' is displayed");
+	}
+	
+	@Test(priority = 23, enabled = true, groups = { "Smoke", "Harinder" })
+	public void P2M6_171() throws InterruptedException {
+		extentTest = extentReport.startTest(" *H7:P2M6_171","Accounting>>Invoices - New Invoice -> When click on Remove Icon message 'Atleast one charge code is required to generate invoice' should be displayed if there is only one record");
+		byId.click(id_InvoiceNewInvoice, "clicking on new invoice");
+		byId.click(id_InvoiceInvoiceToTenatRadioButton, "clicking on radio button to select tenant");
+		byId.click(id_NewInvoiceTenatTextbox, "clicking on tenant textbox");
+		Thread.sleep(3000);
+		byId.clearThenSetText(id_NewInvoiceTenatTextbox, tenantName, "Enter Tenant Name");
+		Thread.sleep(3000);
+		getDriver().findElement(By.id(id_NewInvoiceTenatTextbox)).sendKeys(Keys.ENTER);
+		byId.click(id_NewInvoiceGridCrossIcon+"1", "Click on Cross Icon in table");
+		String getPopupText = byXpath.getText("//*[@class='"+class_NewInvoiceToastPopup+"']//p", "Get Popup Text");
+		Assert.assertEquals(getPopupText, value_NewInvoicePopupText1, "Popup text has been changed");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that Accounting>>Invoices - New Invoice ->When click on Remove Icon message 'Atleast one charge code is required to generate invoice' is displayed if there is only one record");
+	}
+	
+	@Test(priority = 24, enabled = true, groups = { "Smoke", "Harinder" })
+	public void P2M6_172() throws InterruptedException {
+		extentTest = extentReport.startTest(" *H7:P2M6_172","Accounting >> Invoices -> New Invoice -> When click on Plus Icon one more record in the grid should be added in table on New Invoice page");
+		byId.click(id_InvoiceNewInvoice, "clicking on new invoice");
+		byId.click(id_InvoiceInvoiceToTenatRadioButton, "clicking on radio button to select tenant");
+		byId.click(id_NewInvoiceTenatTextbox, "clicking on tenant textbox");
+		Thread.sleep(3000);
+		byId.clearThenSetText(id_NewInvoiceTenatTextbox, tenantName, "Enter Tenant Name");
+		Thread.sleep(3000);
+		getDriver().findElement(By.id(id_NewInvoiceTenatTextbox)).sendKeys(Keys.ENTER);
+		byId.click(id_NewInvoicePlusIcon, "Click on Plus Icon below the table");
+		int getRowCount = byXpath.getSize("//*[@id='"+id_NewInvoiceGrid+"']/table/tbody//tr", "Get Count of all row in table");
+		Assert.assertEquals(getRowCount, 3, "New row is not added in grid");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that Accounting>>Invoices - New Invoice -> When click on Plus Icon one more record in the grid is added in table on New Invoice page");
+	}
+	
+	@Test(priority = 25, enabled = true, groups = { "Smoke", "Harinder" })
+	public void P2M6_173() throws InterruptedException {
+		extentTest = extentReport.startTest(" *H7:P2M6_173","Accounting >> Invoices -> New Invoice -> When click on Remove Icon record should be removed if there are more than two records");
+		byId.click(id_InvoiceNewInvoice, "clicking on new invoice");
+		byId.click(id_InvoiceInvoiceToTenatRadioButton, "clicking on radio button to select tenant");
+		byId.click(id_NewInvoiceTenatTextbox, "clicking on tenant textbox");
+		Thread.sleep(3000);
+		byId.clearThenSetText(id_NewInvoiceTenatTextbox, tenantName, "Enter Tenant Name");
+		Thread.sleep(3000);
+		getDriver().findElement(By.id(id_NewInvoiceTenatTextbox)).sendKeys(Keys.ENTER);
+		byId.click(id_NewInvoicePlusIcon, "Click on Plus Icon below the table");
+		byId.click(id_NewInvoiceGridCrossIcon+"3", "Click on Cross Icon for recently added row in table");
+		int getRowCount = byXpath.getSize("//*[@id='"+id_NewInvoiceGrid+"']/table/tbody//tr", "Get Count of all row in table");
+		Assert.assertEquals(getRowCount, 2, "New added row is not deleted in grid");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that Accounting>> Invoices - New Invoice -> When click on Remove Icon record should be removed if there are more than two records");
+	}
+	
+	@Test(priority = 26, enabled = true, groups = { "Smoke", "Harinder" })
+	public void P2M6_174() throws InterruptedException {
+		extentTest = extentReport.startTest(" *H7:P2M6_174","Accounting >> Invoices -> New Invoice -> Total Amount should be the total amount of the all records in the Grid.");
+		byId.click(id_InvoiceNewInvoice, "clicking on new invoice");
+		byId.click(id_InvoiceInvoiceToTenatRadioButton, "clicking on radio button to select tenant");
+		byId.click(id_NewInvoiceTenatTextbox, "clicking on tenant textbox");
+		Thread.sleep(3000);
+		byId.clearThenSetText(id_NewInvoiceTenatTextbox, tenantName, "Enter Tenant Name");
+		Thread.sleep(3000);
+		getDriver().findElement(By.id(id_NewInvoiceTenatTextbox)).sendKeys(Keys.ENTER);
+		//Enter Required data in first row in table
+		byId.selectByIndex(id_NewInvoiceChargeCodeDDL+"1", 1, "Select Charge code");
+		byId.clearThenSetText(id_NewInvoiceAmount+"1", value_Amount, "Enter value in 'Amount' field in first row on New Invoice form");
+		//Enter Required data in Second row in table
+		byId.click(id_NewInvoicePlusIcon, "Click on Plus Icon below the table");
+		byId.selectByIndex(id_NewInvoiceChargeCodeDDL+"3", 1, "Select Charge code");
+		byId.clearThenSetText(id_NewInvoiceAmount+"3", value_Amount, "Enter value in 'Amount' field in second row on New Invoice form");
+		//get Total amount
+		Actions action = new Actions(getDriver());
+		action.moveToElement(getDriver().findElement(By.id(id_NewInvoiceChargeCodeDDL+"3"))).click().perform();
+		Thread.sleep(2000);
+		String getTotalAmt = byId.getText(id_NewInvoiceTotalAmount, "Get Total Amount");
+		int getIndex1 = getTotalAmt.indexOf(" ");
+		int getIndex2 = getTotalAmt.indexOf(".");
+		getTotalAmt = getTotalAmt.substring((getIndex1+1), getIndex2);
+		int amount = Integer.parseInt(value_Amount);
+		amount = amount+amount;
+		Assert.assertEquals(getTotalAmt, Integer.toString(amount), "Total amount is not equal according the entered amount each row");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that Accounting>> Invoices - New Invoice -> Total Amount should be the total amount of the all records in the Grid.");
+	}
+	
+	@Test(priority = 27, enabled = true, groups = { "Smoke", "Harinder" })
+	public void P2M6_175() throws InterruptedException {
+		extentTest = extentReport.startTest(" *H7:P2M6_175","Accounting >> Invoices ->"
+				+ " New Invoice -> Current Date should be displayed. This Date should"
+				+ " be the Date on which Invoice should be generated");
+		byId.click(id_InvoiceNewInvoice, "clicking on new invoice");
+		String getValue = byId.getAttribute(id_NewInvoiceInvoiceDate, "value",
+				"Get value of Invoice Date field");
+		for (String string : getSystemDate.split("/")) {
+			Assert.assertTrue(getValue.contains(string),
+					"Current date is not displaying in 'Invoice Date' field.");
+		}
+	}
+	
+	@Test(priority = 28, enabled = true, groups = { "Smoke", "Harinder" })
+	public void P2M6_176() throws InterruptedException {
+		extentTest = extentReport.startTest(" *H7:P2M6_176","Accounting >> Invoices -> New Invoice -> Click on 'Invoice Date' field Date Picker Calendar should be displayed to select the Date");
+		byId.click(id_InvoiceNewInvoice, "clicking on new invoice");
+		byId.click(id_NewInvoiceInvoiceDate, "Click on Invoice Date' field");
+		int getDatesSize = byXpath.getSize(xpathNewTenantLeaseDetaulsTabLeaseStartDateCalendar, "Get Calendar's Dates size");
+		Assert.assertTrue(getDatesSize>0,	"No Calendar is displaying on clicking 'Invoice Date' field");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that Accounting>> Invoices - New Invoice -> Click on 'Invoice Date' field Date Picker Calendar should be displayed to select the Date");
+	}
+	
+	@Test(priority = 29, enabled = true, groups = { "Smoke", "Harinder" })
+	public void P2M6_177_1() throws InterruptedException {
+		extentTest = extentReport.startTest(" *H7:P2M6_177_1","Accounting >> Invoices"
+				+ " -> New Invoice -> Click on 'Invoice Date' field Date user"
+				+ " should able to select current date");
+		byId.click(id_InvoiceNewInvoice, "clicking on new invoice");
+		byId.click(id_NewInvoiceInvoiceDate, "Click on Invoice Date' field");
+		byXpath.click("//*[contains(@class,'"+class_CalendarTodaysDate+"')]",
+				" Click on Todays Date");
+		String getValue = byId.getAttribute(id_NewInvoiceInvoiceDate, "value",
+				"Get value of Invoice Date field");
+		for (String string : getSystemDate.split("/")) {
+			Assert.assertTrue(getValue.contains(string),
+					"Current date is not displaying in 'Invoice Date' field.");
+		}
+	}
+	
+	@Test(priority = 30, enabled = true, groups = { "Smoke", "Harinder" })
+	public void P2M6_177_2() throws InterruptedException {
+		extentTest = extentReport.startTest(" *H7:P2M6_177_2","Accounting >>"
+				+ " Invoices -> New Invoice -> Click on 'Invoice Date' field"
+				+ " user should able to select future date");
+		byId.click(id_InvoiceNewInvoice, "New invoice");
+		byId.click(id_NewInvoiceInvoiceDate, "'Invoice Date' field");
+		setLogs.info("Select Next Date from Invoice date field");
+		VendorPortalCommons.SelectNextDateFromTodaysDate();
+		setLogs.info("Select System date and customize into future date");
+		String getDate = getSystemDate.substring(0, 2);
+		DecimalFormat df = new DecimalFormat("00");
+		int parseDateintoInt = Integer.parseInt(getDate) + 1;
+		getDate = df.format(parseDateintoInt);
+		getDate = getDate + getSystemDate.substring(3, 5) + getSystemDate.substring(5);
+		String getDefaultBillDate = byId.getAttribute(id_NewInvoiceInvoiceDate,
+				"value", "get Bill date field value");
+		for (String string : getDate.split("/")) {
+			Assert.assertTrue(getDefaultBillDate.contains(string),
+					"No seleted date is displaying in Bill Date field");
+		}		
+	}
+	
+	@Test(priority = 31, enabled = true, groups = { "Smoke", "Harinder" })
+	public void P2M6_178_1() throws InterruptedException {
+		extentTest = extentReport.startTest(" *H7:P2M6_178_1","Accounting >>"
+				+ " Invoices -> New Invoice -> 'Invoice Date' Calendar"
+				+ " should displayed 100 yr in Year DDL ");
+		byId.click(id_InvoiceNewInvoice, "New invoice");
+		byId.click(id_NewInvoiceInvoiceDate, "'Invoice Date' field");
+		setLogs.info("Select Years from 'Invoice Date' field's Calendar.");
+		List<WebElement> getElements = byXpath.getElements("//*[@class='" + 
+		class_CalendarYearDDL+"']/option", "Options in Year DDL on 'Invoice Date' Calendar");
+		Assert.assertEquals(getElements.size(), 100 , "All 100 Years are not"
+				+ " displaying in 'Invoice Date' field's Calendar");		
+	}
+	
+	@Test(priority = 32, enabled = true, groups = { "Smoke", "Harinder" })
+	public void P2M6_178_2() throws InterruptedException {
+		extentTest = extentReport.startTest(" *H7:P2M6_178_2","Accounting >> Invoices -> New Invoice -> 'Invoice Date' Calendar should displayed 12 months in Month DDL");
+		byId.click(id_InvoiceNewInvoice, "clicking on new invoice");
+		byId.click(id_NewInvoiceInvoiceDate, "Click on Invoice Date' field");
+		setLogs.info("Select Months from 'Invoice Date' field's Calendar.");
+		List<WebElement> getElements = byXpath.getElements("//*[@class='"+class_CalendarMonthDDL+"']/option", "Get all the Options in Month DDL on 'Invoice Date' Calendar");
+		int getMonthsCount = getElements.size();
+		Assert.assertEquals(getMonthsCount, 12 , "All Months are not displaying in 'Invoice Date' field's Calendar");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that Accounting>> Invoices - New Invoice -> 'Invoice Date' Calendar is displayed 12 months in Month DDL");
+	}
+	
+	@Test(priority = 33, enabled = true, groups = { "Smoke", "Harinder" })
+	public void P2M6_179_1() throws InterruptedException {
+		extentTest = extentReport.startTest(" *H7:P2M6_179_1","Accounting >> Invoices -> New Invoice -> Late Date should be displayed as placeholder in 'Late Date' field");
+		byId.click(id_InvoiceNewInvoice, "clicking on new invoice");
+		String getPlaceHolder = byId.getAttribute(id_NewInvoiceLateDate, "placeholder", "Get placeholder in 'Late Date' field");
+		Assert.assertEquals(getPlaceHolder, "Late Date" , "'Late date' field's place holder is missing or has been changed");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that Accounting>> Invoices - New Invoice -> Late Date should be displayed as placeholder in 'Late Date' field");
+	}
+	
+	@Test(priority = 34, enabled = true, groups = { "Smoke", "Harinder" })
+	public void P2M6_180() throws InterruptedException {
+		extentTest = extentReport.startTest(" *H7:P2M6_180","Accounting >> Invoices -> New Invoice -> 'Late Date' Calendar should be displayed to select the Date.");
+		byId.click(id_InvoiceNewInvoice, "clicking on new invoice");
+		byId.click(id_NewInvoiceLateDate, "Click on 'Late Date' field");
+		int getDatesSize = byXpath.getSize(xpathNewTenantLeaseDetaulsTabLeaseStartDateCalendar, "Get Calendar's Dates size");
+		Assert.assertTrue(getDatesSize>0,	"No Calendar is displaying on clicking 'Late Date' field");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that Accounting>> Invoices - New Invoice -> 'Late Date' Calendar should be displayed to select the Date.");
+	}
+	
+	@Test(priority = 35, enabled = true, groups = { "Smoke", "Harinder" })
+	public void P2M6_181_1() throws InterruptedException {
+		extentTest = extentReport.startTest(" *H7:P2M6_181_1","Accounting >> Invoices -> New Invoice -> User should able to select current date from 'Late Date' calendar");
+		byId.click(id_InvoiceNewInvoice, "clicking on new invoice");
+		byId.click(id_NewInvoiceLateDate, "Click on 'Late Date' field");
+		byXpath.click("//*[contains(@class,'"+class_CalendarTodaysDate+"')]", " Click on Todays Date");
+		String getValue = byId.getAttribute(id_NewInvoiceLateDate, "value", "Get value of Invoice Date field");
+		Assert.assertEquals(getValue, getSystemDate+" "+getSystemDay, "Current date is not displaying in 'Late Date' field.");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that Accounting>> Invoices - New Invoice -> User is able to select current date from 'Late Date' calendar");
+	}
+	
+	@Test(priority = 36, enabled = true, groups = { "Smoke", "Harinder" })
+	public void P2M6_181_2() throws InterruptedException {
+		extentTest = extentReport.startTest(" *H7:P2M6_181_2","Accounting >> Invoices -> New Invoice -> Click on 'Late Date' field user should able to select feature date");
+		byId.click(id_InvoiceNewInvoice, "clicking on new invoice");
+		byId.click(id_NewInvoiceLateDate, "Click on 'Late Date' field");
+		setLogs.info("Select Next Date from I'Late Date' field");
+		VendorPortalCommons.SelectNextDateFromTodaysDate();
+		setLogs.info("Select System date and customize into future date");
+		String getDate = getSystemDate.substring(0, 2);
+		DecimalFormat df = new DecimalFormat("00");
+		int parseDateintoInt = Integer.parseInt(getDate) + 1;
+		getDate = df.format(parseDateintoInt);
+		getDate = getDate + getSystemDate.substring(2, 5) + getSystemDate.substring(5);
+		String getDefaultBillDate = byId.getAttribute(id_NewInvoiceLateDate, "value", "get Bill date field value");
+		Assert.assertTrue(getDate.equals(getDefaultBillDate), "no seleted date is displaying in Bill Date field");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that Accounting>> Invoices - New Invoice -> Click on 'Late Date' field Date user should able to select feature date");
+	}
+	
+	@Test(priority = 37, enabled = true, groups = { "Smoke", "Harinder" })
+	public void P2M6_182_1() throws InterruptedException {
+		extentTest = extentReport.startTest(" *H7:P2M6_182_1","Accounting >> Invoices -> New Invoice -> 'Late Date' Calendar should displayed 100 yr in Year DDL ");
+		byId.click(id_InvoiceNewInvoice, "clicking on new invoice");
+		byId.click(id_NewInvoiceLateDate, "Click on 'Late Date' field");
+		setLogs.info("Select Years from 'Late Date' field's Calendar.");
+		List<WebElement> getElements = byXpath.getElements("//*[@class='"+class_CalendarYearDDL+"']/option", "Get all the Options in Year DDL on 'Late Date' Calendar");
+		int getYearsCount = getElements.size();
+		Assert.assertEquals(getYearsCount, 100 , "All 100 Years are not displaying in 'Late Date' field's Calendar");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that Accounting>> Invoices - New Invoice -> 'Late Date' Calendar is displayed 100 yr in Year DDL ");
+	}
+	
+	@Test(priority = 38, enabled = true, groups = { "Smoke", "Harinder" })
+	public void P2M6_182_2() throws InterruptedException {
+		extentTest = extentReport.startTest(" *H7:P2M6_182_2","Accounting >> Invoices -> New Invoice -> 'Late Date' Calendar should displayed 12 months in Month DDL");
+		byId.click(id_InvoiceNewInvoice, "clicking on new invoice");
+		byId.click(id_NewInvoiceLateDate, "Click on 'Late Date' field");
+		setLogs.info("Select Months from 'Late Date' field's Calendar.");
+		List<WebElement> getElements = byXpath.getElements("//*[@class='"+class_CalendarMonthDDL+"']/option", "Get all the Options in Month DDL on 'Late Date' Calendar");
+		int getMonthsCount = getElements.size();
+		Assert.assertEquals(getMonthsCount, 12 , "All Months are not displaying in 'Late Date' field's Calendar");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that Accounting>> Invoices - New Invoice -> 'Late Date' Calendar is displayed 12 months in Month DDL");
+	}
+	
+	@Test(priority = 39, enabled = true, groups = { "Smoke", "Harinder" })
+	public void P2M6_183() throws InterruptedException {
+		extentTest = extentReport.startTest(" *H7:P2M6_183","Accounting >> Invoices -> New Invoice -> 'Email this Invoice' checkbox should be displayed on New Invoice page");
+		byId.click(id_InvoiceNewInvoice, "clicking on new invoice");
+		int getSize = byId.getSize(id_NewInvoiceEmailThisInvoiceCheckbox, "Get size if 'Email this Invoice' checkbox is exists");
+		Assert.assertEquals(getSize, 1 , "'Email this Invoice' checkbox is not exists on New Invoice form");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that Accounting>> Invoices - New Invoice -> 'Email this Invoice' checkbox is displayed on New Invoice page");
+	}
+	
+	@Test(priority = 40, enabled = true, groups = { "Smoke", "Harinder" })
+	public void P2M6_185() throws InterruptedException {
+		extentTest = extentReport.startTest(" *H7:P2M6_185","Accounting >> Invoices -> New Invoice -> ByDefault 'No Late Fee for this invoice' checkbox should be pre - selected on New Invoice page");
+		byId.click(id_InvoiceNewInvoice, "clicking on new invoice");
+		boolean isSelected = byId.isSelected(id_NewInvoiceNoLateFeeForThisInvoiceCheckbox, "Check that 'No Late Fee for this invoice' checkbox is selected");
+		Assert.assertEquals(isSelected, true , "'Email this Invoice' checkbox is not exists on New Invoice form 'No Late Fee for this invoice' checkbox is not pre-Selected");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that Accounting>> Invoices - New Invoice -> ByDefault 'No Late Fee for this invoice' checkbox is pre - selected on New Invoice page");
+	}
+	
+	@Test(priority = 41, enabled = true, groups = { "Smoke", "Harinder" })
+	public void P2M6_188() throws InterruptedException {
+		extentTest = extentReport.startTest(" *H7:P2M6_188","Accounting >> Invoices -> New Invoice ->  when click on save button the Invoice should be saved and displayed in 'List of Invoices' as unpaid status.");
+		addInvoice(tenantName, "", value_Amount);
+		int getSize = byXpath.getSize("//*[@id='"+id_InvoiceListingTable+"']//tbody//tr//td[contains(.,'"+tenantName+"')]", "Get size if newly added record exists in grid");
+		Assert.assertEquals(getSize, 1 , "Newly added record is not exist in 'List of Invoices' grid");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that Accounting>> Invoices - New Invoice ->  when click on save button the Invoice should be saved and displayed in 'List of Invoices' as unpaid status.");
+	}
+	
+	@Test(priority = 42, enabled = true, groups = { "Smoke", "Harinder" })
+	public void P2M6_189() throws InterruptedException {
+		List<WebElement> popupElements = new ArrayList<>();
+		List<String> list = new ArrayList<>();
+		extentTest = extentReport.startTest(" *H7:P2M6_189","Accounting >> Invoices -> New Invoice ->  When click on Cancel button the confirmation message should be displayed with YES and NO options");
+		byId.click(id_InvoiceNewInvoice, "clicking on new invoice");
+		byId.click(id_InvoiceInvoiceToTenatRadioButton, "clicking on radio button to select tenant");
+		byId.click(id_NewInvoiceTenatTextbox, "clicking on tenant textbox");
+		Thread.sleep(3000);
+		byId.clearThenSetText(id_NewInvoiceTenatTextbox, tenantName, "Enter Tenant Name");
+		Thread.sleep(3000);
+		getDriver().findElement(By.id(id_NewInvoiceTenatTextbox)).sendKeys(Keys.ENTER);
+		byId.click(id_NewInvoiceCancelButton, "Click on Cancel button on new invoice form");
+		popupElements = byXpath.getElements("//*[@class='msgBox']//input", "Get Confirm Popup Elements");
+		list.add(popupElements.get(0).getAttribute("value"));
+		list.add(popupElements.get(1).getAttribute("value"));
+		getDriver().navigate().refresh();
+		Assert.assertTrue(list.get(0).equals("Yes") && list.get(1).equals("No") , "'Confirm' Popup is not displayed clicking on 'Cancel' Button");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that Accounting>> Invoices - New Invoice ->  When click on Cancel button the confirmation message should be displayed with YES and NO options");
+	}
+	
+	// To run this Test case("P2M6_194_1()") individually, make dependency on Test Case "P2M6_188"
+	@Test(priority = 43, enabled = true, groups = { "Smoke", "Harinder" })
+	public void P2M6_194_1() throws InterruptedException {
+		List<WebElement> tableElements = new ArrayList<>();
+		List<String> tableHeader = new ArrayList<>();
+		List<String> expectedHeaders = new ArrayList<>();
+		String headers;
+		extentTest = extentReport.startTest(" *H7:P2M6_194_1","Accounting >> Invoices -> Verify that when user click on the record the Receive Payment two grids should be displayed");
+		P2M6_188();
+		byId.click(id_InvoiceReceiveMoney, "clicking on 'Receive Money' button");
+		byId.clearThenSetText(id_ReceiveMoneySearchTB, tenantName, "Enter Tenant Name");
+		Thread.sleep(5000);
+		byXpath.click("//*[@id='"+id_ReceiveMoneyListOfTenantGridData+"']//tbody//tr//td[contains(.,'"+tenantName+"')]", "Click on Tenant Name '"+tenantName+"' in 'List of Tenants' grid");
+		tableElements = byXpath.getElements("//*[@id='"+id_ReceiveMoneyFirstTable+"']//table//tbody//tr//th", "Get all the Header elements for first Table");
+		for (WebElement webElement : tableElements) {
+			headers = webElement.getText();
+			tableHeader.add(headers);
+		}
+		tableHeader.remove(1);
+		String getAmountHeader = tableHeader.get(6);
+		int getIndex = getAmountHeader.indexOf("(");
+		getAmountHeader = getAmountHeader.substring(0, getIndex-1);
+		tableHeader.remove(6);
+		tableHeader.add(6, getAmountHeader);
+		expectedHeaders = VendorPortalCommons.AddMultipleValuesInList(value_ReceiveMoneyFirstTable);
+		Assert.assertEquals(tableHeader, expectedHeaders, "Header might be added or deleted in first Table.");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that Accounting>> Invoices -> when user click on the record the Receive Payment two grids are displayed");
+	}
+	
+	// To run this Test case("P2M6_194_2()") individually, make dependency on Test Case "P2M6_188"
+	@Test(priority = 44, enabled = true, groups = { "Smoke", "Harinder" })
+	public void P2M6_194_2() throws InterruptedException {
+		List<WebElement> tableElements = new ArrayList<>();
+		List<String> tableHeader = new ArrayList<>();
+		List<String> expectedHeaders = new ArrayList<>();
+		String headers;
+		int arr[] = {3,4,5,6,8,9};
+		extentTest = extentReport.startTest(" *H7:P2M6_194_2","Accounting >> Invoices -> Verify that when user click on the record the Receive Payment two grids should be displayed");
+		byId.click(id_InvoiceReceiveMoney, "clicking on 'Receive Money' button");
+		byId.clearThenSetText(id_ReceiveMoneySearchTB, tenantName, "Enter Tenant Name");
+		Thread.sleep(5000);
+		byXpath.click("//*[@id='"+id_ReceiveMoneyListOfTenantGridData+"']//tbody//tr//td[contains(.,'"+tenantName+"')]", "Click on Tenant Name '"+tenantName+"' in 'List of Tenants' grid");
+		tableElements = byXpath.getElements("//*[@id='"+id_ReceiveMoneySecondTable+"']//table//thead//tr//th", "Get all the Header elements for second Table");
+		for (WebElement webElement : tableElements) {
+			headers = webElement.getText();
+			tableHeader.add(headers);
+		}
+		for(int i=0 ; i<arr.length ; i++) {
+			String getAmountHeader = tableHeader.get(arr[i]);
+			int getIndex = getAmountHeader.indexOf("(");
+			getAmountHeader = getAmountHeader.substring(0, getIndex-1);
+			tableHeader.remove(arr[i]);
+			tableHeader.add(arr[i], getAmountHeader);
+		}
+		expectedHeaders = VendorPortalCommons.AddMultipleValuesInList(value_ReceiveMoneySecondTable);
+		Assert.assertEquals(tableHeader, expectedHeaders, "Header might be added or deleted in Second Table.");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that Accounting>> Invoices -> when user click on the record the Receive Payment two grids are displayed");
+	}
+	
+	// To run this Test case("P2M6_195()") individually, make dependency on Test Case "P2M6_188"
+	@Test(priority = 45, enabled = true, groups = { "Smoke", "Harinder" })
+	public void P2M6_195() throws InterruptedException {
+		extentTest = extentReport.startTest(" *H7:P2M6_195","Accounting >> Invoices -> Verify that Name of the Tenant/Owner/Vendor/Other should be displayed in the Name DDL in first grid");
+		byId.click(id_InvoiceReceiveMoney, "clicking on 'Receive Money' button");
+		byId.clearThenSetText(id_ReceiveMoneySearchTB, tenantName, "Enter Tenant Name");
+		Thread.sleep(5000);
+		byXpath.click("//*[@id='"+id_ReceiveMoneyListOfTenantGridData+"']//tbody//tr//td[contains(.,'"+tenantName+"')]", "Click on Tenant Name '"+tenantName+"' in 'List of Tenants' grid");
+		String getNameDDLValue = byId.getAttribute(id_ReceiveMoneyFirstTableNameDDL, "value", "Get 'Name' DDL Value in first Table");
+		System.out.println(getNameDDLValue);
+		int getIndex = getNameDDLValue.indexOf(".");
+		getNameDDLValue = getNameDDLValue.substring(0, getIndex);
+		Assert.assertTrue(tenantName.contains(getNameDDLValue), "Tenant is not displaying in the 'Name' DDL in first grid");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that Accounting>> Invoices -> Receive Money ->  Name of the Tenant/Owner/Vendor/Other should be displayed in the Name DDL in first grid");
+	}
+	
+	// To run this Test case("P2M6_196()") individually, make dependency on Test Case "P2M6_188"
+	@Test(priority = 46, enabled = true, groups = { "Smoke", "Harinder" })
+	public void P2M6_196() throws InterruptedException {
+		List<WebElement> paymentOptionsEle = new ArrayList<>();
+		List<String> paymentOptions = new ArrayList<>();
+		List<String> expectedPaymentTypeOptions = new ArrayList<>();
+		String option;
+		extentTest = extentReport.startTest(" *H7:P2M6_196","Accounting >> Invoices -> Receive Money -> Verify that Payment Type DDL should have following options in first grid");
+		byId.click(id_InvoiceReceiveMoney, "clicking on 'Receive Money' button");
+		byId.clearThenSetText(id_ReceiveMoneySearchTB, tenantName, "Enter Tenant Name");
+		Thread.sleep(5000);
+		byXpath.click("//*[@id='"+id_ReceiveMoneyListOfTenantGridData+"']//tbody//tr//td[contains(.,'"+tenantName+"')]", "Click on Tenant Name '"+tenantName+"' in 'List of Tenants' grid");
+		paymentOptionsEle = byXpath.getElements("//*[@id='"+id_ReceiveMoneyFirstTablePaymentTypeDDL+"']//option", "Get all the options under 'Payment Type' DDL in First Table.");
+		for (WebElement webElement : paymentOptionsEle) {
+			option = webElement.getText();
+			paymentOptions.add(option);
+		}
+		expectedPaymentTypeOptions = VendorPortalCommons.AddMultipleValuesInList(value_ReceiveMoneyFirstTablePaymentTypeOptions);
+		Assert.assertEquals(paymentOptions,expectedPaymentTypeOptions, "Options in 'Payment Type' DDL is not displaying in first grid");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that Accounting>> Invoices -> Receive Money -> Verified that Payment Type DDL should have following options in first grid");
+	}
+	// To run this Test case("P2M6_198()") individually, make dependency on Test Case "P2M6_188"
+	@Test(priority = 47, enabled = true, groups = { "Smoke", "Harinder" })
+	public void P2M6_198() throws InterruptedException {
+		extentTest = extentReport.startTest(" *H7:P2M6_198","Accounting >> Invoices -> Receive Money -> Verify that when Check should be selected as Payment Type the Check# and Ref# (if any) should be autofill according to the record");
+		byId.click(id_InvoiceReceiveMoney, "clicking on 'Receive Money' button");
+		byId.clearThenSetText(id_ReceiveMoneySearchTB, tenantName, "Enter Tenant Name");
+		Thread.sleep(5000);
+		byXpath.click("//*[@id='"+id_ReceiveMoneyListOfTenantGridData+"']//tbody//tr//td[contains(.,'"+tenantName+"')]", "Click on Tenant Name '"+tenantName+"' in 'List of Tenants' grid");
+		byId.selectByVisibleText(id_ReceiveMoneyFirstTablePaymentTypeDDL, "Check", "Select 'Check' from Payment Type DDL");
+		String checkNo = byId.getAttribute(id_ReceiveMoneyFirstTableCheckNo, "value", "Select Auto filled Check Number");
+		String RefNo = byId.getAttribute(id_ReceiveMoneyFirstTableReffNo, "value", "Select Auto filled Reference Number");
+		Assert.assertTrue(!checkNo.equals("") && !checkNo.equals(null) && !RefNo.equals("") && !RefNo.equals(null), "'Check #' and 'Ref #' fields are displaying blank.");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that Accounting>> Invoices -> Receive Money -> Verified that when Check should be selected as Payment Type the Check# and Ref# (if any) is autofilled according to the record");
+	}
+	
+	// To run this Test case("P2M6_199()") individually, make dependency on Test Case "P2M6_188"
+	@Test(priority = 48, enabled = true, groups = { "Smoke", "Harinder" })
+	public void P2M6_199() throws InterruptedException {
+		extentTest = extentReport.startTest(" *H7:P2M6_199","Accounting >> Invoices -> Receive Money -> Verify that when Cash should be selected as Payment Type the Ref# (if any) should be autofill according to the record");
+		byId.click(id_InvoiceReceiveMoney, "clicking on 'Receive Money' button");
+		byId.clearThenSetText(id_ReceiveMoneySearchTB, tenantName, "Enter Tenant Name");
+		Thread.sleep(5000);
+		byXpath.click("//*[@id='"+id_ReceiveMoneyListOfTenantGridData+"']//tbody//tr//td[contains(.,'"+tenantName+"')]", "Click on Tenant Name '"+tenantName+"' in 'List of Tenants' grid");
+		byId.selectByVisibleText(id_ReceiveMoneyFirstTablePaymentTypeDDL, "Cash", "Select 'Cash' from Payment Type DDL");
+		String RefNo = byId.getAttribute(id_ReceiveMoneyFirstTableReffNo, "value", "Select Auto filled Reference Number");
+		if(RefNo==null || RefNo.equals("")) {
+			Assert.fail("'Ref #' field is displaying Null/Blank");
+		}
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that Accounting>> Invoices -> Receive Money -> Verified that when Cash should be selected as Payment Type the Ref# (if any) should be autofill according to the record");
+	}
+	
+	// To run this Test case("P2M6_200()") individually, make dependency on Test Case "P2M6_188"
+		@Test(priority = 49, enabled = true, groups = { "Smoke", "Harinder" })
+		public void P2M6_200() throws InterruptedException {
+			List<WebElement> elements = new ArrayList<>();
+			List<String> actualLabels = new ArrayList<>();
+			List<String> debitCardSectionLabels = new ArrayList<>();
+			List<String> expectedLabels = new ArrayList<>();
+			String label;
+			int index;
+			extentTest = extentReport.startTest(" *H7:P2M6_200","Accounting >> Invoices -> Receive Money -> Verify that  when Debit card option is selected the following fields for Debit Card Details should be displayed");
+			byId.click(id_InvoiceReceiveMoney, "clicking on 'Receive Money' button");
+			byId.clearThenSetText(id_ReceiveMoneySearchTB, tenantName, "Enter Tenant Name");
+			Thread.sleep(5000);
+			byXpath.click("//*[@id='"+id_ReceiveMoneyListOfTenantGridData+"']//tbody//tr//td[contains(.,'"+tenantName+"')]", "Click on Tenant Name '"+tenantName+"' in 'List of Tenants' grid");
+			byId.selectByVisibleText(id_ReceiveMoneyFirstTablePaymentTypeDDL, "Debit Card", "Select 'Debit Card' from Payment Type DDL");
+			elements = byXpath.getElements("//*[@id='"+id_ReceiveMoneyDebitCardSection+"']//div//label", "Get Labels for all the fields displayed selecting on 'Debit Card' option from Payment Type.");
+			for (WebElement ele : elements) {
+				label = ele.getText();
+				debitCardSectionLabels.add(label);
+			}
+			for (String getLabel : debitCardSectionLabels) {
+				index = getLabel.indexOf("*");
+				actualLabels.add(getLabel.substring(0, index-1));
+			}
+			expectedLabels = VendorPortalCommons.AddMultipleValuesInList(value_ReceiveMoneyDebitCardSection);
+			Assert.assertEquals(actualLabels, expectedLabels,"Some fields are missing/Some Labels has been changed");
+			extentTest.log(LogStatus.INFO, "*H7 : Verified, that Accounting>> Invoices -> Receive Money -> Verified that  when Debit card option is selected the following fields for Debit Card Details should be displayed");
+		}
+		
+		// To run this Test case("P2M6_201_1()") individually, make dependency on Test Case "P2M6_188"
+		@Test(priority = 50, enabled = true, groups = { "Smoke", "Harinder" })
+		public void P2M6_201_1() throws InterruptedException {
+					List<WebElement> elements = new ArrayList<>();
+					List<String> debitCardSectionLabels = new ArrayList<>();
+					String label;
+					extentTest = extentReport.startTest(" *H7:P2M6_201_1","Accounting >> Invoices -> Receive Money -> Verify that 'Card Type' should be a Mandatory DDL in First table");
+					byId.click(id_InvoiceReceiveMoney, "clicking on 'Receive Money' button");
+					byId.clearThenSetText(id_ReceiveMoneySearchTB, tenantName, "Enter Tenant Name");
+					Thread.sleep(5000);
+					byXpath.click("//*[@id='"+id_ReceiveMoneyListOfTenantGridData+"']//tbody//tr//td[contains(.,'"+tenantName+"')]", "Click on Tenant Name '"+tenantName+"' in 'List of Tenants' grid");
+					byId.selectByVisibleText(id_ReceiveMoneyFirstTablePaymentTypeDDL, "Debit Card", "Select 'Debit Card' from Payment Type DDL");
+					elements = byXpath.getElements("//*[@id='"+id_ReceiveMoneyDebitCardSection+"']//div//label", "Get Labels for all the fields displayed selecting on 'Debit Card' option from Payment Type.");
+					for (WebElement ele : elements) {
+						label = ele.getText();
+						debitCardSectionLabels.add(label);
+					}
+					if (debitCardSectionLabels.get(0).contains("*"))
+					{
+						Assert.assertTrue(true,"'Card Type' is a Mandatory DDL in First table");
+					}else {
+						Assert.fail("'Card Type' is not a Mandatory DDL in First table");
+					}
+					extentTest.log(LogStatus.INFO, "*H7 : Verified, that Accounting>> Invoices -> Receive Money -> Verified that 'Card Type' should be a Mandatory DDL in First table");
+				}
+				
+				// To run this Test case("P2M6_201_2()") individually, make dependency on Test Case "P2M6_188"
+				@Test(priority = 51, enabled = true, groups = { "Smoke", "Harinder" })
+				public void P2M6_201_2() throws InterruptedException {
+					List<WebElement> elements = new ArrayList<>();
+					List<String> actualOptions = new ArrayList<>();
+					List<String> expectedOptions = new ArrayList<>();
+					String options;
+					extentTest = extentReport.startTest(" *H7:P2M6_201_2","Accounting >> Invoices -> Receive Money -> Verify that 'Card Type' DDL should have following options in First table");
+					byId.click(id_InvoiceReceiveMoney, "clicking on 'Receive Money' button");
+					byId.clearThenSetText(id_ReceiveMoneySearchTB, tenantName, "Enter Tenant Name");
+					Thread.sleep(5000);
+					byXpath.click("//*[@id='"+id_ReceiveMoneyListOfTenantGridData+"']//tbody//tr//td[contains(.,'"+tenantName+"')]", "Click on Tenant Name '"+tenantName+"' in 'List of Tenants' grid");
+					byId.selectByVisibleText(id_ReceiveMoneyFirstTablePaymentTypeDDL, "Debit Card", "Select 'Debit Card' from Payment Type DDL");
+					elements = byXpath.getElements("//*[@id='"+id_ReceiveMoneyFirstTableCardType+"']//option", "Get elements for 'Card Type' DDL");
+					for (WebElement ele : elements) {
+						options = ele.getText();
+						actualOptions.add(options);
+					}
+					expectedOptions = VendorPortalCommons.AddMultipleValuesInList(value_ReceiveMoneyCardTypeOptions);
+					Assert.assertEquals(actualOptions, expectedOptions,"Some options are missing in 'Card Type' DDL/New options are Added or Deleted in 'Card Type' DDL in First table");
+					extentTest.log(LogStatus.INFO, "*H7 : Verified, that Accounting>> Invoices -> Receive Money -> Verified that 'Card Type' DDL should have following options in First table");
+				}
+	
+				//To run this Test case("P2M6_201_3()") individually, make dependency on Test Case "P2M6_188"
+				@Test(priority = 52, enabled = true, groups = { "Smoke", "Harinder" })
+				public void P2M6_201_3() throws InterruptedException {
+					String errMsg;
+					extentTest = extentReport.startTest(" *H7:P2M6_201_3","Accounting >> Invoices -> Receive Money -> Verify that if 'Card Type' DDL is Blank the validation message 'This field is required' should be displayed");
+					byId.click(id_InvoiceReceiveMoney, "clicking on 'Receive Money' button");
+					byId.clearThenSetText(id_ReceiveMoneySearchTB, tenantName, "Enter Tenant Name");
+					Thread.sleep(5000);
+					byXpath.click("//*[@id='"+id_ReceiveMoneyListOfTenantGridData+"']//tbody//tr//td[contains(.,'"+tenantName+"')]", "Click on Tenant Name '"+tenantName+"' in 'List of Tenants' grid");
+					byId.selectByVisibleText(id_ReceiveMoneyFirstTablePaymentTypeDDL, "Debit Card", "Select 'Debit Card' from Payment Type DDL");
+					byId.click(id_ReceiveMoneyFirstTableCardType, "Click on 'Card Type' DDL");
+					Actions action = new Actions(getDriver());
+					action.moveToElement(getDriver().findElement(By.id(id_ReceiveMoneyFirstTableCreditCardNumber))).click().perform();
+					errMsg = byXpath.getText("//*[@id='"+id_ReceiveMoneyFirstTableCardType+"']//following-sibling::div[@class='"+class_MandatoryfieldErrorMessage+"']", "Get Error message for 'Card Type' DDL");
+					Assert.assertEquals(errMsg, value_MandatoryfieldsMessage,"Validation message is not displaying for 'Card Type' DDL");
+					extentTest.log(LogStatus.INFO, "*H7 : Verified, that Accounting>> Invoices -> Receive Money -> Verified that if 'Card Type' is Blank the validation message 'This field is required' should be displayed");
+				}
+				
+				//To run this Test case("P2M6_202_1()") individually, make dependency on Test Case "P2M6_188"
+				@Test(priority = 53, enabled = true, groups = { "Smoke", "Harinder" })
+				public void P2M6_202_1() throws InterruptedException {
+					String errMsg;
+					extentTest = extentReport.startTest(" *H7:P2M6_202_1","Accounting >> Invoices -> Receive Money -> Verify that 'Credit Card Number' should be a mandatory field");
+					byId.click(id_InvoiceReceiveMoney, "clicking on 'Receive Money' button");
+					byId.clearThenSetText(id_ReceiveMoneySearchTB, tenantName, "Enter Tenant Name");
+					Thread.sleep(5000);
+					byXpath.click("//*[@id='"+id_ReceiveMoneyListOfTenantGridData+"']//tbody//tr//td[contains(.,'"+tenantName+"')]", "Click on Tenant Name '"+tenantName+"' in 'List of Tenants' grid");
+					byId.selectByVisibleText(id_ReceiveMoneyFirstTablePaymentTypeDDL, "Debit Card", "Select 'Debit Card' from Payment Type DDL");
+					byId.click(id_ReceiveMoneyFirstTableCreditCardNumber, "Click on 'Credit Card Number' field");
+					Actions action = new Actions(getDriver());
+					action.moveToElement(getDriver().findElement(By.id(id_ReceiveMoneyFirstTableCardHolderName))).click().perform();
+					errMsg = byXpath.getText("//*[@id='"+id_ReceiveMoneyFirstTableCreditCardNumber+"']//following-sibling::div[@class='"+class_MandatoryfieldErrorMessage+"']", "Get Error message for 'Credit Card Number' field");
+					Assert.assertEquals(errMsg, value_MandatoryfieldsMessage,"Validation message is not displaying for 'Credit Card Number' field");
+					extentTest.log(LogStatus.INFO, "*H7 : Verified, that Accounting>> Invoices -> Receive Money -> Verified that 'Credit Card Number' should be a mandatory field");
+				}
+				
+				//To run this Test case("P2M6_202_2()") individually, make dependency on Test Case "P2M6_188"
+				@Test(priority = 54, enabled = true, groups = { "Smoke", "Harinder" })
+				public void P2M6_202_2() throws InterruptedException {
+					String getValue;
+					extentTest = extentReport.startTest(" *H7:P2M6_202_2","Accounting >> Invoices -> Receive Money -> Verify that User should be able to enter digits upto 16 characters in 'Credit Card Number' field");
+					byId.click(id_InvoiceReceiveMoney, "clicking on 'Receive Money' button");
+					byId.clearThenSetText(id_ReceiveMoneySearchTB, tenantName, "Enter Tenant Name");
+					Thread.sleep(5000);
+					byXpath.click("//*[@id='"+id_ReceiveMoneyListOfTenantGridData+"']//tbody//tr//td[contains(.,'"+tenantName+"')]", "Click on Tenant Name '"+tenantName+"' in 'List of Tenants' grid");
+					byId.selectByVisibleText(id_ReceiveMoneyFirstTablePaymentTypeDDL, "Debit Card", "Select 'Debit Card' from Payment Type DDL");
+					byId.clearThenSetText(id_ReceiveMoneyFirstTableCreditCardNumber, value_ReceiveMoneyFirstTableCreditCardNumberMorethan16 , "Enter 16 digits in 'Credit Card Number' field");
+					getValue = byId.getAttribute(id_ReceiveMoneyFirstTableCreditCardNumber, "value", "Get entered value in 'Credit Card Number' field");
+					int length = getValue.length();
+					Assert.assertEquals(length, 16 ," 'Credit Card Number' field accepting more than 16 digits.");
+					extentTest.log(LogStatus.INFO, "*H7 : Verified, that Accounting>> Invoices -> Receive Money -> Verified that User should be able to enter digits upto 16 characters in 'Credit Card Number' field");
+				}
+				
+				//To run this Test case("P2M6_203_1()") individually, make dependency on Test Case "P2M6_188"
+				@Test(priority = 55, enabled = true, groups = { "Smoke", "Harinder" })
+				public void P2M6_203_1() throws InterruptedException {
+					String errMsg;
+					extentTest = extentReport.startTest(" *H7:P2M6_203_1","Accounting >> Invoices -> Receive Money -> Verify that 'Card Holder Name' should be a mandatory field");
+					byId.click(id_InvoiceReceiveMoney, "clicking on 'Receive Money' button");
+					byId.clearThenSetText(id_ReceiveMoneySearchTB, tenantName, "Enter Tenant Name");
+					Thread.sleep(5000);
+					byXpath.click("//*[@id='"+id_ReceiveMoneyListOfTenantGridData+"']//tbody//tr//td[contains(.,'"+tenantName+"')]", "Click on Tenant Name '"+tenantName+"' in 'List of Tenants' grid");
+					byId.selectByVisibleText(id_ReceiveMoneyFirstTablePaymentTypeDDL, "Debit Card", "Select 'Debit Card' from Payment Type DDL");
+					byId.click(id_ReceiveMoneyFirstTableCardHolderName, "Click on 'Card Holder Name' field");
+					Actions action = new Actions(getDriver());
+					action.moveToElement(getDriver().findElement(By.id(id_ReceiveMoneyFirstTableCreditCardNumber))).click().perform();
+					errMsg = byXpath.getText("//*[@id='"+id_ReceiveMoneyFirstTableCardHolderName+"']//following-sibling::div[@class='"+class_MandatoryfieldErrorMessage+"']", "Get Error message for 'Card Holder Name' field");
+					Assert.assertEquals(errMsg, value_MandatoryfieldsMessage,"Validation message is not displaying for 'Credit Card Number' field");
+					extentTest.log(LogStatus.INFO, "*H7 : Verified, that Accounting>> Invoices -> Receive Money -> Verified that 'Card Holder Name' should be a mandatory field ");
+				}
+				
+				//To run this Test case("P2M6_203_2()") individually, make dependency on Test Case "P2M6_188"
+				@Test(priority = 56, enabled = true, groups = { "Smoke", "Harinder" })
+				public void P2M6_203_2() throws InterruptedException {
+					String getValue;
+					extentTest = extentReport.startTest(" *H7:P2M6_203_2","Accounting >> Invoices -> Receive Money -> Verify that user should be able to enter alphanumerics in 'Card Holder Name' field");
+					byId.click(id_InvoiceReceiveMoney, "clicking on 'Receive Money' button");
+					byId.clearThenSetText(id_ReceiveMoneySearchTB, tenantName, "Enter Tenant Name");
+					Thread.sleep(5000);
+					byXpath.click("//*[@id='"+id_ReceiveMoneyListOfTenantGridData+"']//tbody//tr//td[contains(.,'"+tenantName+"')]", "Click on Tenant Name '"+tenantName+"' in 'List of Tenants' grid");
+					byId.selectByVisibleText(id_ReceiveMoneyFirstTablePaymentTypeDDL, "Debit Card", "Select 'Debit Card' from Payment Type DDL");
+					byId.clearThenSetText(id_ReceiveMoneyFirstTableCardHolderName, value_Alphanumeric , "Enter Alphanumeric in 'Card Holder Name' field");
+					getValue = byId.getAttribute(id_ReceiveMoneyFirstTableCardHolderName, "value", "Get entered value in 'Card Holder Name' field");
+					Assert.assertEquals(getValue, value_Alphanumeric,"User is unable to enter Alphanumeric in 'Card Holder Name' field");
+					extentTest.log(LogStatus.INFO, "*H7 : Verified, that Accounting>> Invoices -> Receive Money -> Verified that user should be able to enter alphanumerics in 'Card Holder Name' field");
+				}
+				
+				//To run this Test case("P2M6_203_3()") individually, make dependency on Test Case "P2M6_188"
+				@Test(priority = 57, enabled = true, groups = { "Smoke", "Harinder" })
+				public void P2M6_203_3() throws InterruptedException {
+					String getValue;
+					extentTest = extentReport.startTest(" *H7:P2M6_203_3","Accounting >> Invoices -> Receive Money -> Verify that user should be able to enter special characters in 'Card Holder Name' field");
+					byId.click(id_InvoiceReceiveMoney, "clicking on 'Receive Money' button");
+					byId.clearThenSetText(id_ReceiveMoneySearchTB, tenantName, "Enter Tenant Name");
+					Thread.sleep(5000);
+					byXpath.click("//*[@id='"+id_ReceiveMoneyListOfTenantGridData+"']//tbody//tr//td[contains(.,'"+tenantName+"')]", "Click on Tenant Name '"+tenantName+"' in 'List of Tenants' grid");
+					byId.selectByVisibleText(id_ReceiveMoneyFirstTablePaymentTypeDDL, "Debit Card", "Select 'Debit Card' from Payment Type DDL");
+					byId.clearThenSetText(id_ReceiveMoneyFirstTableCardHolderName, value_SpecialCharcters , "Enter special characters in 'Card Holder Name' field");
+					getValue = byId.getAttribute(id_ReceiveMoneyFirstTableCardHolderName, "value", "Get entered value in 'Card Holder Name' field");
+					Assert.assertEquals(getValue, value_SpecialCharcters,"User is unable to enter special characters in 'Card Holder Name' field");
+					extentTest.log(LogStatus.INFO, "*H7 : Verified, that Accounting>> Invoices -> Receive Money -> Verified that user should be able to enter special characters in 'Card Holder Name' field");
+				}
+				
+				//To run this Test case("P2M6_205_1()") individually, make dependency on Test Case "P2M6_188"
+				@Test(priority = 58, enabled = true, groups = { "Smoke", "Harinder" })
+				public void P2M6_205_1() throws InterruptedException {
+					String errMsg;
+					extentTest = extentReport.startTest(" *H7:P2M6_205_1","Accounting >> Invoices -> Receive Money -> Verify that 'Expiration Year' DDL should be mandatory field.");
+					byId.click(id_InvoiceReceiveMoney, "clicking on 'Receive Money' button");
+					byId.clearThenSetText(id_ReceiveMoneySearchTB, tenantName, "Enter Tenant Name");
+					Thread.sleep(5000);
+					byXpath.click("//*[@id='"+id_ReceiveMoneyListOfTenantGridData+"']//tbody//tr//td[contains(.,'"+tenantName+"')]", "Click on Tenant Name '"+tenantName+"' in 'List of Tenants' grid");
+					byId.selectByVisibleText(id_ReceiveMoneyFirstTablePaymentTypeDDL, "Debit Card", "Select 'Debit Card' from Payment Type DDL");
+					byId.click(id_ReceiveMoneyFirstTableExpirationYearDDL, "Click on 'Expiration Year' DDL");
+					Actions action = new Actions(getDriver());
+					action.moveToElement(getDriver().findElement(By.id(id_ReceiveMoneyFirstTableCVVNo))).click().perform();
+					errMsg = byXpath.getText("//*[@id='"+id_ReceiveMoneyFirstTableExpirationYearDDL+"']//following-sibling::div[@class='"+class_MandatoryfieldErrorMessage+"']", "Get Error message for 'Expiration Year' DDL");
+					Assert.assertEquals(errMsg, value_MandatoryfieldsMessage,"Validation message is not displaying for 'Expiration Year' DDL");
+					extentTest.log(LogStatus.INFO, "*H7 : Verified, that Accounting>> Invoices -> Receive Money -> Verified that 'Expiration Year' DDL is a mandatory field.");
+				}
+				
+				//To run this Test case("P2M6_205_2()") individually, make dependency on Test Case "P2M6_188"
+				@Test(priority = 59, enabled = true, groups = { "Smoke", "Harinder" })
+				public void P2M6_205_2() throws InterruptedException {
+					extentTest = extentReport.startTest(" *H7:P2M6_205_2","Accounting >> Invoices -> Receive Money -> Verify that future 30 yr should be displayed in 'Expiration Year' DDL");
+					byId.click(id_InvoiceReceiveMoney, "clicking on 'Receive Money' button");
+					byId.clearThenSetText(id_ReceiveMoneySearchTB, tenantName, "Enter Tenant Name");
+					Thread.sleep(5000);
+					byXpath.click("//*[@id='"+id_ReceiveMoneyListOfTenantGridData+"']//tbody//tr//td[contains(.,'"+tenantName+"')]", "Click on Tenant Name '"+tenantName+"' in 'List of Tenants' grid");
+					byId.selectByVisibleText(id_ReceiveMoneyFirstTablePaymentTypeDDL, "Debit Card", "Select 'Debit Card' from Payment Type DDL");
+					byId.click(id_ReceiveMoneyFirstTableExpirationYearDDL, "Click on 'Expiration Year' DDL");
+					List<WebElement> getElements = byXpath.getElements("//*[@id='"+id_ReceiveMoneyFirstTableExpirationYearDDL+"']//option", "Get all the Options in 'Expiration Year' DDL");
+					int getYearsCount = getElements.size();
+					getYearsCount = getYearsCount-1;
+					Assert.assertEquals(getYearsCount, 30 , "All future 30 Years are not displaying in 'Expiration Year' DDL");
+					extentTest.log(LogStatus.INFO, "*H7 : Verified, that Accounting>> Invoices -> Receive Money -> Verified that future 30 yr should be displayed in 'Expiration Year' DDL");
+				}
+				
+				//To run this Test case("P2M6_205_3()") individually, make dependency on Test Case "P2M6_188"
+				@Test(priority = 60, enabled = true, groups = { "Smoke", "Harinder" })
+				public void P2M6_205_3() throws InterruptedException {
+					extentTest = extentReport.startTest(" *H7:P2M6_205_3","Accounting >> Invoices -> Receive Money -> Verify that By Default 'YY' should be displayed in 'Expiration Year' DDL");
+					byId.click(id_InvoiceReceiveMoney, "clicking on 'Receive Money' button");
+					byId.clearThenSetText(id_ReceiveMoneySearchTB, tenantName, "Enter Tenant Name");
+					Thread.sleep(5000);
+					byXpath.click("//*[@id='"+id_ReceiveMoneyListOfTenantGridData+"']//tbody//tr//td[contains(.,'"+tenantName+"')]", "Click on Tenant Name '"+tenantName+"' in 'List of Tenants' grid");
+					byId.selectByVisibleText(id_ReceiveMoneyFirstTablePaymentTypeDDL, "Debit Card", "Select 'Debit Card' from Payment Type DDL");
+					String getValue = byId.getFirstSelectedOption(id_ReceiveMoneyFirstTableExpirationYearDDL, "Get Default selected value in 'Expiration Year' DDL");
+					Assert.assertEquals(getValue, "YY" , "By Default 'YY' is not displaying in 'Expiration Year' DDL");
+					extentTest.log(LogStatus.INFO, "*H7 : Verified, that Accounting>> Invoices -> Receive Money -> Verified that By Default 'YY' should be displayed in 'Expiration Year' DDL");
+				}
+				
+				//To run this Test case("P2M6_209()") individually, make dependency on Test Case "P2M6_188"
+				@Test(priority = 61, enabled = true, groups = { "Smoke", "Harinder" })
+				public void P2M6_209() throws InterruptedException {
+					extentTest = extentReport.startTest(" *H7:P2M6_209","Accounting >> Invoices -> Receive Money -> Verify that By Default 'YY' should be displayed in 'Expiration Year' DDL");
+					byId.click(id_InvoiceReceiveMoney, "clicking on 'Receive Money' button");
+					byId.clearThenSetText(id_ReceiveMoneySearchTB, tenantName, "Enter Tenant Name");
+					Thread.sleep(5000);
+					byXpath.click("//*[@id='"+id_ReceiveMoneyListOfTenantGridData+"']//tbody//tr//td[contains(.,'"+tenantName+"')]", "Click on Tenant Name '"+tenantName+"' in 'List of Tenants' grid");
+					byId.selectByVisibleText(id_ReceiveMoneyFirstTablePaymentTypeDDL, "ACH", "Select 'ACH' from Payment Type DDL");
+					String getHeaderName = byXpath.getText("//*[@id='"+id_ReceiveMoneyDisclaimerPopup+"']//div[@class='login-hdr']", "Get Popup Header Name from Disclaimer popup");
+					String getCheckBoxLabel = byXpath.getText("//*[@id='"+id_ReceiveMoneyDisclaimerPopup+"']//div[@class='radio-text']", "Get Check Box Label from Disclaimer popup");
+					int cancelButton = byId.getSize(id_ReceiveMoneyDisclaimerPopupCancelButton, "Verify Cancel button on 'Disclaimer' popup");
+					getDriver().navigate().refresh();
+					se.assertEquals(getHeaderName, "DISCLAIMER", "'DISCLAIMER' popup header is missing/ not the same as 'DISCLAIMER'");
+					se.assertEquals(getCheckBoxLabel, "Check to proceed further.", "'Check to proceed further.' checkbox is not exists on 'Disclaimer' popup");
+					se.assertEquals(cancelButton, 1, "Cancel button is missing on 'Disclaimer' popup");
+					se.assertAll();
+					extentTest.log(LogStatus.INFO, "*H7 : Verified, that Accounting>> Invoices -> Receive Money -> Verified that By Default 'YY' should be displayed in 'Expiration Year' DDL");
+				}
+				
+				@Test(priority = 62, enabled = true, groups = { "Smoke", "Harinder" })
+				public void P2M6_210() throws InterruptedException {
+					extentTest = extentReport.startTest(" *H7:P2M6_210","Accounting >> Invoices -> Receive Money -> Verify that when click on checkbox 'Check to Proceed Further' the following fields should be displayed: Account Type, Routing Number,Account Number");
+					byId.click(id_InvoiceReceiveMoney, "clicking on 'Receive Money' button");
+					byId.clearThenSetText(id_ReceiveMoneySearchTB, tenantName, "Enter Tenant Name");
+					Thread.sleep(5000);
+					byXpath.click("//*[@id='"+id_ReceiveMoneyListOfTenantGridData+"']//tbody//tr//td[contains(.,'"+tenantName+"')]", "Click on Tenant Name '"+tenantName+"' in 'List of Tenants' grid");
+					byId.selectByVisibleText(id_ReceiveMoneyFirstTablePaymentTypeDDL, "ACH", "Select 'ACH' from Payment Type DDL");
+					byId.click(id_ReceiveMoneyDisclaimerPopupCheckBox, "Click on 'Check to proceed further.' Checkbox");
+					int getAccType = byId.getSize(id_ReceiveMoneyAccountTypeDDL, "Get size if 'Account Type' DDL is exists.");
+					int getRoutingNumber = byId.getSize(id_ReceiveMoneyRoutingNumber, "Get size if Rounting Number field is exists.");
+					int getAccNumber = byId.getSize(id_ReceiveMoneyAccountNumber, "Get size if Account Number field is exists.");
+					se.assertEquals(getAccType, 1, "'Account Type' DDL is not exists for ACH");
+					se.assertEquals(getRoutingNumber, 1, "'Routing Number' Field is not exists for ACH");
+					se.assertEquals(getAccNumber, 1, "'Account Number' Field is not exists for ACH");
+					se.assertAll();
+					extentTest.log(LogStatus.INFO, "*H7 : Verified, that Accounting>> Invoices -> Receive Money -> Verified that when click on checkbox 'Check to Proceed Further' the following fields should be displayed: Account Type, Routing Number,Account Number");
+				}
+				
+				@Test(priority = 63, enabled = true, groups = { "Smoke", "Harinder" })
+				public void P2M6_214_1() throws InterruptedException {
+					extentTest = extentReport.startTest(" *H7:P2M6_214_1","Accounting >> Invoices -> Receive Money -> Verify that 'DISCLAIMER' popup is disappear after clicking on Cancel button on 'DISCLAIMER' popup");
+					byId.click(id_InvoiceReceiveMoney, "clicking on 'Receive Money' button");
+					byId.clearThenSetText(id_ReceiveMoneySearchTB, tenantName, "Enter Tenant Name");
+					Thread.sleep(5000);
+					byXpath.click("//*[@id='"+id_ReceiveMoneyListOfTenantGridData+"']//tbody//tr//td[contains(.,'"+tenantName+"')]", "Click on Tenant Name '"+tenantName+"' in 'List of Tenants' grid");
+					byId.selectByVisibleText(id_ReceiveMoneyFirstTablePaymentTypeDDL, "ACH", "Select 'ACH' from Payment Type DDL");
+					byId.click(id_ReceiveMoneyDisclaimerPopupCancelButton, "Click on 'Cancel' button on 'DISCLAIMER' popup");
+					int getPopupSize = byXpath.getSize("//*[@id='"+id_ReceiveMoneyDisclaimerPopup+"'][contains(@style,'display: block;')]", "Get size if 'DISCLAIMER' popup is exists.");
+					Assert.assertEquals(getPopupSize, 0, "Clicking on 'Cancel' button on 'DISCLAIMER' popup, 'DISCLAIMER' popup still displaying");
+					extentTest.log(LogStatus.INFO, "*H7 : Verified, that Accounting>> Invoices -> Receive Money -> Verified that 'DISCLAIMER' popup is disappear after clicking on Cancel button on 'DISCLAIMER' popup");
+				}
+				
+				@Test(priority = 64, enabled = true, groups = { "Smoke", "Harinder" })
+				public void P2M6_214_2() throws InterruptedException {
+					extentTest = extentReport.startTest(" *H7:P2M6_214_2","Accounting >> Invoices -> Receive Money -> Verify that clicking on Cancel button on 'DISCLAIMER' popup, bydefault Check should be selected in Payment Type");
+					byId.click(id_InvoiceReceiveMoney, "clicking on 'Receive Money' button");
+					byId.clearThenSetText(id_ReceiveMoneySearchTB, tenantName, "Enter Tenant Name");
+					Thread.sleep(5000);
+					byXpath.click("//*[@id='"+id_ReceiveMoneyListOfTenantGridData+"']//tbody//tr//td[contains(.,'"+tenantName+"')]", "Click on Tenant Name '"+tenantName+"' in 'List of Tenants' grid");
+					byId.selectByVisibleText(id_ReceiveMoneyFirstTablePaymentTypeDDL, "ACH", "Select 'ACH' from Payment Type DDL");
+					byId.click(id_ReceiveMoneyDisclaimerPopupCancelButton, "Click on 'Cancel' button on 'DISCLAIMER' popup");
+					String getPopupSize = byId.getFirstSelectedOption(id_ReceiveMoneyFirstTablePaymentTypeDDL, "Get First selected option from 'Payment Type' DDL on 'Receive Payment' Page.");
+					Assert.assertEquals(getPopupSize, "Check", "Bydefault 'Check' option is not displaying in 'Payment Type' DDL");
+					extentTest.log(LogStatus.INFO, "*H7 : Verified, that Accounting>> Invoices -> Receive Money -> Verified that clicking on Cancel button on 'DISCLAIMER' popup bydefault Check should be selected in Payment Type");
+				}
+				
+				@Test(priority = 65, enabled = true, groups = { "Smoke", "Harinder" })
+				public void P2M6_218() throws InterruptedException {
+					extentTest = extentReport.startTest(" *H7:P2M6_218","Accounting >> Invoices -> Receive Money -> Verify that clicking on Cancel button on 'DISCLAIMER' popup, bydefault Check should be selected in Payment Type");
+					byId.click(id_InvoiceReceiveMoney, "clicking on 'Receive Money' button");
+					byId.clearThenSetText(id_ReceiveMoneySearchTB, tenantName, "Enter Tenant Name");
+					Thread.sleep(5000);
+					byXpath.click("//*[@id='"+id_ReceiveMoneyListOfTenantGridData+"']//tbody//tr//td[contains(.,'"+tenantName+"')]", "Click on Tenant Name '"+tenantName+"' in 'List of Tenants' grid");
+					byId.selectByVisibleText(id_ReceiveMoneyFirstTablePaymentTypeDDL, "ACH", "Select 'ACH' from Payment Type DDL");
+					byId.click(id_ReceiveMoneyDisclaimerPopupCancelButton, "Click on 'Cancel' button on 'DISCLAIMER' popup");
+					String getPopupSize = byId.getFirstSelectedOption(id_ReceiveMoneyFirstTablePaymentTypeDDL, "Get First selected option from 'Payment Type' DDL on 'Receive Payment' Page.");
+					Assert.assertEquals(getPopupSize, "Check", "Bydefault 'Check' option is not displaying in 'Payment Type' DDL");
+					extentTest.log(LogStatus.INFO, "*H7 : Verified, that Accounting>> Invoices -> Receive Money -> Verified that clicking on Cancel button on 'DISCLAIMER' popup bydefault Check should be selected in Payment Type");
+				}
+				
+				@Test(priority = 66, enabled = true, groups = { "Smoke", "Harinder" })
+				public void P2M6_232() throws InterruptedException {
+					extentTest = extentReport.startTest(" *H7:P2M6_232","Accounting >> Invoices -> Receive Money -> Verify that in Pay field  the Checkbox should be displayed");
+					byId.click(id_InvoiceReceiveMoney, "clicking on 'Receive Money' button");
+					byId.clearThenSetText(id_ReceiveMoneySearchTB, tenantName, "Enter Tenant Name");
+					Thread.sleep(5000);
+					byXpath.click("//*[@id='"+id_ReceiveMoneyListOfTenantGridData+"']//tbody//tr//td[contains(.,'"+tenantName+"')]", "Click on Tenant Name '"+tenantName+"' in 'List of Tenants' grid");
+					int getSize = byClassName.getSize(class_ReceiveMoneySeconfTablePayCheckbox, "Get size if Pay checkbox exists in Sencod table on receive money page.");
+					Assert.assertTrue(getSize>0, "Pay checkbox is not exist in Sencod table on receive money page.");
+					extentTest.log(LogStatus.INFO, "*H7 : Verified, that Accounting>> Invoices -> Receive Money -> Verified that in Pay field  the Checkbox should be displayed");
+				}
+				
+				@Test(priority = 67, enabled = true, groups = { "Smoke", "Harinder" })
+				public void P2M6_233_1() throws InterruptedException {
+					extentTest = extentReport.startTest(" *H7:P2M6_233_1","Accounting >> Invoices -> Receive Money -> Verify that if pay checkbox is not ticked the amount should not be paid in sencond Table");
+					byId.click(id_InvoiceReceiveMoney, "clicking on 'Receive Money' button");
+					byId.clearThenSetText(id_ReceiveMoneySearchTB, tenantName, "Enter Tenant Name");
+					Thread.sleep(5000);
+					byXpath.click("//*[@id='"+id_ReceiveMoneyListOfTenantGridData+"']//tbody//tr//td[contains(.,'"+tenantName+"')]", "Click on Tenant Name '"+tenantName+"' in 'List of Tenants' grid");
+					byXpath.click("//*[@id='"+id_ReceiveMoneySecondTable+"']//table//tbody//tr[1]//td//input[@class='"+class_ReceiveMoneySeconfTablePayCheckbox+"']", "Uncheck the Pay Checkbox in first row.");
+					String getValue = byXpath.getAttribute("//*[@id='"+id_ReceiveMoneySecondTable+"']//table//tbody//tr[1]//td//input[@class='"+class_ReceiveMoneySeconfTablePayCheckbox+"']//parent::td//preceding-sibling::td//input[contains(@class,'clsCurrentPayment')]", "value", "Get value from Current Payment field in first row");
+					Assert.assertEquals(getValue,"0.00", "Payable Amount still displaying in Current payment field.");
+					extentTest.log(LogStatus.INFO, "*H7 : Verified, that Accounting>> Invoices -> Receive Money -> Verified that if pay checkbox is not ticked the amount should not be paid in sencond Table");
+				}
+				
+				@Test(priority = 68, enabled = true, groups = { "Smoke", "Harinder" })
+				public void P2M6_233_2() throws InterruptedException {
+					extentTest = extentReport.startTest(" *H7:P2M6_233_2","Accounting >> Invoices -> Receive Money -> Verify that if Pay checkbox is ticked the amount to be paid should be displayed in sencond Table");
+					byId.click(id_InvoiceReceiveMoney, "clicking on 'Receive Money' button");
+					byId.clearThenSetText(id_ReceiveMoneySearchTB, tenantName, "Enter Tenant Name");
+					Thread.sleep(5000);
+					byXpath.click("//*[@id='"+id_ReceiveMoneyListOfTenantGridData+"']//tbody//tr//td[contains(.,'"+tenantName+"')]", "Click on Tenant Name '"+tenantName+"' in 'List of Tenants' grid");
+					String getAttr = byXpath.getAttribute("//*[@id='"+id_ReceiveMoneySecondTable+"']//table//tbody//tr[1]//td//input[@class='"+class_ReceiveMoneySeconfTablePayCheckbox+"']","checked", "Check if Pay checkbox is checked");
+					String getValue = byXpath.getAttribute("//*[@id='"+id_ReceiveMoneySecondTable+"']//table//tbody//tr[1]//td//input[@class='"+class_ReceiveMoneySeconfTablePayCheckbox+"']//parent::td//preceding-sibling::td//input[contains(@class,'clsCurrentPayment')]", "value", "Get value from Current Payment field in first row");
+					se.assertEquals(getAttr, "true", "Checkbox is checked in Second table for first row.");
+					se.assertEquals(getValue, ProratedRent, "Amount is not displaying in Current payment field in Second table");
+					se.assertAll();
+					extentTest.log(LogStatus.INFO, "*H7 : Verified, that Accounting>> Invoices -> Receive Money -> Verified that if Pay checkbox is ticked the amount to be paid should be displayed in sencond Table");
+				}				
+				@Test(priority = 69, enabled = true, groups = { "Smoke", "Harinder" })
+				public void P2M6_234_1() throws InterruptedException {
+					extentTest = extentReport.startTest(" *H7:P2M6_234_1","Accounting >> Invoices -> Receive Money -> Verify that when click on 'Save & New' button the message 'The Payment saved successfully' should be displayed");
+					byId.click(id_InvoiceReceiveMoney, "clicking on 'Receive Money' button");
+					byId.clearThenSetText(id_ReceiveMoneySearchTB, tenantName, "Enter Tenant Name");
+					Thread.sleep(5000);
+					byXpath.click("//*[@id='"+id_ReceiveMoneyListOfTenantGridData+"']//tbody//tr//td[contains(.,'"+tenantName+"')]", "Click on Tenant Name '"+tenantName+"' in 'List of Tenants' grid");
+					byId.click(id_ReceiveMoneySaveAndNewButton, "Click on 'Save & Next' button");
+					String getPopupText = byXpath.getText("//*[@class='"+class_NewInvoiceToastPopup+"']//p", "Get Popup Text");
+					Assert.assertEquals(getPopupText, valiMsg_PaymentSavedSuccessfully, "Popup text has been changed");
+					extentTest.log(LogStatus.INFO, "*H7 : Verified, that Accounting>> Invoices -> Receive Money -> Verified that when click on 'Save & New' button the message 'The Payment saved successfully' should be displayed");
+				}
+				
+				@Test(priority = 70, enabled = true, groups = { "Smoke", "Harinder" })
+				public void P2M6_234_2() throws InterruptedException {
+					extentTest = extentReport.startTest(" *H7:P2M6_234_2","Accounting >> Invoices -> Receive Money -> Verify that when click on 'Save & New' button User should be redirects to Receive Payments page to select new Tenant for receivables");
+					byId.click(id_InvoiceReceiveMoney, "clicking on 'Receive Money' button");
+					byId.clearThenSetText(id_ReceiveMoneySearchTB, tenantName, "Enter Tenant Name");
+					Thread.sleep(5000);
+					byXpath.click("//*[@id='"+id_ReceiveMoneyListOfTenantGridData+"']//tbody//tr//td[contains(.,'"+tenantName+"')]", "Click on Tenant Name '"+tenantName+"' in 'List of Tenants' grid");
+					byId.click(id_ReceiveMoneySaveAndNewButton, "Click on 'Save & Next' button");
+					int getSize = byXpath.getSize("//*[@id='"+id_ReceiveMoneyFirstTable+"'][contains(@style,'display: none;')]", "Verify user redirects on Receive Payments page");
+					Assert.assertEquals(getSize, 1, "User redirects on Receive Payments page");
+					extentTest.log(LogStatus.INFO, "*H7 : Verified, that Accounting>> Invoices -> Receive Money -> Verified that when click on 'Save & New' button User should be redirects to Receive Payments page to select new Tenant for receivables");
+				}
+				
+				@Test(priority = 71, enabled = true, groups = { "Smoke", "Harinder" })
+				public void P2M6_235_1() throws InterruptedException {
+					extentTest = extentReport.startTest(" *H7:P2M6_235_1","Accounting >> Invoices -> Receive Money -> Verify that when click on 'Save' button when click on Save & New the message 'The Payment saved successfully' should be displayed");
+					byId.click(id_InvoiceReceiveMoney, "clicking on 'Receive Money' button");
+					byId.clearThenSetText(id_ReceiveMoneySearchTB, tenantName, "Enter Tenant Name");
+					Thread.sleep(5000);
+					byXpath.click("//*[@id='"+id_ReceiveMoneyListOfTenantGridData+"']//tbody//tr//td[contains(.,'"+tenantName+"')]", "Click on Tenant Name '"+tenantName+"' in 'List of Tenants' grid");
+					byId.click(id_ReceiveMoneySaveButton, "Click on 'Save' button");
+					String getPopupText = byXpath.getText("//*[@class='"+class_NewInvoiceToastPopup+"']//p", "Get Popup Text");
+					Assert.assertEquals(getPopupText, valiMsg_PaymentSavedSuccessfully, "Popup text has been changed");
+					extentTest.log(LogStatus.INFO, "*H7 : Verified, that Accounting >> Invoices -> Receive Money -> Verify that when click on 'Save' button when click on Save & New the message 'The Payment saved successfully' should be displayed");
+				}
+				
+				@Test(priority = 72, enabled = true, groups = { "Smoke", "Harinder" })
+				public void P2M6_235_2() throws InterruptedException {
+					extentTest = extentReport.startTest(" *H7:P2M6_235_2","Accounting >> Invoices -> Receive Money -> Verify that when click on 'Save' button User should be redirects to Receive Payments page to select new Tenant for receivables");
+					byId.click(id_InvoiceReceiveMoney, "clicking on 'Receive Money' button");
+					byId.clearThenSetText(id_ReceiveMoneySearchTB, tenantName, "Enter Tenant Name");
+					Thread.sleep(5000);
+					byXpath.click("//*[@id='"+id_ReceiveMoneyListOfTenantGridData+"']//tbody//tr//td[contains(.,'"+tenantName+"')]", "Click on Tenant Name '"+tenantName+"' in 'List of Tenants' grid");
+					byId.click(id_ReceiveMoneySaveButton, "Click on 'Save' button");
+					int getSize = byXpath.getSize("//*[@id='"+id_ReceiveMoneyFirstTable+"'][contains(@style,'display: none;')]", "Verify user redirects on Receive Payments page");
+					Assert.assertEquals(getSize, 1, "User redirects on Receive Payments page");
+					extentTest.log(LogStatus.INFO, "*H7 : Verified, that Accounting>> Invoices -> Receive Money -> Verified that when click on 'Save' button User should be redirects to Receive Payments page to select new Tenant for receivables");
+				}
+				
+				@Test(priority = 73, enabled = true, groups = { "Smoke", "Harinder" })
+				public void P2M6_239() throws InterruptedException {
+					extentTest = extentReport.startTest(" *H7:P2M6_239","Accounting >> Invoices -> Receive Money -> Verify that if user has deseclected any of the pay checkbox and click on Re-allocate the all checkbox should be autoselected");
+					byId.click(id_InvoiceReceiveMoney, "clicking on 'Receive Money' button");
+					byId.clearThenSetText(id_ReceiveMoneySearchTB, tenantName, "Enter Tenant Name");
+					Thread.sleep(5000);
+					byXpath.click("//*[@id='"+id_ReceiveMoneyListOfTenantGridData+"']//tbody//tr//td[contains(.,'"+tenantName+"')]", "Click on Tenant Name '"+tenantName+"' in 'List of Tenants' grid");
+					byXpath.click(xpath_RecievePaymentSecndTable+"//tbody//tr[1]//td[last()-1]//input", "Uncheck the checkbox for first Row in second table");
+					int getSizeafterUncheck = byXpath.getSize(xpath_RecievePaymentSecndTable+"//tbody//tr[1]//td[last()-1]//input[@checked='true']", "Get size after uncheck the checkbox");
+					byId.click(id_ReceiveMoneyReAllocateButton, "Click on 'Reallocate' button");
+					int getSizeAfterReallocate = byXpath.getSize(xpath_RecievePaymentSecndTable+"//tbody//tr[1]//td[last()-1]//input[@checked='true']", "Get size after clicking ReAllocate button");
+					Assert.assertTrue(getSizeafterUncheck!=getSizeAfterReallocate, "Checkbox still Uncheked/Reallocate button is not working");
+					extentTest.log(LogStatus.INFO, "*H7 : Verified, that Accounting>> Invoices -> Receive Money -> Verified that if user has deseclected any of the pay checkbox and click on Re-allocate the all checkbox should be autoselected");
+				}
+				
+				@Test(priority = 74, enabled = true, groups = { "Smoke", "Harinder" })
+				public void P2M6_241_1() throws InterruptedException {
+					extentTest = extentReport.startTest(" *H7:P2M6_241_1","Accounting >> Invoices -> click on checkbox the all records should be selected");
+					byClassName.click("clsallChk", "Click on 'Check All' check all checkbox in Invoices listing table");
+					List<WebElement> list = byXpath.getElements("//input[@class='chkDone']", "Get all the CheckBoxes in invoice listing table");
+					boolean isChecked;
+					for (WebElement webElement : list) {
+						isChecked = webElement.isSelected();
+						Assert.assertEquals(isChecked, true, "CheckBox is not checked clicking on 'Check All' checkbox.");}
+					extentTest.log(LogStatus.INFO, "*H7 : Verified, that Accounting >> Invoices -> click on checkbox all records should be selected");
+				}
+
+				@Test(priority = 75, enabled = true, groups = { "Smoke", "Harinder" })
+				public void P2M6_241_2() throws InterruptedException {
+					extentTest = extentReport.startTest(" *H7:P2M6_241_2","Accounting >> Invoices -> user should also able to select only one check box from Invoices table");
+					List<WebElement> list = byXpath.getElements("//input[@class='chkDone']", "Get all the CheckBoxes in invoice listing table");
+					boolean isChecked;
+					har : for (WebElement webElement : list) {
+						webElement.click();
+						isChecked = webElement.isSelected();
+						Assert.assertEquals(isChecked, true, "CheckBox is not checked");
+					break har;	
+					}
+					extentTest.log(LogStatus.INFO, "*H7 : Verified, that Accounting >> Invoices -> user should also able to select only one check box from Invoices table");
+				}
+				
+				@Test(priority = 76, enabled = true, groups = { "Smoke", "Harinder" })
+				public void P2M6_241_3() throws InterruptedException {
+					extentTest = extentReport.startTest(" *H7:P2M6_241_3","Accounting >> Invoices -> user should also able to Deselect only one check box from Invoices table");
+					byClassName.click("clsallChk", "Click on 'Check All' check all checkbox in Invoices listing table");
+					List<WebElement> list = byXpath.getElements("//input[@class='chkDone']", "Get all the CheckBoxes in invoice listing table");
+					boolean isChecked;
+					har : for (WebElement webElement : list) {
+						webElement.click();
+						isChecked = webElement.isSelected();
+						Assert.assertEquals(isChecked, false, "Unable to Deselect the CheckBox");
+					break har;	
+					}
+					extentTest.log(LogStatus.INFO, "*H7 : Verified, that Accounting >> Invoices -> user should also able to Deselect only one check box from Invoices table");
+				}
+				
+				@Test(priority = 77, enabled = true, groups = { "Smoke", "Harinder" })
+				public void P2M6_241_4() throws InterruptedException {
+					extentTest = extentReport.startTest(" *H7:P2M6_241_4","Accounting >> Invoices -> user should also able to select Multiple check box from Invoices table");
+					List<WebElement> list = byXpath.getElements("//input[@class='chkDone']", "Get all the CheckBoxes in invoice listing table");
+					boolean isChecked;
+					for (WebElement webElement : list) {
+						webElement.click();
+						isChecked = webElement.isSelected();
+						Assert.assertEquals(isChecked, true, "CheckBox is not checked");
+					}
+					extentTest.log(LogStatus.INFO, "*H7 : Verified, that Accounting >> Invoices -> user should also able to select Multiple check box from Invoices table");
+				}
+				
+				@Test(priority = 78, enabled = true, groups = { "Smoke", "Harinder" })
+				public void P2M6_241_5() throws InterruptedException {
+					extentTest = extentReport.startTest(" *H7:P2M6_241_5","Accounting >> Invoices -> user should also able to Deselect Multiple check box from Invoices table");
+					byClassName.click("clsallChk", "Click on 'Check All' check all checkbox in Invoices listing table");
+					List<WebElement> list = byXpath.getElements("//input[@class='chkDone']", "Get all the CheckBoxes in invoice listing table");
+					boolean isChecked;
+					for (WebElement webElement : list) {
+						webElement.click();
+						isChecked = webElement.isSelected();
+						Assert.assertEquals(isChecked, false, "Unable to Select multiple CheckBox in Invoices table");
+					}
+					extentTest.log(LogStatus.INFO, "*H7 : Verified, that Accounting >> Invoices -> user should also able to Deselect Multiple check box from Invoices table");
+				}
+				
+				@Test(priority = 79, enabled = true, groups = { "Smoke", "Harinder" })
+				public void P2M6_242() throws InterruptedException {
+					extentTest = extentReport.startTest(" *H7:P2M6_242","Accounting >> Invoices -> user should also able to Deselect Multiple check box from Invoices table");
+					byClassName.click("clsallChk", "Click on 'Check All' check all checkbox in Invoices listing table");
+					List<WebElement> list = byXpath.getElements("//input[@class='chkDone']", "Get all the CheckBoxes in invoice listing table");
+					boolean isChecked;
+					for (WebElement webElement : list) {
+						webElement.click();
+						isChecked = webElement.isSelected();
+						Assert.assertEquals(isChecked, false, "Unable to Deselect multiple CheckBox in Invoices table");
+					}
+					extentTest.log(LogStatus.INFO, "*H7 : Verified, that Accounting >> Invoices -> user should also able to Deselect Multiple check box from Invoices table");
+				}
+				
+				@Test(priority = 80, enabled = true, groups = { "Smoke", "Harinder" })
+				public void P2M6_246_2() throws InterruptedException {
+					extentTest = extentReport.startTest(" *H7:P2M6_246_2","Accounting >> Invoices -> The status of the Invoice should be displayed as UnPaid");
+					addInvoice(tenantName, "", value_Amount);
+					String getStatus = byXpath.getText("//*[@id='"+id_InvoiceListingTable+"']//tbody//tr//td[contains(.,'"+tenantName+"')]//preceding-sibling::td[2]//font", "Get Status of recently added invoice");
+					Assert.assertEquals(getStatus, "UnPaid", "Status column is not updated correctly/ status should be displayed as 'UnPaid' for recently added invoice");
+					extentTest.log(LogStatus.INFO, "*H7 : Verified, that Accounting >> Invoices -> The status of the Invoice should be displayed as UnPaid");
+				}
+				
+				@Test(priority = 81, enabled = true, groups = { "Smoke", "Harinder" })
+				public void P2M6_246_3() throws InterruptedException {
+					extentTest = extentReport.startTest(" *H7:P2M6_246_3","Accounting >> Invoices -> Unpaid status should be displayed in Red color.");
+					//addInvoice(tenantName, "", value_Amount);
+					String getStatusColor = byXpath.getAttribute("//*[@id='"+id_InvoiceListingTable+"']//tbody//tr//td[contains(.,'"+tenantName+"')]//preceding-sibling::td[2]//font", "color", "Get Color of Status for recently added invoice");
+					Assert.assertEquals(getStatusColor, "red", "Color of Status is not 'Red' for recently added invoice");
+					extentTest.log(LogStatus.INFO, "*H7 : Verified, that Accounting >> Invoices -> Unpaid status should be displayed in Red color. ");
+				}
+				
+				@Test(priority = 82, enabled = true, groups = { "Smoke", "Harinder" })
+				public void P2M6_246_1() throws InterruptedException {
+					extentTest = extentReport.startTest(" *H7:P2M6_246_1","Accounting >> Invoices -> The status of the Invoice should be displayed as Paid");
+					//addInvoice(tenantName, "", value_Amount);
+					byXpath.click("//*[@id='"+id_InvoiceListingTable+"']//tbody//tr//td[contains(.,'"+tenantName+"')]", "Click on recently added invoice");
+					byId.click(id_ReceiveMoneySaveButton, "Click on Save button to pay invoice");
+					getDriver().navigate().refresh();
+					String getStatus = byXpath.getText("//*[@id='"+id_InvoiceListingTable+"']//tbody//tr//td[contains(.,'"+tenantName+"')]//preceding-sibling::td[2]", "Get Status of recently paid invoice");
+					Assert.assertEquals(getStatus, "Paid", "Status column is not updated correctly/ status should be displayed as 'UnPaid' for recently added invoice");
+					extentTest.log(LogStatus.INFO, "*H7 : Verified, that Accounting >> Invoices -> The status of the Invoice should be displayed as Paid");
+				}
+				
+				@Test(priority = 83, enabled = true, groups = { "Smoke", "Harinder" })
+				public void P2M6_251() throws InterruptedException {
+					extentTest = extentReport.startTest(" *H7:P2M6_251","Accounting >> Invoices -> Ensure that the Total Amount of the Invoice, Amount Paid of the Invoice and Amount Due for the Invoice should be displayed in this field.");
+					//addInvoice(tenantName, "", value_Amount);
+					String getAmountDue = byXpath.getAttribute("//*[@id='"+id_InvoiceListingTable+"']//tbody//tr//td[contains(.,'"+tenantName+"')]//following-sibling::td[3]","title", "Get amount Due Column Data");
+					String[] arr = getAmountDue.split(" ");
+					System.out.println("arr : " +arr[0] +", "+ arr[1]+", "+ arr[2]+", "+ arr[3]);
+					String invoiceAmt = arr[1];
+					int getIndInvoiceAmt = invoiceAmt.indexOf("A");
+					invoiceAmt = invoiceAmt.substring(2, getIndInvoiceAmt);
+					se.assertEquals(value_Amount+".00", invoiceAmt, "Wrong Invoice amount is displaying");
+					String AmtPaid = arr[2];
+					int getIndAmtPaid = AmtPaid.indexOf("A");
+					AmtPaid = AmtPaid.substring(2, getIndAmtPaid);
+					se.assertEquals(value_Amount+".00", AmtPaid, "Wrong Paid amount is displaying");
+					String AmtDue = arr[3];
+					AmtDue = AmtDue.substring(2);
+					se.assertEquals("0.00", AmtDue, "Wrong Amount Due is displaying");
+					se.assertAll();
+					extentTest.log(LogStatus.INFO, "*H7 : Verified, that Accounting >> Invoices -> Verified the Total Amount of the Invoice, Amount Paid of the Invoice and Amount Due for the Invoice should be displayed in this field.");
+				}
+				
+				@Test(priority = 84, enabled = true, groups = { "Smoke", "Harinder" })
+				public void P2M6_252() throws InterruptedException {
+					extentTest = extentReport.startTest(" *H7:P2M6_252","Accounting >> Invoices -> Ensure that Edit and View Details attributes should display in the Action DDL");
+					List<String> actualActionOptions = new ArrayList<>();
+					List<String> expectedActionOptions = new ArrayList<>();
+					expectedActionOptions.add("SELECT");expectedActionOptions.add("EDIT");expectedActionOptions.add("VIEW DETAIL");
+					//addInvoice(tenantName, "", value_Amount);
+					List<WebElement> li = byXpath.getElements("//*[@id='"+id_InvoiceListingTable+"']//tbody//tr//td[contains(.,'"+tenantName+"')]//following-sibling::td//select//option", "Get Action column's elements");
+					for (WebElement webElement : li) {
+						String getOptions = webElement.getText();
+						actualActionOptions.add(getOptions);
+					}
+					Assert.assertEquals(actualActionOptions, expectedActionOptions,"Action column attributes has been changed/ missing");
+					extentTest.log(LogStatus.INFO, "*H7 : Verified, that Accounting >> Invoices -> Verified Edit and View Details attributes are displayed in the Action DDL");
+				}
+				
+				@Test(priority = 85, enabled = true, groups = { "Smoke", "Harinder" })
+				public void P2M6_253_1() throws InterruptedException {
+					extentTest = extentReport.startTest(" *H7:P2M6_253_1","Accounting >> Edit Invoices -> Ensure that user is able to edit the Invoice Date");
+					addInvoice(tenantName, "", value_Amount);
+					byXpath.selectByVisibleText("//*[@id='"+id_InvoiceListingTable+"']//tbody//tr//td[contains(.,'"+tenantName+"')]//following-sibling::td//select","Edit", "Select Edit option against newly added invoice");
+					String getDefalutDate = byId.getAttribute(id_EditInvoiceInvoiceDate, "value", "Get default selected date");
+					byId.click(id_EditInvoiceInvoiceDate, "Click on Invoice Date field to open calendar");
+					VendorPortalCommons.SelectNextDateFromTodaysDate();
+					String getNewSelectedDate = byId.getAttribute(id_EditInvoiceInvoiceDate, "value", "Get New selected date");
+					Assert.assertTrue(!(getDefalutDate.equals(getNewSelectedDate)),"User is unable to Edit Invoice Date field");
+					extentTest.log(LogStatus.INFO, "*H7 : Verified, that Accounting >> Edit Invoices -> Verified user is able to edit the Invoice Date");
+				}				
+}

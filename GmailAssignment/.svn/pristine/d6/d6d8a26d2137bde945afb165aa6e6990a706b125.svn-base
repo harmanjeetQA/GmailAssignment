@@ -1,0 +1,881 @@
+package p2M5.vendorPortal;
+
+import java.awt.AWTException;
+import java.awt.Robot;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.CookieHandler;
+import java.net.CookieManager;
+import java.net.CookiePolicy;
+import java.net.CookieStore;
+import java.net.HttpCookie;
+import java.net.URL;
+import java.net.URLConnection;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.Select;
+import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
+import org.testng.asserts.SoftAssert;
+
+import common.ApexCommon;
+import objectRepository.IWorkOrder;
+
+public class WorkOrder extends ApexCommon implements IWorkOrder{
+		
+	@BeforeClass(alwaysRun = true, groups = {"Smoke", "Regression", "Jasmeet"}, enabled = true)
+	public void beforeClass() throws InterruptedException {
+		login(null, userName, password);
+	}
+	
+	@BeforeMethod(alwaysRun = true, groups = {"Smoke", "Regression", "Jasmeet"}, enabled = true)
+	public void refresh() {
+		getDriver().navigate().refresh();
+		byClassName.click("logo", ": Click on company logo.");
+		//byId.click(id_CompanyLogo, ": Click on company logo.");
+	}
+	
+	public String newWorkOrder(String propertyName, String radioBtn, String Frequency)
+			throws InterruptedException, IOException, AWTException
+	{
+		privateBrowser();
+		login("", adminEmail, password);		
+		utility.goTo(URL_AddWorkOrder, "Add New Work Order");
+		if (!byId.isSelected(id_OneTimeRadioBTNNewWorkOrder, "One Time Radio Btn")) {
+			byId.click(id_OneTimeRadioBTNNewWorkOrder, "One Time Radio Btn");
+		}
+		byId.clearThenSetText(id_PropertyNameNewWorkOrder, propertyName, "Property Name");
+		Thread.sleep(1000);
+		Robot robot = new Robot();
+		robot.keyPress(java.awt.event.KeyEvent.VK_DOWN);
+		robot.keyRelease(java.awt.event.KeyEvent.VK_DOWN);
+		robot.keyPress(java.awt.event.KeyEvent.VK_ENTER);
+		robot.keyRelease(java.awt.event.KeyEvent.VK_ENTER);
+		
+		Thread.sleep(1000);
+		String workOrderNo = byId.getAttribute(id_WorkOrderNoNewWorkOrder, "value", "WorkOrder No");
+		
+		
+		if (!byId.isSelected(id_VendorPortalChkBoxNewWorkOrder, "Publish to Vendor Portal")) {
+			byId.click(id_VendorPortalChkBoxNewWorkOrder, "Publish to Vendor Portal");
+		}
+		byId.click(id_VendorNameNewWorkOrder, "Vendor Name");
+		List<WebElement> li = byXpath.getElements(xpath_EmailColumnnVendorList,
+				"Get Emails of Vendors");
+		for (WebElement webElement : li) {
+			if (webElement.getText().contains(email)) {
+				webElement.click();
+				break;
+			}
+		}			
+		byId.click(id_SaveBTNNewWorkOrder, "Save Btn");
+		Thread.sleep(2000);
+		driverClose();
+		return workOrderNo;
+	}
+		
+	//************************Class Variables*******************#
+	
+	static String prop[] = null;
+	static String workOrderNo = null;
+	String vendorEmail = "jjasmeetsingh@yopmail.com";
+	
+	//**********************Test Cases Start*******************#
+	
+	@Test(groups = {"Smoke", "Jasmeet"}, enabled = true)
+	public void VNDR_P2M5_139(){
+		extentTest = extentReport.startTest("VNDR_P2M5_139", "JS: Vendor Portal >> Work Order >> "
+				+ "Ensure that work order tab should be clickable and when click it should be open");
+		
+		Assert.assertTrue(byId.getAttribute(id_WorkOrderTab, "href", ": href value").
+				contains("/Vendor/WorkOrderVendor"), "Work order tab is not clickable");
+		byId.click(id_WorkOrderTab, ": Work Order Tab Clicked");
+		Assert.assertTrue(getDriver().getCurrentUrl().contains("/Vendor/WorkOrderVendor"),
+				"When click Work Order Tab it is not opening");
+		}
+	
+	@Test(groups = {"Smoke", "Jasmeet"}, enabled = true)
+	public void VNDR_P2M5_140(){
+		extentTest = extentReport.startTest("VNDR_P2M5_140", "JS: Vendor Portal >> Work Order >> "
+				+ "On work order tab click Open tab, Closed Tab, Radio Button, List of Work Orders should open");
+		
+		byId.click(id_WorkOrderTab, ": Work Order Tab Clicked");
+		Assert.assertEquals(byId.getSize(id_OpenTabWorkOrder, ": Open is Present?"), 1, 
+				"'Open Tab' is not there ");
+		Assert.assertEquals(byId.getSize(id_ClosedTabWorkOrder, ": Closed is Present?"), 1, 
+				"'Closed Tab' is not there ");
+		Assert.assertEquals(byXpath.getSize(xpath_ClosedTabWorkOrder, ": Radio buttons are  present?"), 2, 
+				"'Radio Button (One Time and Recurring)' are not there ");
+		Assert.assertEquals(byClassName.getSize(class_WorkOrderTableTitle, ": 'List of Work Orders' are  present?"),
+				1, "'List of Work Orders' is not there ");
+		}
+	
+	@Test(groups = {"Smoke", "Jasmeet"}, enabled = true)
+	public void VNDR_P2M5_141(){
+		extentTest = extentReport.startTest("VNDR_P2M5_141", "JS: Vendor Portal >> Work Order >> "
+				+ "Ensure that when user click on Work Order tab the Open tab should be the default tab");
+		
+		byId.click(id_WorkOrderTab, ": Work Order Tab Clicked");
+		Assert.assertTrue(byId.getAttribute(id_OpenTabWorkOrder, "class", "Class of OpenTab").
+				contains("active"), "'Open Tab' is not the default tab");
+		
+	}
+	
+	@Test(groups = {"Smoke", "Jasmeet"}, enabled = true)
+	public void VNDR_P2M5_142(){
+		extentTest = extentReport.startTest("VNDR_P2M5_142", "JS: Vendor Portal >> Work Order >> "
+				+ "Ensure that 'One time' radio button should be selected by default");
+		
+		byId.click(id_WorkOrderTab, ": Work Order Tab Clicked");
+		Assert.assertTrue(byId.isSelected(id_OneTimeRadioBtnWorkOrder, "One Time RadioBtn check"),
+				"'One time' radio button is not selected by default");
+	}
+	
+	@Test(groups = {"Smoke", "Jasmeet"}, enabled = true)
+	public void VNDR_P2M5_143() throws IOException, InterruptedException, AWTException{
+		extentTest = extentReport.startTest("VNDR_P2M5_143", "JS: Vendor Portal >> Work Order >> "
+				+ "Ensure that work orders with one time frequency should be displayed in the List");
+		privateBrowser();
+		login("", adminEmail, password);
+		if(prop == null)
+			prop = addProperty();
+		System.out.println("Property name is ===== "+ prop[0]+ " and porfolio is ===== " + prop[1]);
+		
+		if(workOrderNo == null)
+			workOrderNo = addWorkOrder(prop[0], "OneTime", "", vendorEmail, "");
+		
+		driverClose();
+		
+		byId.click(id_WorkOrderTab, ": Work Order Tab Clicked");
+		if (!byId.isSelected(id_OneTimeRadioBtnWorkOrder, "One Time Radio Btn")) {
+			byId.click(id_OneTimeRadioBtnWorkOrder, "One Time Radio Btn");
+		}
+		//System.out.println(byId.getText(id_ListingTableWorkOrder,"WorkOrder Listing Table"));
+		Assert.assertTrue(byId.getText(id_ListingTableWorkOrder,"WorkOrder Listing Table").contains(workOrderNo),
+				"Work orders with one time frequency is not displaying in the List");
+	}
+	
+	@Test(groups = {"Smoke", "Jasmeet"}, enabled = true)
+	public void VNDR_P2M5_144(){
+		extentTest = extentReport.startTest("VNDR_P2M5_144", "JS: Vendor Portal >> Work Order >>"
+				+ "Recurring Radio Button Ensure that the dropdown should be displayed.");
+		
+		byId.click(id_WorkOrderTab, ": Work Order Tab Clicked");
+		if (!byId.isSelected(id_ReoccuringRadioBtnWorkOrder, "Reoccuring Radio Btn")) {
+			byId.click(id_ReoccuringRadioBtnWorkOrder, ": Reoccuring radio Btn Checked");
+		}
+		Assert.assertTrue(byId.isDisplayed(id_ListingFrequencyDDLWorkOrder, "Filter DDL"),
+				"The dropdown is not displaying.");
+	}
+	
+	@Test(groups = {"Smoke", "Jasmeet"}, enabled = true)
+	public void VNDR_P2M5_145(){
+		extentTest = extentReport.startTest("VNDR_P2M5_145", "JS: Vendor Portal >> Work Order >>"
+				+ "Ensure that Frequency Dropdown should displayed all options");
+		
+		byId.click(id_WorkOrderTab, ": Work Order Tab Clicked");
+		if (!byId.isSelected(id_ReoccuringRadioBtnWorkOrder, "Reoccuring Radio Btn")) {
+			byId.click(id_ReoccuringRadioBtnWorkOrder, ": Reoccuring radio Btn Checked");
+		}
+		List<WebElement> li = byId.getElement(id_ListingFrequencyDDLWorkOrder,
+				"All DDL options").findElements(By.tagName("option"));
+		String []ddlOptions = new String[li.size()];
+		byte i = 0;
+		for (WebElement webElement : li) {
+			ddlOptions[i] = webElement.getText();
+			i++;
+		}
+		Assert.assertEqualsNoOrder(ddlOptions, ddlOptionsValue,
+				"Frequency Dropdown is not displaying all options");
+	}
+	
+	//@Test(groups = {"Smoke", "Jasmeet"}, enabled = true)
+	public void VNDR_P2M5_146() throws InterruptedException, IOException, AWTException{
+		extentTest = extentReport.startTest("VNDR_P2M5_146", "JS: Vendor Portal >> Work Order >> "
+				+ "Ensure that workorder for that recurring frequency option should be displayed in grid");
+		
+		privateBrowser();
+		login("", adminEmail, password);
+		if(prop == null)
+			prop = addProperty();
+		System.out.println("Property name is ===== "+ prop[0]+ " and porfolio is ===== " + prop[1]);
+		
+		for(byte i = 1; i < ddlOptionsValue.length; i++)
+		{
+			System.out.println("=============================="+i+" iteration ===========================");
+			driverFlag = false;
+			
+			String workOrderNo = addWorkOrder(prop[0], "Recurring", ddlOptionsValue[i], vendorEmail, "");
+			
+			driverFlag = true;
+			
+			byId.click(id_WorkOrderTab, ": Work Order Tab");
+			if (!byId.isSelected(id_ReoccuringRadioBtnWorkOrder, "Reoccuring Radio Btn")) {
+				byId.click(id_ReoccuringRadioBtnWorkOrder, "Reoccuring Radio Btn");
+			}
+			byId.selectByVisibleText(id_ListingFrequencyDDLWorkOrder, ddlOptionsValue[i],
+					ddlOptionsValue[i] +" Reoccuring Frequency slected");
+			
+			//System.out.println(byId.getText(id_ListingTableWorkOrder,"WorkOrder Listing Table"));
+			Assert.assertTrue(byId.getText(id_ListingTableWorkOrder,"WorkOrder Listing Table").contains(workOrderNo),
+					"Work orders with one time frequency is not displaying in the List");
+		}
+	}
+	
+	@Test(groups = {"Smoke", "Jasmeet"}, enabled = true)
+	public void VNDR_P2M5_147() throws IOException, InterruptedException, AWTException{
+		extentTest = extentReport.startTest("VNDR_P2M5_147", "JS: Vendor Portal >> Work Order >> "
+				+ "Ensure that all closed workorders should be displayed in List of work Order Grid");
+		privateBrowser();
+		login("", adminEmail, password);
+		if(prop == null)
+			prop = addProperty();
+		System.out.println("Property name is ===== "+ prop[0]+ " and porfolio is ===== " + prop[1]);
+		
+		String workOrderNo = addWorkOrder(prop[0], "OneTime", "", vendorEmail, "Closed");
+		
+		driverClose();
+		
+		byId.click(id_WorkOrderTab, ": Work Order Tab Clicked");
+		byId.click(id_ClosedTabWorkOrder, ": Closed Tab Clicked");
+		
+		if (!byId.isSelected(id_OneTimeRadioBtnWorkOrder, "One Time Radio Btn")) {
+			byId.click(id_OneTimeRadioBtnWorkOrder, "One Time Radio Btn");
+		}
+		//System.out.println(byId.getText(id_ListingTableWorkOrder,"WorkOrder Listing Table"));
+		Assert.assertTrue(byId.getText(id_ListingTableWorkOrder,"WorkOrder Listing Table").contains(workOrderNo),
+				"Closed workorder is not displaying in List of work Order Grid");
+	}
+	
+	@Test(groups = {"Smoke", "Jasmeet"}, enabled = true)
+	public void VNDR_P2M5_148() throws IOException, InterruptedException, AWTException{
+		extentTest = extentReport.startTest("VNDR_P2M5_148", "JS: Vendor Portal >> Work Order >> "
+				+ "Ensure that OneTime closed work order should be displayed in List of Work Order Grid");
+		privateBrowser();
+		login("", adminEmail, password);
+		if(prop == null)
+			prop = addProperty();
+		System.out.println("Property name is ===== "+ prop[0]+ " and porfolio is ===== " + prop[1]);
+		
+		String workOrderNo = addWorkOrder(prop[0], "OneTime", "", vendorEmail, "Closed");
+		
+		driverClose();
+		
+		byId.click(id_WorkOrderTab, ": Work Order Tab Clicked");
+		byId.click(id_ClosedTabWorkOrder, ": Closed Tab Clicked");
+		
+		if (!byId.isSelected(id_OneTimeRadioBtnWorkOrder, "One Time Radio Btn")) {
+			byId.click(id_OneTimeRadioBtnWorkOrder, "One Time Radio Btn");
+		}
+		//System.out.println(byId.getText(id_ListingTableWorkOrder,"WorkOrder Listing Table"));
+		Assert.assertTrue(byId.getText(id_ListingTableWorkOrder,"WorkOrder Listing Table").contains(workOrderNo),
+				"OneTime Closed workorder is not displaying in List of work Order Grid");
+	}
+	
+	@Test(groups = {"Smoke", "Jasmeet"}, enabled = true)
+	public void VNDR_P2M5_149(){
+		extentTest = extentReport.startTest("VNDR_P2M5_149", "JS: Vendor Portal>> Work Order>>Closed>> "
+				+ "Recurring Radio Button Ensure that the dropdown should be displayed.");
+		
+		byId.click(id_WorkOrderTab, ": Work Order Tab Clicked");
+		byId.click(id_ClosedTabWorkOrder, ": Closed Tab Clicked");
+		
+		if (!byId.isSelected(id_ReoccuringRadioBtnWorkOrder, "Reoccuring Radio Btn")) {
+			byId.click(id_ReoccuringRadioBtnWorkOrder, ": Reoccuring radio Btn Checked");
+		}
+		Assert.assertTrue(byId.isDisplayed(id_ListingFrequencyDDLWorkOrder, "Filter DDL"),
+				"Frequency dropdown is not displaying.");
+	}
+	
+	@Test(groups = {"Smoke", "Jasmeet"}, enabled = true)
+	public void VNDR_P2M5_150(){
+		extentTest = extentReport.startTest("VNDR_P2M5_150", "JS: Vendor Portal>> Work Order>> Closed"
+				+ "Ensure that Frequency Dropdown should displayed all options");
+		
+		byId.click(id_WorkOrderTab, ": Work Order Tab Clicked");
+		byId.click(id_ClosedTabWorkOrder, ": Closed Tab Clicked");
+		
+		if (!byId.isSelected(id_ReoccuringRadioBtnWorkOrder, "Reoccuring Radio Btn")) {
+			byId.click(id_ReoccuringRadioBtnWorkOrder, ": Reoccuring radio Btn Checked");
+		}
+		List<WebElement> li = byId.getElement(id_ListingFrequencyDDLWorkOrder,
+				"All DDL options").findElements(By.tagName("option"));
+		String []ddlOptions = new String[li.size()];
+		byte i = 0;
+		for (WebElement webElement : li) {
+			ddlOptions[i] = webElement.getText();
+			i++;
+		}
+		Assert.assertEqualsNoOrder(ddlOptions, ddlOptionsValue,
+				"Closed>> Frequency Dropdown is not displaying all options");
+	}
+	
+	@Test(groups = {"Smoke", "Jasmeet"}, enabled = true)
+	public void VNDR_P2M5_151() throws IOException, InterruptedException, AWTException{
+		extentTest = extentReport.startTest("VNDR_P2M5_151", "JS: Vendor Portal>> Work Order>> Closed>>"
+				+ "Ensure that workorder for recurring frequency option should be displayed in grid.");
+		privateBrowser();
+		login("", adminEmail, password);
+		if(prop == null)
+			prop = addProperty();
+		System.out.println("Property name is ===== "+ prop[0]+ " and porfolio is ===== " + prop[1]);
+		
+		String workOrderNo = addWorkOrder(prop[0], "Recurring", "", vendorEmail, "");
+		
+		driverClose();
+		
+		byId.click(id_WorkOrderTab, ": Work Order Tab Clicked");
+		byId.click(id_ClosedTabWorkOrder, ": Closed Tab Clicked");
+		
+		if (!byId.isSelected(id_ReoccuringRadioBtnWorkOrder, "Reoccuring Radio Btn")) {
+			byId.click(id_ReoccuringRadioBtnWorkOrder, "Reoccuring Radio Btn");
+		}
+		//System.out.println(byId.getText(id_ListingTableWorkOrder,"WorkOrder Listing Table"));
+		Assert.assertTrue(byId.getText(id_ListingTableWorkOrder,"WorkOrder Listing Table").contains(workOrderNo),
+				"Work orders with recurring frequency is not displaying in the List");
+	}
+	
+	@Test(groups = {"Smoke", "Jasmeet"}, enabled = true)
+	public void VNDR_P2M5_152(){
+		extentTest = extentReport.startTest("VNDR_P2M5_152", "JS: Vendor Portal >> Work Order >> "
+				+ "Ensure that Given attributes should be displayed in the Grid");
+		
+		byId.click(id_WorkOrderTab, ": Work Order Tab Clicked");
+		String metaData = byClassName.getText(class_WorkOrderGridLabels, " Coloumn Names");
+		
+		for (String string : value_ArrayColoumnsWorkOrderGrid) {
+			Assert.assertTrue(metaData.contains(string),
+					string+ " Column is not in the Work Order grid");
+		}
+	}
+	
+	@Test(groups = {"Smoke", "Jasmeet"}, enabled = true)
+	public void VNDR_P2M5_153() throws IOException, InterruptedException, AWTException{
+		extentTest = extentReport.startTest("VNDR_P2M5_153", "JS: Vendor Portal >> Work Order >> "
+				+ "Ensure that Work Order Number should be displayed in Grid "
+				+ "which is generated while creating Work Order from Company Admin.");
+		privateBrowser();
+		login("",  adminEmail, password);
+		if(prop == null)
+			prop = addProperty();
+		System.out.println("Property name is ===== "+ prop[0]+ " and porfolio is ===== " + prop[1]);
+		
+		if(workOrderNo == null)
+			workOrderNo = addWorkOrder(prop[0], "OneTime", "", vendorEmail, "");
+		
+		driverClose();
+		
+		byId.click(id_WorkOrderTab, ": Work Order Tab Clicked");
+		if (!byId.isSelected(id_OneTimeRadioBtnWorkOrder, "One Time Radio Btn")) {
+			byId.click(id_OneTimeRadioBtnWorkOrder, "One Time Radio Btn");
+		}
+		//System.out.println(byId.getText(id_ListingTableWorkOrder,"WorkOrder Listing Table"));
+		Assert.assertTrue(byId.getText(id_ListingTableWorkOrder,"WorkOrder Listing Table").contains(workOrderNo),
+				"Work orders no. is not displaying in the Grid");
+	}
+	
+	@Test(groups = {"Smoke", "Jasmeet"}, enabled = true)
+	public void VNDR_P2M5_154() throws IOException, InterruptedException, AWTException{
+		extentTest = extentReport.startTest("VNDR_P2M5_154", "JS: Vendor Portal >> Work Order >> "
+				+ "Ensure that Work Order Category should be displayed in Grid "
+				+ "which is generated while creating Work Order from Company Admin.");
+		privateBrowser();
+		login("",  adminEmail, password);
+		if(prop == null)
+			prop = addProperty();
+		System.out.println("Property name is ===== "+ prop[0]+ " and porfolio is ===== " + prop[1]);
+		
+		if(workOrderNo == null)
+			workOrderNo = addWorkOrder(prop[0], "OneTime", "", vendorEmail, "");
+		
+		getDriver().navigate().refresh();
+		utility.goTo(URL_WorkOrders, "Work Orders Page open");
+		List<WebElement> li = byXpath.getElements(xpath_TblRowsListWorkOrder, "Work Oder Rows");
+		String workOrderCategory = null;
+		for (WebElement webElement : li) {
+			if (webElement.getText().contains(workOrderNo)) {
+				workOrderCategory =webElement.findElements(By.tagName("td")).get(2).getText();
+				break;
+			}
+		}
+		System.out.println("+==================+"+workOrderCategory);
+		
+		driverClose();
+		
+		byId.click(id_WorkOrderTab, ": Work Order Tab Clicked");
+		if (!byId.isSelected(id_OneTimeRadioBtnWorkOrder, "One Time Radio Btn")) {
+			byId.click(id_OneTimeRadioBtnWorkOrder, "One Time Radio Btn");
+		}
+		
+		li = byXpath.getElements(xpath_TblRowsListWorkOrder, "Work Oder Rows");
+		for (WebElement webElement : li) {
+			if (webElement.getText().contains(workOrderNo)) {
+				Assert.assertTrue(webElement.findElements(By.tagName("td")).get(2).getText().contains(workOrderCategory),
+						"Work orders Category is not displaying in the Grid");
+				break;
+			}
+		}
+		System.out.println(byId.getText(id_ListingTableWorkOrder,"WorkOrder Listing Table"));
+		Assert.assertTrue(byId.getText(id_ListingTableWorkOrder,"WorkOrder Listing Table").contains(workOrderCategory),
+				"Work orders Category is not displaying in the Grid");
+	}
+	
+	@Test(groups = {"Smoke", "Jasmeet"}, enabled = true)
+	public void VNDR_P2M5_155() throws IOException, InterruptedException, AWTException{
+		extentTest = extentReport.startTest("VNDR_P2M5_155", "JS: Vendor Portal >> Work Order >> "
+				+ "View Vendor >> Ensure that the name of the Vendor should be displayed here");
+		privateBrowser();
+		login("",  adminEmail, password);
+		if(prop == null)
+			prop = addProperty();
+		System.out.println("Property name is ===== "+ prop[0]+ " and porfolio is ===== " + prop[1]);
+		
+		if(workOrderNo == null)
+			workOrderNo = addWorkOrder(prop[0], "OneTime", "", vendorEmail, "");
+		
+		driverClose();
+		
+		String vendorName = byId.getAttribute(id_VendorName, "value", "Vendor Name");
+		System.out.println("Vendor name is ============"+vendorName);
+		byId.click(id_WorkOrderTab, ": Work Order Tab Clicked");
+		if (!byId.isSelected(id_OneTimeRadioBtnWorkOrder, "One Time Radio Btn")) {
+			byId.click(id_OneTimeRadioBtnWorkOrder, "One Time Radio Btn");
+		}
+		List<WebElement> li = byXpath.getElements(xpath_TblRowsListWorkOrder, "Work Oder Rows");
+		for (WebElement webElement : li) {
+			if (webElement.getText().contains(workOrderNo)) {
+				Assert.assertTrue(webElement.findElements(By.tagName("td")).get(3).getText().
+						contains(vendorName), "Vendor Name is not displaying in the Grid");
+				break;
+			}
+		}
+	}
+	
+	@Test(groups = {"Smoke", "Jasmeet"}, enabled = true)
+	public void VNDR_P2M5_156() throws IOException, InterruptedException, AWTException{
+		extentTest = extentReport.startTest("VNDR_P2M5_156", "JS: Vendor Portal >> Work Order >> "
+				+ "View Property >> Ensure that the Name of the Property should be displayed here");
+		privateBrowser();
+		login("",  adminEmail, password);
+		if(prop == null)
+			prop = addProperty();
+		System.out.println("Property name is ===== "+ prop[0]+ " and porfolio is ===== " + prop[1]);
+		
+		if(workOrderNo == null)
+			workOrderNo = addWorkOrder(prop[0], "OneTime", "", vendorEmail, "");
+		
+		driverClose();
+		
+		byId.click(id_WorkOrderTab, ": Work Order Tab Clicked");
+		if (!byId.isSelected(id_OneTimeRadioBtnWorkOrder, "One Time Radio Btn")) {
+			byId.click(id_OneTimeRadioBtnWorkOrder, "One Time Radio Btn");
+		}
+		List<WebElement> li = byXpath.getElements(xpath_TblRowsListWorkOrder, "Work Oder Rows");
+		for (WebElement webElement : li) {
+			if (webElement.getText().contains(workOrderNo)) {
+				Assert.assertTrue(webElement.findElements(By.tagName("td")).get(4).getText().
+						contains(prop[0]), "Property Name is not displaying in the Grid");
+				break;
+			}
+		}
+	}
+	
+	@Test(groups = {"Smoke", "Jasmeet"}, enabled = true)
+	public void VNDR_P2M5_157() throws IOException, InterruptedException, AWTException{
+		extentTest = extentReport.startTest("VNDR_P2M5_157", "JS: Vendor Portal >> Work Order >> "
+				+ "View Created Date>> Ensure that work order created date should be displayed here");
+		privateBrowser();
+		login("",  adminEmail, password);
+		if(prop == null)
+			prop = addProperty();
+		System.out.println("Property name is ===== "+ prop[0]+ " and porfolio is ===== " + prop[1]);
+		
+		if(workOrderNo == null)
+			workOrderNo = addWorkOrder(prop[0], "OneTime", "", vendorEmail, "");
+		
+		DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
+		Date date = new Date();
+		String curentDate = dateFormat.format(date);	
+		
+		driverClose();
+		SoftAssert Assert = new SoftAssert();
+		byId.click(id_WorkOrderTab, ": Work Order Tab Clicked");
+		if (!byId.isSelected(id_OneTimeRadioBtnWorkOrder, "One Time Radio Btn")) {
+			byId.click(id_OneTimeRadioBtnWorkOrder, "One Time Radio Btn");
+		}
+		List<WebElement> li = byXpath.getElements(xpath_TblRowsListWorkOrder, "Work Oder Rows");
+		for (WebElement webElement : li) {
+			if (webElement.getText().contains(workOrderNo)) {
+				System.out.println(webElement.getText());
+				String actualDate = webElement.findElements(By.tagName("td")).get(5).getText();
+				System.out.println(actualDate);
+				for (String splitDate : curentDate.split("/")) {
+					System.out.println(splitDate);
+					Assert.assertTrue(actualDate.contains(splitDate),
+							"Work order 'Created Date' should be displayed");					
+				}
+				break;
+			}
+		}
+		Assert.assertAll();
+	}
+	
+	@Test(groups = {"Smoke", "Jasmeet"}, enabled = true)
+	public void VNDR_P2M5_158() throws IOException, InterruptedException, AWTException{
+		extentTest = extentReport.startTest("VNDR_P2M5_158", "JS: Vendor Portal >> Work Order >> "
+				+ "Ensure that the Caller/Requested By should be displayed here");
+		privateBrowser();
+		login("",  adminEmail, password);
+		if(prop == null)
+			prop = addProperty();
+		System.out.println("Property name is ===== "+ prop[0]+ " and porfolio is ===== " + prop[1]);
+		if(workOrderNo == null)
+			workOrderNo = addWorkOrder(prop[0], "OneTime", "", vendorEmail, "");
+				
+		driverClose();
+		
+		byId.click(id_WorkOrderTab, ": Work Order Tab Clicked");
+		if (!byId.isSelected(id_OneTimeRadioBtnWorkOrder, "One Time Radio Btn")) {
+			byId.click(id_OneTimeRadioBtnWorkOrder, "One Time Radio Btn");
+		}
+		List<WebElement> li = byXpath.getElements(xpath_TblRowsListWorkOrder, "Work Oder Rows");
+		for (WebElement webElement : li) {
+			if (webElement.getText().contains(workOrderNo)) {
+				Assert.assertTrue(webElement.findElements(By.tagName("td")).get(6).getText().
+						contains("Vendor"), "'Vendor' is not displayed in Caller/Requested By");
+				break;
+			}
+		}
+	}
+	
+	@Test(groups = {"Smoke", "Jasmeet"}, enabled = true)
+	public void VNDR_P2M5_159() throws IOException, InterruptedException, AWTException{
+		extentTest = extentReport.startTest("VNDR_P2M5_159", "JS: Vendor Portal >> Work Order >> "
+				+ "View Amount>> Ensure that the Amount should be displayed");
+		privateBrowser();
+		login("",  adminEmail, password);
+		if(prop == null)
+			prop = addProperty();
+		System.out.println("Property name is ===== "+ prop[0]+ " and porfolio is ===== " + prop[1]);
+		if(workOrderNo == null)
+			workOrderNo = addWorkOrder(prop[0], "OneTime", "", vendorEmail, "");
+				
+		driverClose();
+		
+		byId.click(id_WorkOrderTab, ": Work Order Tab Clicked");
+		if (!byId.isSelected(id_OneTimeRadioBtnWorkOrder, "One Time Radio Btn")) {
+			byId.click(id_OneTimeRadioBtnWorkOrder, "One Time Radio Btn");
+		}
+		List<WebElement> li = byXpath.getElements(xpath_TblRowsListWorkOrder, "Work Oder Rows");
+		for (WebElement webElement : li) {
+			if (webElement.getText().contains(workOrderNo)) {
+				Assert.assertTrue(webElement.findElements(By.tagName("td")).get(7).getText().
+						contains("10"), "'10' is not displayed in Amount By");
+				break;
+			}
+		}
+	}
+	
+	@Test(groups = {"Smoke", "Jasmeet"}, enabled = true)
+	public void VNDR_P2M5_160() throws IOException, InterruptedException, AWTException{
+		extentTest = extentReport.startTest("VNDR_P2M5_160", "JS: Vendor Portal >> Work Order >> "
+				+ "View Priority>> Ensure that the Priority should be displayed");
+		privateBrowser();
+		login("",  adminEmail, password);
+		if(prop == null)
+			prop = addProperty();
+		System.out.println("Property name is ===== "+ prop[0]+ " and porfolio is ===== " + prop[1]);
+		if(workOrderNo == null)
+			workOrderNo = addWorkOrder(prop[0], "OneTime", "", vendorEmail, "");
+				
+		driverClose();
+		
+		byId.click(id_WorkOrderTab, ": Work Order Tab Clicked");
+		if (!byId.isSelected(id_OneTimeRadioBtnWorkOrder, "One Time Radio Btn")) {
+			byId.click(id_OneTimeRadioBtnWorkOrder, "One Time Radio Btn");
+		}
+		List<WebElement> li = byXpath.getElements(xpath_TblRowsListWorkOrder, "Work Oder Rows");
+		for (WebElement webElement : li) {
+			if (webElement.getText().contains(workOrderNo)) {
+				Assert.assertTrue(webElement.findElements(By.tagName("td")).get(8).getText().
+						contains("Normal"), "'Normal' is not displayed in Priority ");
+				break;
+			}
+		}
+	}
+	
+	@Test(groups = {"Smoke", "Jasmeet"}, enabled = true)
+	public void VNDR_P2M5_161() throws IOException, InterruptedException, AWTException{
+		extentTest = extentReport.startTest("VNDR_P2M5_161", "JS: Vendor Portal >> Work Order >> "
+				+ "View Status>> Ensure that Status should be displayed as Open/Closed/InProgress");
+		privateBrowser();
+		login("",  adminEmail, password);
+		if(prop == null)
+			prop = addProperty();
+		System.out.println("Property name is ===== "+ prop[0]+ " and porfolio is ===== " + prop[1]);
+		if(workOrderNo == null)
+			workOrderNo = addWorkOrder(prop[0], "OneTime", "", vendorEmail, "");
+				
+		driverClose();
+		
+		byId.click(id_WorkOrderTab, ": Work Order Tab Clicked");
+		if (!byId.isSelected(id_OneTimeRadioBtnWorkOrder, "One Time Radio Btn")) {
+			byId.click(id_OneTimeRadioBtnWorkOrder, "One Time Radio Btn");
+		}
+		List<WebElement> li = byXpath.getElements(xpath_TblRowsListWorkOrder, "Work Oder Rows");
+		for (WebElement webElement : li) {
+			if (webElement.getText().contains(workOrderNo)) {
+				String status = webElement.findElements(By.tagName("td")).get(9).getText();
+				Assert.assertTrue(status.equals("Open") || status.equals("Closed") || status.equals("InProgress"),
+						"'Open/Closed/InProgress' is not displayed in Status");
+				break;
+			}
+		}
+	}
+	
+	@Test(groups = {"Smoke", "Jasmeet"}, enabled = true)
+	public void VNDR_P2M5_162() throws IOException, InterruptedException, AWTException{
+		extentTest = extentReport.startTest("VNDR_P2M5_162", "JS: Vendor Portal >> Work Order >> "
+				+ "View Status>> Ensure that first status should be Open for every Work order");
+		privateBrowser();
+		login("",  adminEmail, password);
+		if(prop == null)
+			prop = addProperty();
+		System.out.println("Property name is ===== "+ prop[0]+ " and porfolio is ===== " + prop[1]);
+		if(workOrderNo == null)
+			workOrderNo = addWorkOrder(prop[0], "OneTime", "", vendorEmail, "");
+				
+		driverClose();
+		
+		byId.click(id_WorkOrderTab, ": Work Order Tab Clicked");
+		if (!byId.isSelected(id_OneTimeRadioBtnWorkOrder, "One Time Radio Btn")) {
+			byId.click(id_OneTimeRadioBtnWorkOrder, "One Time Radio Btn");
+		}
+		List<WebElement> li = byXpath.getElements(xpath_TblRowsListWorkOrder, "Work Oder Rows");
+		for (WebElement webElement : li) {
+			if (webElement.getText().contains(workOrderNo)) {
+				String status = webElement.findElements(By.tagName("td")).get(9).getText();
+				Assert.assertTrue(status.equals("Open"),
+						"First status is not Open for every Work order");
+				break;
+			}
+		}
+	}
+	
+	// -------------------------------Deepak--------------------------------
+    
+	@Test(groups = {"Smoke", "Jasmeet"}, enabled = true)
+	public void VNDR_P2M5_163() throws IOException, InterruptedException, AWTException{
+	     extentTest = extentReport.startTest("VNDR_P2M5_163", "DK: Vendor Portal >> Work Order >> "
+	              +"Ensure that options are displayed in Action Dropdown:Select, edit and view");
+	     privateBrowser();
+			login("",  adminEmail, password);
+			if(prop == null)
+				prop = addProperty();
+			System.out.println("Property name is ===== "+ prop[0]+ " and porfolio is ===== " + prop[1]);
+			if(workOrderNo == null)
+				workOrderNo = addWorkOrder(prop[0], "OneTime", "", vendorEmail, "");
+					
+			driverClose();
+			
+			byId.click(id_WorkOrderTab, ": Work Order Tab Clicked");
+			List <String> getActionOptions = byXpath.getOptions(xpath_TblRowsListWorkOrder+"//select",
+					"All options from action DDL");
+			
+			List<String> list = new ArrayList<String>();
+		     list.add("SELECT");
+		     list.add("EDIT");
+		     list.add("VIEW");
+		     Assert.assertEquals(getActionOptions, list, "Select,"
+		     		+ " edit and view are not options of Actions DDL");
+	}
+	
+	@Test(groups = {"Smoke", "Jasmeet"}, enabled = true)
+	public void VNDR_P2M5_164() throws IOException, InterruptedException, AWTException{
+	     extentTest = extentReport.startTest("VNDR_P2M5_164", "DK: Vendor Portal >> Work Order >> "+
+	              ">>Edit >>Ensure that user should view all Work Order Details and only Status should be"
+	              + " Editable and with following attributes:- Back Button, Update Button, Cancel Button");
+	     privateBrowser();
+	     login("",  adminEmail, password);
+	     if(prop == null)
+				prop = addProperty();
+	     System.out.println("Property name is ===== "+ prop[0]+ " and porfolio is ===== " + prop[1]);
+	     if(workOrderNo == null)
+				workOrderNo = addWorkOrder(prop[0], "OneTime", "", vendorEmail, "");
+	     
+	     driverClose();
+	     
+	     byId.click(id_WorkOrderTab, ": Work Order Tab Clicked");
+	     
+	     byXpath.selectByValue(xpath_TblRowsListWorkOrder+"//select", "Edit", "'Edit' option");
+	     
+	     boolean getEditableField = byId.isEnabled(id_StatusDDLNewWorkOrder, "Field is editable");
+	     Assert.assertTrue(getEditableField, "Status field is not editable");
+	     
+	     int getBackButtonSize = byXpath.getSize(xpath_BackBtnWorkOrderEdit,
+	    		 "Availability of back button");
+	     int getUpdateButtonSize = byId.getSize(id_SaveBTNNewWorkOrder,
+	    		 "Availability of update button");
+	     int getCancelButtonSize = byId.getSize(id_CancelBtnWorkOrderEdit,
+	    		 "Availability of cancel button");
+	     
+	     Assert.assertTrue(getBackButtonSize >0 && getUpdateButtonSize >0 && getCancelButtonSize >0,
+	    		 "Elements are missing"); 
+	}
+	
+	@Test
+	public void VNDR_P2M5_165() throws IOException, InterruptedException, AWTException{
+	     extentTest = extentReport.startTest("VNDR_P2M5_165", "DK: Vendor Portal>> Work Order>> "+
+	              "Ensure that user is able to edit the Status of the Work Order");
+	     
+	     privateBrowser();
+	     login("",  adminEmail, password);
+	     if(prop == null)
+				prop = addProperty();
+	     System.out.println("Property name is ===== "+ prop[0]+ " and porfolio is ===== " + prop[1]);
+	     if(workOrderNo == null)
+				workOrderNo = addWorkOrder(prop[0], "OneTime", "", vendorEmail, "");
+	     
+	     driverClose();
+	     
+	     byId.click(id_WorkOrderTab, ": Work Order Tab Clicked");
+	     
+	     byXpath.selectByValue(xpath_TblRowsListWorkOrder+"//select", "Edit", "'Edit' option");
+	     
+	     boolean getEditableField = byId.isEnabled(id_StatusDDLNewWorkOrder, "Field is editable");
+	     Assert.assertTrue(getEditableField, "Status field is not editable");
+	}
+	
+	@Test(groups = {"Smoke", "Jasmeet"}, enabled = true)
+    public void VNDR_P2M5_166() throws InterruptedException, IOException, AWTException{
+		extentTest = extentReport.startTest("VNDR_P2M5_166", "DK: Vendor Portal >> Work Order >>"
+	     		+ "Ensure that options should be displayed in dropdown:Open, Closed and InProgress");
+
+	     privateBrowser();
+	     login("",  adminEmail, password);
+	     if(prop == null)
+				prop = addProperty();
+	     System.out.println("Property name is ===== "+ prop[0]+ " and porfolio is ===== " + prop[1]);
+	     if(workOrderNo == null)
+				workOrderNo = addWorkOrder(prop[0], "OneTime", "", vendorEmail, "");
+	     
+	     driverClose();
+	     
+	     byId.click(id_WorkOrderTab, ": Work Order Tab Clicked");
+	     
+	     byXpath.selectByValue(xpath_TblRowsListWorkOrder+"//select", "Edit", "'Edit' option");
+	    
+	     List<String> getAllOptions = byId.getOptions(id_StatusDDLNewWorkOrder, "Get all option of status DDL");
+	    
+	     System.out.println(getAllOptions);
+	    
+	     List<String> list = new ArrayList<>();
+	    list.add("Open");
+	    list.add("Closed");
+	    list.add("In Progress");
+	    list.add("Canceled");
+	    list.add("Assigned");
+	    list.add("Completed");
+	    list.add("Completed, no need to Bill");
+	    list.add("Estimated");
+	    list.add("Estimate Requested");
+	    list.add("New");
+	    list.add("Parts on Order");
+	    list.add("Pending Owners Approval");
+	    list.add("Scheduled");
+	    list.add("Vendor Notified");
+	    list.add("Waiting");
+	    list.add("Other");
+	    
+	     Assert.assertEquals(list, getAllOptions, "Open, Closed and InProgress are not options of Actions DDL");
+	}
+	
+	@Test(groups = {"Smoke", "Jasmeet"}, enabled = true)
+    public void VNDR_P2M5_167() throws InterruptedException, IOException, AWTException{
+		
+		extentTest = extentReport.startTest("VNDR_P2M5_167", "DK: Vendor Portal >> Work Order >>"+
+	              "Edit >> Ensure that confirmation message displayed and workorder displayed"
+	              + " with open status in the List of Work Order in Open tab");
+		privateBrowser();
+		login("",  adminEmail, password);
+	     if(prop == null)
+				prop = addProperty();
+	     System.out.println("Property name is ===== "+ prop[0]+ " and porfolio is ===== " + prop[1]);
+	     if(workOrderNo == null)
+				workOrderNo = addWorkOrder(prop[0], "OneTime", "", vendorEmail, "");
+	     
+	     driverClose();
+	     
+	     byId.click(id_WorkOrderTab, ": Work Order Tab Clicked");
+	     
+	     byXpath.selectByValue(xpath_TblRowsListWorkOrder+"//select", "Edit", "'Edit' option");
+		
+	     byId.selectByVisibleText(id_StatusDDLNewWorkOrder, "Open", "Select open option from DDL");
+	     
+	     byId.click(id_SaveBTNNewWorkOrder, "Click on update button");
+	    
+	    String getMsg = byClassName.getText(class_AlertMessage, "Getting success message");
+	    Assert.assertEquals(getMsg, "The record updated successfully.");
+	    
+	    String getStatus = byXpath.getText(".//*[@id='tblWorkOrderGrid']/tbody/tr/td[contains(.,'Open')]", "Getting workorder status");
+	    Assert.assertEquals(getStatus, "Open");
+	}
+	
+	@Test(groups = {"Smoke", "Jasmeet"}, enabled = true)
+    public void VNDR_P2M5_168() throws InterruptedException, IOException, AWTException{
+		
+		extentTest = extentReport.startTest("VNDR_P2M5_168", "DK: Vendor Portal >> Work Order >>"+
+	              "Edit >> Ensure that confirmation message displayed and workorder displayed"
+	              + " with InProgress status in the List of Work Order in Open tab");
+		privateBrowser();
+		login("",  adminEmail, password);
+	     if(prop == null)
+				prop = addProperty();
+	     System.out.println("Property name is ===== "+ prop[0]+ " and porfolio is ===== " + prop[1]);
+	     String workOrderNo = addWorkOrder(prop[0], "OneTime", "", vendorEmail, "");
+	     
+	     driverClose();
+	     
+	     byId.click(id_WorkOrderTab, ": Work Order Tab Clicked");
+	     
+	     List<WebElement> li = byXpath.getElements(xpath_TblRowsListWorkOrder, "Work Oder Rows");
+			for (WebElement webElement : li) {
+				if (webElement.getText().contains(workOrderNo)) {
+					Select sel = new Select(webElement.findElement(By.tagName("Select")));
+					sel.selectByVisibleText("Edit");
+					break;
+				}
+			}
+	     byId.selectByVisibleText(id_StatusDDLNewWorkOrder, "In Progress",
+	    		 "Select 'In Progress' option from DDL");
+	     byId.click(id_SaveBTNNewWorkOrder, "Click on update button");
+	     
+	     String getMsg = byClassName.getText(class_AlertMessage, "Getting success message");
+	     
+	     Assert.assertEquals(getMsg, "The record updated successfully.");
+	     Thread.sleep(5000);
+	     li = byXpath.getElements(xpath_TblRowsListWorkOrder, "Work Oder Rows");
+	     boolean flag = false;
+			for (WebElement webElement : li) {
+				String s = webElement.getText();
+				//if(!(s.equals("")||s.equals(null)))
+				if (s.contains(workOrderNo)) {
+					String status = webElement.findElements(By.tagName("td")).get(9).getText();
+					Assert.assertTrue(status.equals("In Progress"),
+							"'In Progress' is not displayed in Status");
+					flag = true;
+					break;
+				}
+			}
+			Assert.assertTrue(flag, "WorkOrder is not in the List");
+	}
+		
+}

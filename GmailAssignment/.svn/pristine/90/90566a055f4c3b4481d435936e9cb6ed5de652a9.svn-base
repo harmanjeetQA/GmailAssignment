@@ -1,0 +1,10 @@
+package p2M5.vendorPortal;
+
+public class Test {
+
+	@org.testng.annotations.Test
+	public void testfuc()
+	{
+		System.out.println("Hello test");
+	}
+}

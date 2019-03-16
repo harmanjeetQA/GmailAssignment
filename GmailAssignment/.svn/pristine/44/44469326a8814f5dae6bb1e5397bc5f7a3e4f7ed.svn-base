@@ -1,0 +1,75 @@
+package objectRepository;
+
+public interface Accounts {
+	
+	//-------------Basics
+	
+	
+	public String emailAddress = "deepak@yopmail.com";
+	public String password = "mind@123";
+	
+		
+	// Accounts
+	
+	public String id_MyAccountInfoVendorAccountInfoSection = "lblVendorDetailsName,lblVendorDetailsVendorId_AG,lblVendorDetailsPayable,lblVendorDetailsPayment,lblVendorDetailsWorkOrder,lblVendorDetailsPhone";
+    public String xpath_VendorAccountInfoSectionVendorNameLabel = ".//div[2][@class='tenant-detail-col-outer']/div[1]";
+    public String xpath_VendorAccountInfoSectionVendorIdLabel = ".//div[2][@class='tenant-detail-col-outer']/div[2]";
+    public String xpath_VendorAccountInfoSectionTotalPayableLabel = ".//div[2][@class='tenant-detail-col-outer']/div[3]";
+    public String xpath_VendorAccountInfoSectionYTDPaymentLabel = ".//div[3][@class='tenant-detail-col-outer']/div[1]";	
+    public String xpath_VendorAccountInfoSectionOpenworkOrderLabel = ".//div[3][@class='tenant-detail-col-outer']/div[2]";
+    public String xpath_VendorAccountInfoSectionPhoneLabel = ".//div[3][@class='tenant-detail-col-outer']/div[3]";
+    public String xpath_VendorAccountInfoSectionLedgerTab = ".//*[@class='tabs']/li[2]";
+    public String id_VendorAccountInfoSectionLedgerSearchButton = "btnLedgerSearch";
+    public String xpath_VendorAccountInfoSectionLedgerTabLedgerGrid = ".//*[@id='LedgerTable']/tbody[1]/tr/th";
+    public String xpath_VendorAccountInfoSectionLedgerTabLedgerGridData = ".//*[@id='tbodyLedger']/tr";
+    public String xpath_VendorAccountInfoSectionLedgerTabLedgericons =".//*[@class='ledger-icon']/a";
+    public String id_VendorAccountLedgerTabStartDateField = "txtLedgerStartDate";
+    public String id_VendorAccountLedgerTabStartDateCalendar = "ui-datepicker-div";
+    public String xpath_VendorAccountLedgerTabStartDateCurrentDate = "//*[contains(@class,'ui-state-active')]";
+    public String id_VendorAccountLedgerTabEndDateField = "txtLedgerEndDate";
+    public String id_VendorAccountLedgerTabEndDateCalendar = "ui-datepicker-div";
+    
+    public String xpath_VendorAccountLedgerTabStartDateCalendarMonthDDL = ".//*[@class='ui-datepicker-title']/select[1]";
+    public String xpath_VendorAccountLedgerTabStartDateCalendarDate = ".//*[@class='ui-datepicker-calendar']//a[text()='1']";
+    
+    public String xpath_VendorAccountInfoSectionPaymentSettingTab = ".//*[@class='tabs']/li[3]";
+    public String xpath_VendorAccountPaymentSettingTabTaxInformationSection = ".//*[@id='VendorViewPayment']/div[1]/div[1]";
+    public String xpath_VendorAccountPaymentSettingTabPaymentSettingSection = ".//*[@id='VendorViewPayment']/div[2]/div[1]";
+    public String xpath_VendorAccountPaymentSettingTabBankAccInfoSection = ".//*[@id='VendorViewPayment']/div[2]/div[3]/div[1]";
+    
+    public String xpath_VendorAccountInfoSectionConversationTab = ".//*[@class='tabs']/li[5]";
+    public String id_VendorAccountInfoSectionConversationTabNewConversationLink = "aNewConversation";
+    
+    public String id_VendorAccountConversationTabNewConversationSectionFields = "ddlAddConversationPropertyManager,ddlAddConversationProblemCategory,ddlAddConversationDescription,btnAddConversation,btnCancelConversation";
+    
+    /*public String id_VendorAccountConversationTabNewConversationPropertyManagerDDL = "ddlAddConversationPropertyManager";
+    public String id_VendorAccountConversationTabNewConversationProblemCategoryDDL = "ddlAddConversationProblemCategory";
+    public String id_VendorAccountConversationTabNewConversationDescriptionTextBox = "ddlAddConversationDescription";
+    public String id_VendorAccountConversationTabNewConversationSendButton = "btnAddConversation";
+    public String id_VendorAccountConversationTabNewConversationCancelButton = "btnCancelConversation";*/
+    
+    public String class_AdminPortalSettingsLink = "clssettings";
+    public String xpath_AdminPortalLeftPanelUsersTab = ".//*[@id='ulLeftMenu']/li/ul/li[4]/a";
+    public String xpath_AdminPortalLeftPanelManageUsers = ".//*[@id='users']/li[1]/a";
+    public String id_AdminPortalManageUsersGridRoleTypeDDL = "ddlRoleFilter";
+    public String xpath_AdminPortalManageUsersGrid = ".//*[@id='tblGrid']//tr";
+    
+    public String xpath_NewConversationSectionValidationErrorMsg1Field = ".//*[@id='ddlAddConversationPropertyManager']//following-sibling::div";
+    public String xpath_NewConversationSectionValidationErrorMsg3Field = ".//*[@id='ddlAddConversationDescription']//following-sibling::div";
+    public String xpath_NewConversationSectionValidationErrorMsg2Field = ".//*[@id='ddlAddConversationProblemCategory']//following-sibling::div";
+    public String xpath_SendConversationToastMessage = "//*[@class='toast-item toast-type-success']//p";
+    
+    public String xpath_VendorAccountInfoSectionChangePWDTab = ".//*[@class='tabs']/li[6]";
+    public String id_ChangePWDTabSaveButton = "btnSavePwd";
+    public String class_ChangePWDTabValidationMessages = "errorMsg";
+    public String id_ChangePWDTabAllFields = "txtOldPassword,txtNewPassword,txtConfirmPassword";
+    
+    public String id_VendorPortalLogoutLink = "aLogOutVendorPortal";
+    public String id_VendorPortalLoginButton = "btnLogin";
+    
+    
+    
+    
+    
+    
+}

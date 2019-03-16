@@ -1,0 +1,112 @@
+package objectRepository;
+
+public interface VendorPortal {
+
+	// ----------- Login
+
+	public String id_LoginEmailField = "txtUsername";
+	public String id_LoginPasswordField = "txtPassword";
+	public String id_LoginButton = "btnLogin";
+
+	public String vendorURL = "http://www.uat.herbdigest.com/VendorPortal";
+	public String emailAddress = "automation1@yopmail.com";
+	//public String password = "mind@123";
+
+	String url_VendorPortal = "/VendorPortal/Login";
+
+	/* #####################_Harinder_####################### */
+	String id_LeftTopLogo = "imgCompanyMainLogo";
+	String id_ManageBill = "ancManageBill";
+	String id_ManageBillNewBillButton = "dvVendorListingNewBill";
+	String id_ManageBillGridListing = "gbox_tblVendorInvoiceRegisterPO";
+
+	String id_NewNillBillDate = "txtBillDate";
+	String id_NewNillAmount = "txtAmount";
+	String id_NewNillSelectTerm = "ddlVendorInvoiceTerms";
+	String id_NewNillReference = "txtReference";
+	String id_NewNillDueDate = "txtDueDate";
+	String id_NewNillPortfolio = "btnSaveInvoice";
+	String id_NewNillMemo = "txtMemo";
+	String id_NewNillSplitBillProperty = "ddlProperty";
+	String id_NewNillSplitBillUnit = "txtInvoiceUnit";
+	String id_NewNillSplitBillAccount = "ddlExpenseAccount";
+	String id_NewNillSplitBillAmount = "txtPropertyAmount";
+	String id_NewNillSplitBillDescription = "txtDescription";
+	String id_NewNillNotes = "txtVendorNotes";
+	String id_NewNillFileLibrarySection = "actions";
+	String id_NewNillCancelButton = "btnCancelInvoice";
+	String id_NewNillSaveButton = "btnSaveInvoice";
+	String id_NewNillSplitBillAmountLabel = "lblChangeSplitBillCurrency";
+	String ids_NewNillAllElements = "txtBillDate,txtAmount,ddlVendorInvoiceTerms,txtReference,txtDueDate,btnSaveInvoice,txtMemo,ddlProperty,txtInvoiceUnit,ddlExpenseAccount,txtPropertyAmount,txtDescription,txtVendorNotes,actions,btnCancelInvoice,btnSaveInvoice";
+
+	String class_CalendarTable = "ui-datepicker-calendar";
+	String class_CalendarContainsActiveDate = "ui-state-active";
+	String class_CalendarTodaysDate = "ui-datepicker-today";
+	String class_CalendarContainsHighlight = "ui-state-highlight";
+	String class_MandatoryfieldErrorMessage = "errorMsg";
+
+	String title_CalendarPrevIcon = "Prev";
+	String title_CalendarNextIcon = "Next";
+
+	// ############# Harman ##################
+	String id_LogoutButton = "aLogOutVendorPortal";
+	String id_MyAccountButton = "ancAccount";
+	String id_WorkOrderButton = "ancWorkOrders";
+	String id_TransactionsButton = "ancTransactions";
+	String id_FileLibraryButton = "ancRepository";
+	String id_VendorInsuranceButton = "ancInsurence";
+	String id_ManageBillButton = "ancManageBill";
+	String id_MyReportingButton = "ancReporting";
+	String xpath_NameofVendor = "//*[@id='outerwrapper']/div[2]/div/div[2]/div[1]";
+	String id_Calendar = "btnGlobalCalender";
+	String xpath_Help = "//*[@id='outerwrapper']/div[2]/div/div[2]/div[3]/ul/li[1]/a";
+	String xpath_Notification = "//*[@id='BubbleUL']/a";
+	String xpath_FileLibraryAddFilesButton = "//*[@id='actions']/div[1]/span";
+	String xpath_FileLibraryRemoveAllButton = "//*[@id='actions']/div[1]/a/span";
+	String id_FileLibrarySaveButton = "btnSaveFiles";
+	String xpath_FileLibraryListing = "//*[@id='gview_tblGridImages']/div[1]/span";
+	String value_FileLibraryXlsFilepath = "\\AppData\\HardCodedValues\\Book1.xls";
+	String value_FileLibraryXlsxFilepath = "\\AppData\\HardCodedValues\\File1.xlsx";
+	String value_FileLibraryDocFilepath = "\\AppData\\HardCodedValues\\File2.doc";
+	String value_FileLibraryDocxFilepath = "\\AppData\\HardCodedValues\\owner_testing2.docx";
+	String value_FileLibraryPDFFilepath = "\\AppData\\HardCodedValues\\test.pdf";
+	String value_FileLibraryLargerSizeFilepath = "\\AppData\\HardCodedValues\\owner_testing_largersize.docx";
+	String xpath_FileLibraryXlsFilepath = "//*[@id='previews']/div[1]/div[2]/strong";
+	String xpath_FileLibraryXlsxFilepath = "//*[@id='previews']/div[2]/div[2]/strong";
+	String xpath_FileLibraryDocFilepath = "//*[@id='previews']/div[3]/div[2]/strong";
+	String xpath_FileLibraryDocxFilepath = "//*[@id='previews']/div[4]/div[2]/strong";
+	String xpath_FileLibraryPDFFilepath = "//*[@id='previews']/div[5]/div[2]/strong";
+	String xpath_FileLibraryLargerSizeFilepath = "//*[@id='previews']/div[6]/div[2]/strong";
+	String value_FileLibraryUploadFileIncorrectFormatError = "You can't upload files of this type.";
+	String value_FileLibraryUploadFileCorrectFormatError = "";
+	String value_FileLibraryUploadLargeFileError = "File is too big (5.28MB). Max filesize: 5MB.";
+	String xpath_FileLibraryUploadedFile1Name = "//*[@id='previews']/div[1]/div[2]/p";
+	String xpath_FileLibraryUploadedFile2Name = "//*[@id='previews']/div[2]/div[2]/p";
+	String value_FileLibraryUploadedFile1Name = "File1.xlsx";
+	String value_FileLibraryUploadedFile2Name = "File2.doc";
+	String xpath_FileLibraryUploadedFileCancelButton = "//*[@id='previews']/div[1]/div[4]/button[2]";
+	String value_FileLibraryUploadedFileCancelButton = "Cancel";
+	String value_FileLibraryUploadedFileCancelledFile = "The record deleted successfully.";
+	String xpath_FileLibraryUploadedFileCancelledFile = "//*[@class='toast-item-wrappe']/div/p";
+	String xpath_FileLibraryUploadedFileImg = "//*[@id='previews']/div[1]/div[1]/span/img";
+	String xpath_FileLibraryUploadedFileImg2 = "//*[@id='previews']/div[2]/div[1]/span/img";
+	String xpath_FileLibraryRemoveAll = "//*[@id='actions']/div[1]/a";
+	String classname_FileLibraryRemoveAllYesOption = "msgButton";
+	String xpath_FileLibraryGridFirstRecord = "//*[@id='tblGridImages']/tbody/tr[2]/td[3]";
+	String id_FileLibraryGridFirstCol = "jqgh_tblGridImages_ImageDisplayName";
+	String id_FileLibraryGridSecCol = "jqgh_tblGridImages_image";
+	String id_FileLibraryGridThirdCol = "jqgh_tblGridImages_act";
+	String value_FileLibraryGridFirstCol = "File Name";
+	String value_FileLibraryGridSecCol = "Preview";
+	String value_FileLibraryGridThirdCol = "Action";
+	String xpath_Calculator="//*[@id='outerwrapper']/div[2]/div/div[2]/div[2]/a";
+	String id_Companylogo="imgCompanyMainLogo";
+	String xpath_Companylogo="//*[@id='outerwrapper']/div[2]/div/div[1]/a/img";
+	String xpath_Notifications="//*[@id='BubbleUL']/a";
+	
+	
+	
+	String value_MandatoryfieldsMessage = "* This field is required";
+	String value_SelectTermNet30 = "Net 30";
+	String value_SelectTermDDL = "Net 30,Net 7,Net 10,Net 15,Net 60,Net 90,PIA,EOM,21 MFI,Due on Receipt,1% 10 Net 30";
+}

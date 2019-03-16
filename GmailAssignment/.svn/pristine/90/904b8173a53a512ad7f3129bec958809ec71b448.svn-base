@@ -1,0 +1,2495 @@
+package p2M5.vendorPortal;
+
+import java.awt.AWTException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Keys;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
+import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
+
+import com.ibm.icu.text.DecimalFormat;
+import com.relevantcodes.extentreports.LogStatus;
+
+import common.ApexCommon;
+import interfaces.GlobalComponents;
+import objectRepository.IManageBill;
+import p2M6.Accounting.objectRepositry.Admin_AccountingTab;
+
+public class ManageBill extends ApexCommon implements GlobalComponents, IManageBill, Admin_AccountingTab {
+	List<Object> values = new ArrayList<>();
+	List<String> building;
+	static String[] arr;
+	String unitName;
+	String refNo;
+	String portfolioName;
+	String tenantName;
+	String getSystemDate = utility.getCurrentDate("MM/dd/YYYY");
+	String getSystemDay = utility.getCurrentDate("("+"EEE"+".)");
+	
+/*	@BeforeClass(enabled = true, groups = { "Smoke", "Regression", "Harinder"})
+	public void Login() throws InterruptedException, IOException {
+		login(null, userName, password);
+	}*/
+
+	@BeforeClass(enabled = true, groups = { "Smoke", "Regression", "Harinder"})
+	public void addPortfolioAndProperty() throws InterruptedException, IOException, AWTException {
+		setLogs.info("Go to admin portal and login with admin Credentials");
+		login(null, userName, password);
+		privateBrowser();
+		login("", adminEmail, password);
+		ChangesDefaultDate(value_DefaultDateFormat, value_DateFormat);
+		login("", adminEmail, password);
+		ChangesDefaultCurrency(value_DefaultCurrency);
+		login("", adminEmail, password);
+		setLogs.info("Add Portfolio");
+		portfolioName = addPortfolio("H");
+		setLogs.info("Add Bank and attach portolio to it");
+		String getUniqueNumber = utility.getCurrentDateTime("ddMMYYYYssSSS");
+		ApexCommon.addBank(portfolioName, value_BankName+getUniqueNumber, getUniqueNumber, getUniqueNumber, getUniqueNumber, value_BankIntialAmount, getUniqueNumber, "Active", "");
+		setLogs.info("Add Property");
+		byId.click(id_PropertiesTab, "Click on Properties Tab");
+		byId.click(id_NewPropertyBTN, "Click on 'New Property' button");
+		arr = addProperty(value_PropertyName, portfolioName, "", "", "", "1", "1");
+		byName.click(class_PopupYesButton, "Click on 'Yes' button on Popup");
+		building = addBuilding(value_PropertyName, "1", value_Address);
+		byName.click(class_PopupYesButton, "Click on 'Yes' button on Popup");
+		unitName = addUnit("", "", "1", "A", "1", "", "", "", "", "", value_RentAmount, value_RentAmount, "", "");
+		Thread.sleep(3000);
+		driverClose();
+	}
+
+	/*
+	 * @AfterClass(priority = 1, enabled = true, groups={"Smoke","Regression"})
+	 * public static void close() throws Exception{ driver.close();
+	 * ApexlinkCommonClass.killRunningProcess(ReadDataFromPropertiesFile.
+	 * testReadDataFromPropertiesFile_masterSetupData("processName")); }
+	 */
+
+	@BeforeMethod(alwaysRun = true, enabled = true, groups = { "Smoke", "Regression", "Harinder"})
+	public static void defaultPage() throws IOException, Throwable {
+		Thread.sleep(3000);
+		driverFlag = true;
+		//byId.click("ancAccount", "Click on Company Logo in Vendor Portal");
+		byClassName.click("logo", "Click on Company Logo in Vendor Portal");
+	}
+
+	@Test(priority = 0, enabled = true, groups = { "Smoke", "Harinder"})
+	public void VNDR_P2M5_223() throws InterruptedException {
+		extentTest = extentReport.startTest("VNDR_P2M5_223",
+				"*H7 : Verify that Ensure that when user login in Vendor Portal, Manage Bill tab should be displayed");
+		int getSize = byId.getSize(id_ManageBill, "get size of Manage Bill Tab");
+		Assert.assertEquals(getSize, 1, "'Manage Bil' is not found/exits");
+		extentTest.log(LogStatus.INFO,
+				"*H7 : Verified, that Ensure that when user login in Vendor Portal, Manage Bill tab is displayed");
+	}
+
+	@Test(priority = 1, enabled = true, groups = { "Smoke", "Harinder"})
+	public void VNDR_P2M5_224() throws InterruptedException {
+		driverFlag = true;
+		extentTest = extentReport.startTest("VNDR_P2M5_224",
+				"*H7 : Verify that 'New Bill' and 'List of Bills Grid' sections should be displayed");
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		int getButton = byId.getSize(id_ManageBillNewBillButton, "get size of 'New Bill' button");
+		int getGridSize = byId.getSize(id_ManageBillGridListing, "get size of 'New Bill Listing' grid");
+		Assert.assertTrue(getButton == 1 && getGridSize == 1,
+				" New Bill Button/ New Bill Listing grid is missing on page");
+		extentTest.log(LogStatus.INFO,
+				"*H7 : Verified, that Ensure that 'New Bill' and 'List of Bills Grid' sections are displayed");
+	}
+
+	@Test(priority = 2, enabled = true, groups = { "Smoke", "Harinder"})
+	public void VNDR_P2M5_225() throws InterruptedException {
+		extentTest = extentReport.startTest("VNDR_P2M5_225", "*H7 : Verify that 'New Bill' button is clickable");
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		byId.click(id_ManageBillNewBillButton, "Click on 'New Bill' button");
+		int getButtonSize = byId.getSize(id_NewBillSaveButton, "get size of 'Save' Button on New Bill page");
+		Assert.assertTrue(getButtonSize == 1, " 'New Bill' button is not clickable");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that 'New Bill' button is clickable");
+	}
+
+	@Test(priority = 3, enabled = true, groups = { "Smoke", "Harinder"})
+	public void VNDR_P2M5_226() throws InterruptedException {
+		extentTest = extentReport.startTest("VNDR_P2M5_226",
+				"*H7 : Verify that New Bill screen is open with the fields");
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		byId.click(id_ManageBillNewBillButton, "Click on 'New Bill' button");
+		String[] eleIdsList = ids_NewBillAllElements.split(",");
+		List<Object> listWebEle = VendorPortalCommons.getWebElementsByIds(eleIdsList);
+		int getListSize = listWebEle.size();
+		Assert.assertTrue(getListSize == 20, "Some filds are not present on 'New Bill' page.");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that New Bill screen is open with the fields");
+	}
+
+	@Test(priority = 4, enabled = true, groups = { "Smoke", "Harinder"})
+	public void VNDR_P2M5_227() throws InterruptedException {
+		
+		extentTest = extentReport.startTest("VNDR_P2M5_227",
+				"*H7 : Verify that By Default Current date should be displayed.");
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		byId.click(id_ManageBillNewBillButton, "Click on 'New Bill' button");
+		String getDefaultBillDate = byId.getAttribute(id_NewBillBillDate, "value", "get Bill date field value");
+		Assert.assertEquals((getSystemDate+" "+getSystemDay),getDefaultBillDate,"no default Current date is displaying in Bill Date field");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that By Default Current date is selected in Bill Date field");
+	}
+
+	@Test(priority = 5, enabled = true, groups = { "Smoke", "Harinder"})
+	public void VNDR_P2M5_228_1() throws InterruptedException {
+		extentTest = extentReport.startTest("VNDR_P2M5_228_1",
+				"*H7 : Verify that user should be able to select current date");
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		byId.click(id_ManageBillNewBillButton, "Click on 'New Bill' button");
+		byId.click(id_NewBillBillDate, "Click on Bill date field value");
+		byClassName.click(class_CalendarTodaysDate, " Click on Todays Date");
+		String getDefaultBillDate = byId.getAttribute(id_NewBillBillDate, "value", "get Bill date field value");
+		Assert.assertEquals((getSystemDate+" "+getSystemDay),getDefaultBillDate, "no seleted date is displaying in Bill Date field");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that By Default user is able to select current date");
+	}
+
+	@Test(priority = 6, enabled = true, groups = { "Smoke", "Harinder"})
+	public void VNDR_P2M5_228_2() throws InterruptedException {
+		
+		extentTest = extentReport.startTest("VNDR_P2M5_228_2",
+				"*H7 : Verify that user should be able to select back date from current date");
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		byId.click(id_ManageBillNewBillButton, "Click on 'New Bill' button");
+		byId.click(id_NewBillBillDate, "Click on Bill date field value");
+		setLogs.info("Select Previous Date from todays date");
+		VendorPortalCommons.SelectPrevDateFromTodaysDate();
+		String getDefaultBillDate = byId.getAttribute(id_NewBillBillDate, "value", "get Bill date field value");
+		setLogs.info("Select System date and customize into Previous date");
+		String getDate = getSystemDate.substring(3, 5);
+		String getMonth = getSystemDate.substring(0, 2);
+		String getYear = getSystemDate.substring(6, 10);
+		String getDefaultDate = getDefaultBillDate.substring(3, 5);
+		int getMonth1 = 0;
+		if(getDate.equals("01"))
+		{
+			getMonth1 = Integer.parseInt(getMonth)-1;
+			if (getMonth1==00 || getMonth1==0) {
+				getMonth1 = 12;
+				int getYear1 = Integer.parseInt(getYear)-1;
+				Assert.assertTrue(getDefaultBillDate.contains(getMonth1+"/"+getDefaultDate+"/"+getYear1), "no seleted date is displaying in Bill Date field");
+				}
+			}
+			
+		/*DecimalFormat df = new DecimalFormat("00");
+		int parseDateintoInt = Integer.parseInt(getDate) - 1;
+		getDate = df.format(parseDateintoInt);
+		getDate = getSystemDate.substring(0, 3) + getDate + getSystemDate.substring(5);*/
+		Assert.assertTrue(getDefaultBillDate.contains(getMonth1+"/"+getDefaultDate+"/"+getYear), "no seleted date is displaying in Bill Date field");
+		extentTest.log(LogStatus.INFO,
+				"*H7 : Verified, that By Default user is able to select back date from current date");
+	}
+
+	@Test(priority = 7, enabled = true, groups = { "Smoke", "Harinder"})
+	public void VNDR_P2M5_228_3() throws InterruptedException 
+	{
+		extentTest = extentReport.startTest("VNDR_P2M5_228_3",
+				"*H7 : Verify that user should be able to select future date from current date");
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		byId.click(id_ManageBillNewBillButton, "Click on 'New Bill' button");
+		byId.click(id_NewBillBillDate, "Click on Bill date field value");
+		setLogs.info("Select Next Date from todays date");
+		Thread.sleep(2000);
+		VendorPortalCommons.SelectNextDateFromTodaysDate();
+		setLogs.info("Select System date and customize into future date");
+		String getDate = getSystemDate.substring(3, 5);
+		String getYear = getSystemDate.substring(6, 10);
+		if(getDate.equals("30") || getDate.equals("31"))
+		{
+			VendorPortalCommons.SelectNextDateFromTodaysDate();
+			getDate = getSystemDate.substring(0, 2);
+			int getDate2 = Integer.parseInt(getDate)+1;
+			if (getDate2==13) {
+				getDate = "01";
+				int getYear1= Integer.parseInt(getYear)+1;
+				getDate = getDate+"/"+getDate+"/getYear1";
+				String getDefaultBillDate = byId.getAttribute(id_NewBillBillDate, "value", "get Bill date field value");
+				Assert.assertTrue(getDefaultBillDate.contains(getDate), "no seleted date is displaying in Bill Date field");
+			}
+			
+			String getDefaultBillDate = byId.getAttribute(id_NewBillBillDate, "value", "get Bill date field value");
+			Assert.assertTrue(getDefaultBillDate.contains(getDate2+"/01/"+getYear), "no seleted date is displaying in Bill Date field");
+		}
+		else {
+		DecimalFormat df = new DecimalFormat("00");
+		int parseDateintoInt = Integer.parseInt(getDate) + 1;
+		getDate = df.format(parseDateintoInt);
+		getDate =getSystemDate.substring(0, 3)  +getDate+ getSystemDate.substring(5);
+		String getDefaultBillDate = byId.getAttribute(id_NewBillBillDate, "value", "get Bill date field value");
+		Assert.assertTrue(getDefaultBillDate.contains(getDate), "no seleted date is displaying in Bill Date field");
+		}
+		extentTest.log(LogStatus.INFO,
+				"*H7 : Verified, that By Default user is able to select future date from current date");
+	}
+
+	@Test(priority = 8, enabled = true, groups = { "Smoke", "Harinder"})
+	public void VNDR_P2M5_229() throws InterruptedException {
+		
+		extentTest = extentReport.startTest("VNDR_P2M5_229",
+				"*H7 : Verify that it should be a mandatory field and if field is blank the validation should be fired");
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		byId.click(id_ManageBillNewBillButton, "Click on 'New Bill' button");
+		setLogs.info("Delete "
+				+ ""
+				+ ""
+				+ "default date from 'Bill date'");
+		byId.clear(id_NewBillBillDate, "Clear Bill Date field");
+		Actions act = new Actions(getDriver());
+		act.moveToElement(getDriver().findElement(By.id(id_NewBillSelectTerm))).click().perform();
+		setLogs.info("Get error msg when 'Bill date' field is blank");
+		String getErrorMsg = byClassName.getText(class_MandatoryfieldErrorMessage, "get Error message");
+		Assert.assertTrue(getErrorMsg.equals(value_MandatoryfieldsMessage),
+				"'* This field is required' message is not displaying for this field");
+		extentTest.log(LogStatus.INFO,
+				"*H7 : Verified, that it should be a mandatory field and if field is blank the validation should be fired");
+	}
+
+	@Test(priority = 9, enabled = true, groups = { "Smoke", "Harinder"})
+	public void VNDR_P2M5_238() throws InterruptedException {
+		
+		extentTest = extentReport.startTest("VNDR_P2M5_238",
+				"*H7 : Verify that By Default Net30 term should be displayed in Select Term DDL");
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		byId.click(id_ManageBillNewBillButton, "Click on 'New Bill' button");
+		String getSelectedValue = byId.getFirstSelectedOption(id_NewBillSelectTerm,
+				"get first selected value from 'Select Term' ddl");
+		Assert.assertTrue(getSelectedValue.equals(value_SelectTermNet30), "'Net 30' is not the Default Selected value");
+		extentTest.log(LogStatus.INFO,
+				"*H7 : Verified, that Ensure Default Net30 term should be displayed in Select Term DDL");
+	}
+
+	@Test(priority = 10, enabled = true, groups = { "Smoke", "Harinder"})
+	public void VNDR_P2M5_239() throws InterruptedException {
+		
+		List<String> list = new ArrayList<>();
+		List<String> list1 = new ArrayList<>();
+		list1 = VendorPortalCommons.AddMultipleValuesInList(value_SelectTermDDL);
+		extentTest = extentReport.startTest("VNDR_P2M5_239",
+				"*H7 : Verify that By Default Net30 term should be displayed in Select Term DDL");
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		byId.click(id_ManageBillNewBillButton, "Click on 'New Bill' button");
+		setLogs.info("Get all option values from 'Select Term' DDL");
+		List<WebElement> getWebEle = byXpath.getElements("//*[@id='" + id_NewBillSelectTerm + "']/option",
+				"get all options from 'Select Term' ddl");
+		for (WebElement webElement : getWebEle) {
+			String getValue = webElement.getText();
+			list.add(getValue);
+		}
+		System.out.println(list);
+		System.out.println(list1);
+		Assert.assertEquals(list, list1, "Some values are missing/Added");
+		extentTest.log(LogStatus.INFO,
+				"*H7 : Verified, that By Default Net30 term should be displayed in Select Term DDL");
+	}
+
+	@Test(priority = 11, enabled = true, groups = { "Smoke", "Harinder"})
+	public void VNDR_P2M5_240() throws InterruptedException, IOException {
+		List<Object> list = new ArrayList<>();
+		extentTest = extentReport.startTest("VNDR_P2M5_240",
+				"*H7 : Verify Ensure that if 1% 10 Net 30 is selected the bill is generated with full amount and paid with 1% discount  amount.");
+		setLogs.info("Get Vendor Name from My Account Tab");
+		byId.click(id_MyAccountTab, " Click on My Account Tab");
+		String VendorName = byId.getText(id_MyAccountTabVendorName, "Get Full Vendor Name");
+		int getIndex = VendorName.indexOf(" ");
+		if (getIndex > 0)
+			VendorName = VendorName.substring(0, getIndex);
+		System.out.println("Vendor Name is = " + VendorName);
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		setLogs.info("Create New Bill");
+		refNo = utility.uniqueNo();
+		values = VendorPortalCommons.NewBill(value_Amount, value_SelectTermDDLValue, refNo, arr[1], "",arr[0], "", "", "", "", "", value_Amount, "", "");
+		setLogs.info("Pay Bill from Admin Portal");
+		privateBrowser();
+		login("", adminEmail, password);
+		list = ApexCommon.PayVendorBill(VendorName, refNo, "", "", "", "");
+		driverClose();
+		getDriver().navigate().refresh();
+		String getPaidAmount = byXpath.getText(
+				"//*[@id='" + id_ManageBillGridListingTable + "']//tbody//tr//td[contains(text(),'" + refNo
+						+ "')]//following-sibling::td[contains(@aria-describedby,'AmountPaid')]",
+				"Get Paid Amount for the Reference No '" + refNo + "' from List of Bills Grid");
+		Assert.assertEquals(list.get(4), getPaidAmount, "Discounted amount is displaying");
+		extentTest.log(LogStatus.INFO,
+				"*H7 : Verified, Ensure that if 1% 10 Net 30 is selected the bill is generated with full amount and paid with 1% discount  amount.");
+	}
+
+	@Test(priority = 12, enabled = true, groups = { "Smoke", "Harinder"})
+	public void VNDR_P2M5_247() throws InterruptedException {
+		
+		extentTest = extentReport.startTest("VNDR_P2M5_247",
+				"*H7 : Verify that By Default Current date should be displayed.");
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		byId.click(id_ManageBillNewBillButton, "Click on 'New Bill' button");
+		setLogs.info("Get System Date");
+		setLogs.info("Get Date from 'Due Date' field");
+		String getDefaultDueDate = byId.getAttribute(id_NewBillBillDate, "value", "get Bill date field value");
+		Assert.assertEquals(getSystemDate+" "+getSystemDay, getDefaultDueDate,
+				"no default Current date is displaying in 'Due Date' field");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, By Default Current date should be displayed.");
+	}
+
+	@Test(priority = 13, enabled = true, groups = { "Smoke", "Harinder"})
+	public void VNDR_P2M5_248_1() throws InterruptedException {
+		
+		extentTest = extentReport.startTest("VNDR_P2M5_248_1",
+				"*H7 : Verify that user should be able to select current date.");
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		byId.click(id_ManageBillNewBillButton, "Click on 'New Bill' button");
+		setLogs.info("Get System Date");
+		setLogs.info("Get Date from 'Due Date' field");
+		byId.click(id_NewBillDueDate, "Click on Due date field value");
+		byClassName.click(class_CalendarTodaysDate, " Click on Todays Date");
+		String getDefaultBillDate = byId.getAttribute(id_NewBillDueDate, "value", "get Due date field value");
+		Assert.assertEquals(getSystemDate+" "+getSystemDay, getDefaultBillDate, "no seleted date is displaying in Due Date field");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, user is able to select current date.");
+	}
+
+	@Test(priority = 14, enabled = true, groups = { "Smoke", "Harinder"})
+	public void VNDR_P2M5_248_2() throws InterruptedException {
+		
+		extentTest = extentReport.startTest("VNDR_P2M5_248_2",
+				"*H7 : Verify that user should be able to select back date from current date");
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		byId.click(id_ManageBillNewBillButton, "Click on 'New Bill' button");
+		byId.click(id_NewBillDueDate, "Click on Due date field value");
+		setLogs.info("Select Previous Date from todays date");
+		VendorPortalCommons.SelectPrevDateFromTodaysDate();
+		String getDefaultBillDate = byId.getAttribute(id_NewBillDueDate, "value", "get Due date field value");
+		setLogs.info("Select System date and customize into Previous date");
+		String getDate = getSystemDate.substring(3, 5);
+		String getMonth = getSystemDate.substring(0, 2);
+		String getYear = getSystemDate.substring(6, 10);
+		String getDefaultDate = getDefaultBillDate.substring(3, 5);
+		int getMonth1 = 0;
+		if(getDate.equals("01"))
+		{
+			getMonth1 = Integer.parseInt(getMonth)-1;
+			if (getMonth1==00 || getMonth1==0) {
+				getMonth1 = 12;
+				int getYear1 = Integer.parseInt(getYear)-1;
+				Assert.assertTrue(getDefaultBillDate.contains(getMonth1+"/"+getDefaultDate+"/"+getYear1), "no seleted date is displaying in Due Date field");
+				}
+			}
+		/*DecimalFormat df = new DecimalFormat("00");
+		int parseDateintoInt = Integer.parseInt(getDate) - 1;
+		getDate = df.format(parseDateintoInt);
+		getDate = getSystemDate.substring(0, 3) + getDate + getSystemDate.substring(5);*/
+		Assert.assertTrue(getDefaultBillDate.contains(getMonth1+"/"+getDefaultDate+"/"+getYear), "no seleted date is displaying in Due Date field");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, user is able to select back date from current date");
+	}
+
+	@Test(priority = 15, enabled = true, groups = { "Smoke", "Harinder"})
+	public void VNDR_P2M5_248_3() throws InterruptedException {
+		
+		extentTest = extentReport.startTest("VNDR_P2M5_248_3",
+				"*H7 : Verify that user should be able to select future date from current date");
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		byId.click(id_ManageBillNewBillButton, "Click on 'New Bill' button");
+		byId.click(id_NewBillDueDate, "Click on Due date field value");
+		setLogs.info("Select Next Date from todays date");
+		Thread.sleep(2000);
+		VendorPortalCommons.SelectNextDateFromTodaysDate();
+		setLogs.info("Select System date and customize into future date");
+		String getDate = getSystemDate.substring(3, 5);
+		String getYear = getSystemDate.substring(6, 10);
+		if(getDate.equals("30") || getDate.equals("31"))
+		{
+			VendorPortalCommons.SelectNextDateFromTodaysDate();
+			getDate = getSystemDate.substring(0, 2);
+			int getDate2 = Integer.parseInt(getDate)+1;
+			if (getDate2==13) {
+				getDate = "01";
+				int getYear1= Integer.parseInt(getYear)+1;
+				getDate = getDate+"/"+getDate+"/getYear1";
+				String getDefaultBillDate = byId.getAttribute(id_NewBillDueDate, "value", "get Bill date field value");
+				Assert.assertTrue(getDefaultBillDate.contains(getDate), "no seleted date is displaying in Bill Date field");
+			}
+			
+			String getDefaultBillDate = byId.getAttribute(id_NewBillDueDate, "value", "get Bill date field value");
+			Assert.assertTrue(getDefaultBillDate.contains(getDate2+"/01/"+getYear), "no seleted date is displaying in Bill Date field");
+		}
+		else {
+		DecimalFormat df = new DecimalFormat("00");
+		int parseDateintoInt = Integer.parseInt(getDate) + 1;
+		getDate = df.format(parseDateintoInt);
+		getDate =getSystemDate.substring(0, 3)  +getDate+ getSystemDate.substring(5);
+		String getDefaultBillDate = byId.getAttribute(id_NewBillDueDate, "value", "get Bill date field value");
+		Assert.assertTrue(getDefaultBillDate.contains(getDate), "no seleted date is displaying in Bill Date field");
+		}
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, user is able to select future date from current date");
+	}
+
+	@Test(priority = 16, enabled = true, groups = { "Smoke", "Harinder"})
+	public void VNDR_P2M5_249() throws InterruptedException {
+		
+		extentTest = extentReport.startTest("VNDR_P2M5_249",
+				"*H7 : Verify that 'Due Date' should be a mandatory field and if field is blank the validation should be fired");
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		byId.click(id_ManageBillNewBillButton, "Click on 'New Bill' button");
+		setLogs.info("Delete default date from 'Due date'");
+		byId.clear(id_NewBillDueDate, "Clear Due Date field");
+		Actions act = new Actions(getDriver());
+		act.moveToElement(getDriver().findElement(By.id(id_NewBillSelectTerm))).click().perform();
+		setLogs.info("Get error msg when 'Due date' field is blank");
+		String getErrorMsg = byClassName.getText(class_MandatoryfieldErrorMessage, "get Error message");
+		Assert.assertTrue(getErrorMsg.equals(value_MandatoryfieldsMessage),
+				"'* This field is required' message is not displaying for this field");
+		extentTest.log(LogStatus.INFO,
+				"*H7 : Verified, that 'Due Date' is mandatory field and if field is blank the validation should be fired");
+	}
+
+	@Test(priority = 17, enabled = true, groups = { "Smoke", "Harinder"})
+	public void VNDR_P2M5_250() throws InterruptedException {
+		
+		extentTest = extentReport.startTest("VNDR_P2M5_250",
+				"*H7 : Verify that user should not able to enter Alphabets");
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		byId.click(id_ManageBillNewBillButton, "Click on 'New Bill' button");
+		setLogs.info("Enter Alphabets in 'Due date'");
+		byId.clearThenSetText(id_NewBillDueDate, "New Bill", "Enter Alphabets in Due Date field");
+		setLogs.info("Get text from 'Due date' field");
+		String getText = byId.getText(id_NewBillDueDate, "get value from 'Due Date' field");
+		Assert.assertTrue(getText.equals(""), "User should not be able to enter Albhabets in 'Due Date' field");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that user is not able to enter Alphabets");
+	}
+
+	@Test(priority = 18, enabled = true, groups = { "Smoke", "Harinder"})
+	public void VNDR_P2M5_251() throws InterruptedException {
+		
+		extentTest = extentReport.startTest("VNDR_P2M5_251",
+				"*H7 : Verify that No validation should be fired by click on Due date");
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		byId.click(id_ManageBillNewBillButton, "Click on 'New Bill' button");
+		setLogs.info("Click on 'Due date'");
+		byId.click(id_NewBillDueDate, "Click on Due Date field");
+		int getErrorText = byClassName.getSize(class_MandatoryfieldErrorMessage, "get Error msg for 'Due Date' field");
+		Assert.assertTrue(getErrorText == 0, "User should not be able to enter Albhabets in 'Due Date' field");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that No validation should be fired by click on Due date");
+	}
+
+	@Test(priority = 19, enabled = true, groups = { "Smoke", "Harinder"})
+	public void VNDR_P2M5_262() throws InterruptedException {
+		
+		extentTest = extentReport.startTest("VNDR_P2M5_262",
+				"*H7 : Verify that 'unit' ddl in 'Add Items' Section should be a mandatory field");
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		byId.click(id_ManageBillNewBillButton, "Click on 'New Bill' button");
+		byId.click(id_NewBillAddItemsUnit, "Click on Unit DDL in 'Add Items' Section");
+		Actions act = new Actions(getDriver());
+		act.moveToElement(getDriver().findElement(By.id(id_NewBillAddItemsAmount))).click().perform();
+		String getErrorText = byClassName.getText(class_MandatoryfieldErrorMessage,
+				"get Error msg for 'Due Date' field");
+		Assert.assertTrue(getErrorText.equals(value_MandatoryfieldsMessage),
+				"'Unit' DDL is not mandatory. it should be Mandatory field.");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, 'unit' ddl in 'Add Items' Section is a mandatory field");
+	}
+
+	@Test(priority = 20, enabled = true, groups = { "Smoke", "Harinder"})
+	public void VNDR_P2M5_268() throws InterruptedException {
+		
+		extentTest = extentReport.startTest("VNDR_P2M5_268",
+				"*H7 : Verify that 'Account' ddl in 'Add Items' Section should be mandatory field");
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		byId.click(id_ManageBillNewBillButton, "Click on 'New Bill' button");
+		byId.click(id_NewBillAddItemsAccount, "Click on Account DDL in 'Add Items' Section");
+		Actions act = new Actions(getDriver());
+		act.moveToElement(getDriver().findElement(By.id(id_NewBillAddItemsAmount))).click().perform();
+		String getErrorText = byClassName.getText(class_MandatoryfieldErrorMessage,
+				"get Error msg for 'Due Date' field");
+		Assert.assertTrue(getErrorText.equals(value_MandatoryfieldsMessage),
+				"'Unit' DDL is not mandatory. it should be Mandatory field.");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, 'Account' ddl in 'Add Items' Section is a mandatory field");
+	}
+
+	@Test(priority = 21, enabled = true, groups = { "Smoke", "Harinder"})
+	public void VNDR_P2M5_269() throws InterruptedException {
+		
+		extentTest = extentReport.startTest("VNDR_P2M5_269",
+				"*H7 : Verify that user should be able to Select the Account from the DDL");
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		byId.click(id_ManageBillNewBillButton, "Click on 'New Bill' button");
+		setLogs.info("Get Default Selected option from Account DDL in 'Add Items' Section");
+		String getDefaultValue = byId.getFirstSelectedOption(id_NewBillAddItemsAccount,
+				"Get Default Selected value from Account DDL in 'Add Items' Section");
+		setLogs.info("Select required option from Account DDL in 'Add Items' Section");
+		byId.selectByIndex(id_NewBillAddItemsAccount, 1, "Select Account DDL option by Index");
+		setLogs.info("Get Default Selected option from Account DDL in 'Add Items' Section");
+		String getSelectedValue = byId.getFirstSelectedOption(id_NewBillAddItemsAccount,
+				"Get Selected value from Account DDL in 'Add Items' Section");
+		Assert.assertTrue(!getDefaultValue.equals(getSelectedValue),
+				"Unable to selected option from Account DDL in 'Add Items' Section");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, user is able to Select the Account from the DDL");
+	}
+
+	@Test(priority = 23, enabled = true, groups = { "Smoke", "Harinder"})
+	public void VNDR_P2M5_270_1() throws InterruptedException {
+		
+		extentTest = extentReport.startTest("VNDR_P2M5_270_1",
+				"*H7 : Verify that 'Amount' field in 'Add Items' Section should be a mandatory field");
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		byId.click(id_ManageBillNewBillButton, "Click on 'New Bill' button");
+		byId.click(id_NewBillAddItemsAmount, "Click in Amount fiels in Add Items sections");
+		Thread.sleep(1000);
+		Actions act = new Actions(getDriver());
+		act.moveToElement(getDriver().findElement(By.id(id_NewBillAddItemsDescription))).click().perform();
+		Thread.sleep(2000);
+		//int getErrorText = byClassName.getSize(class_MandatoryfieldErrorMessage, "get Error msg for 'Amount' field");
+		setLogs.info("Get Asterik Sign for Amount field in 'Add Items' Section");
+		/*String getAsterikSign = byXpath.getText("//*[@id='" + id_NewBillAddItemsAmountLabel + "']/span",
+				"get Asterik Sing");*/
+		String getAsterikSign = byClassName.getText(class_MandatoryfieldErrorMessage, "get Asterik Sing");
+		Assert.assertTrue(getAsterikSign.equals(value_MandatoryfieldsMessage), "No Asterik Sign is Present for Ammount field");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, 'Amount' field in 'Add Items' Section is a mandatory field ");
+	}
+
+	@Test(priority = 24, enabled = true, groups = { "Smoke", "Harinder"})
+	public void VNDR_P2M5_270_2() throws InterruptedException, IOException {
+		
+		extentTest = extentReport.startTest("VNDR_P2M5_270_2",
+				"*H7 : Verify that Currency sign set by default in Company Admin should be displayed");
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		byId.click(id_ManageBillNewBillButton, "Click on 'New Bill' button");
+		setLogs.info("Get Label for Amount field in 'Add Items' Section");
+		/*String getLabel = byId.getText(id_NewBillAddItemsAmountLabel,
+				"get Label of Amount field in 'Add Items' Section");*/
+		String getLabel = byXpath.getText("//*[@id='"+id_NewBillAddItemsSection+"']//table//thead//th[4]",
+				"get Label of Amount field in 'Add Items' Section");
+		int getLeftBracesIndex = getLabel.indexOf("(");
+		int getRightBracesIndex = getLabel.indexOf(")");
+		getLabel = getLabel.substring(getLeftBracesIndex + 1, getRightBracesIndex);
+		setLogs.info("Open New tab and Login as admin in Admin Portal");
+		privateBrowser();
+		login("", adminEmail, password);
+		byClassName.click("clssettings", "click on Setting tab");
+		String getOption = byId.getFirstSelectedOption("ddlCurrency",
+				"get First Selected option in 'Default Currency' DDL");
+		int getAdminLeftBracesIndex = getOption.indexOf("(");
+		int getAdminRightBracesIndex = getOption.indexOf(")");
+		getOption = getOption.substring(getAdminLeftBracesIndex + 1, getAdminRightBracesIndex);
+		driverClose();
+		Assert.assertTrue(getLabel.equals(getOption), "Admin's set Currency is not reflecting in vendor Portal");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, Currency sign set by default in Company Admin is displayed");
+	}
+
+	@Test(priority = 25, enabled = true, groups = { "Smoke", "Harinder"})
+	public void VNDR_P2M5_271() throws InterruptedException {
+		
+		extentTest = extentReport.startTest("VNDR_P2M5_271",
+				"*H7 : Verify that 'Amount' field should be clickable in 'Add Item' section");
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		byId.click(id_ManageBillNewBillButton, "Click on 'New Bill' button");
+		setLogs.info("Click on Amount field in 'Add Items' Section");
+		byId.clearThenSetText(id_NewBillAddItemsAmount, value_Amount, "Enter Text in Amount Field");
+		String getAmount = byId.getAttribute(id_NewBillAddItemsAmount, "value", "get Entered text from ");
+		Assert.assertTrue(getAmount.equals(value_Amount),
+				"User is Unable to Click/Enter Amount in 'Amount' Field in Split Bill");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, 'Amount' field should be clickable in Spilit bill section");
+	}
+
+	@Test(priority = 26, enabled = true, groups = { "Smoke", "Harinder"})
+	public void VNDR_P2M5_272() throws InterruptedException {
+		
+		extentTest = extentReport.startTest("VNDR_P2M5_272",
+				"*H7 : Verify that Enter Numerics in Amount field in 'Add Items' Section no validation should fired");
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		byId.click(id_ManageBillNewBillButton, "Click on 'New Bill' button");
+		setLogs.info("Enter Numerics in Amount field in 'Add Items' Section");
+		byId.clearThenSetText(id_NewBillAddItemsAmount, value_Amount, "Enter Text in Amount Field");
+		String getAmount = byId.getAttribute(id_NewBillAddItemsAmount, "value", "get Entered text from ");
+		int getErrorText = byClassName.getSize(class_MandatoryfieldErrorMessage, "get Error msg for 'Amount' field");
+		Assert.assertTrue(getAmount.equals(value_Amount) && getErrorText == 0,
+				"Error message is displaying entering numeric data in Amount field in 'Add Items' Section");
+		extentTest.log(LogStatus.INFO,
+				"*H7 : Verified, Enter Numerics in Amount field in 'Add Items' Section no validation is fired");
+	}
+
+	@Test(priority = 27, enabled = true, groups = { "Smoke", "Harinder"})
+	public void VNDR_P2M5_274() throws InterruptedException {
+	
+		extentTest = extentReport.startTest("VNDR_P2M5_274",
+				"*H7 : Verify that Enter number more than one in Amount field in 'Add Items' Section no validation should fired");
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		byId.click(id_ManageBillNewBillButton, "Click on 'New Bill' button");
+		byId.clearThenSetText(id_NewBillAmount,value_Amount , "Enter Bill Amount");
+		setLogs.info("Enter number more than one in Amount field in 'Add Items' Section");
+		byId.clearThenSetText(id_NewBillAddItemsAmount, value_Amount, "Enter Text in Amount Field");
+		String getAmount = byId.getAttribute(id_NewBillAddItemsAmount, "value", "get Entered text from ");
+		Actions act = new Actions(getDriver());
+		act.moveToElement(getDriver().findElement(By.id(id_NewBillAddItemsDescription))).click().perform();
+		int getErrorText = byClassName.getSize(class_MandatoryfieldErrorMessage, "get Error msg for 'Amount' field");
+		Assert.assertTrue(getAmount.equals(value_Amount) && getErrorText == 0,
+				"User is Unable to Enter number more than one in 'Amount' Field in Add Item section");
+		extentTest.log(LogStatus.INFO,
+				"*H7 : Verified, Entering number more than one in Amount field in 'Add Items' Section no validation should fired");
+	}
+
+	@Test(priority = 28, enabled = true, groups = { "Smoke", "Harinder"})
+	public void VNDR_P2M5_275() throws InterruptedException {
+		
+		extentTest = extentReport.startTest("VNDR_P2M5_275",
+				"*H7 : Verify that Enter Albhabets in Amount field in 'Add Items' Section User should not be able to enter alphabets");
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		byId.click(id_ManageBillNewBillButton, "Click on 'New Bill' button");
+		setLogs.info("Enter Alphabets in Amount field in 'Add Items' Section");
+		byId.clearThenSetText(id_NewBillAddItemsAmount, "New Bill", "Enter Text in Amount Field");
+		String getText = byId.getAttribute(id_NewBillAddItemsAmount, "value", "get Entered text from ");
+		Actions act = new Actions(getDriver());
+		act.moveToElement(getDriver().findElement(By.id(id_NewBillAddItemsDescription))).click().perform();
+		Assert.assertTrue(getText.equals(""), "User is Unable to Click/Enter Amount in 'Amount' Field in Split Bill");
+		extentTest.log(LogStatus.INFO,
+				"*H7 : Verified, Enter Albhabets in Amount field in 'Add Items' Section User should not be able to enter alphabets");
+	}
+
+	@Test(priority = 29, enabled = true, groups = { "Smoke", "Harinder"})
+	public void VNDR_P2M5_282() throws InterruptedException {
+		
+		extentTest = extentReport.startTest("VNDR_P2M5_282",
+				"*H7 : Verify Ensure that when user fill all 'Add Items' Section and click anywhere the 'List of Properties' grid should be displayed with following columns");
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		setLogs.info("to New Bill from Fill 'Add Items' Section");
+		byId.click(id_ManageBillNewBillButton, "Click on 'New Bill' button");
+		refNo = utility.uniqueNo();
+		byId.clearThenSetText(id_NewBillAmount, value_Amount, " Enter Amount in Amount field");
+		byId.clearThenSetText(id_NewBillReference, refNo, "Enter Reference# in 'Referecne#' field");
+		byId.selectByVisibleText(id_NewBillPortfolio, arr[1], "Select Portfolio");
+		byId.clearThenSetText(id_NewBillSplitBillProperty, arr[0], "Enter Property from Property DDL in 'Add Items' Section");
+		//getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ARROW_DOWN);
+		Thread.sleep(2000);
+		getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ARROW_DOWN);
+		getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ARROW_DOWN);
+		getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ENTER);
+		byId.selectByVisibleText(id_AddItemsSectionBuildingDDL, building.get(0), "Select Building");
+		String getUnitNum = byId.getFirstSelectedOption(id_NewBillAddItemsUnit, "Get Selected unit No");
+		if (getUnitNum.equals("Select")) {
+			byId.selectByIndex(id_NewBillAddItemsUnit, 1, "Click on Unit DDL");
+		}
+			/*byXpath.click("//*[@class='" + class_NewBillUnitPopupUnitsCheckBox + "'][1]//input",
+					"Check the checkbox to select Unit");
+			byId.click("btnInvoiceUnitSave", "Click on Save button");
+		}*/
+		byId.selectByIndex(id_NewBillAddItemsAccount, 1, "Select Account by Index");
+		//String getAccountName = byId.getFirstSelectedOption(id_NewBillAddItemsAccount, "Get Selected Account");
+		byId.clearThenSetText(id_NewBillAddItemsAmount, value_Amount, "Enter Amount in 'Add Items' Section");
+		Actions act = new Actions(getDriver());
+		act.moveToElement(getDriver().findElement(By.id(id_NewBillAddItemsDescription))).click().perform();
+
+		List<String> HeaderLabel = new ArrayList<>();
+		//List<WebElement> webList = byXpath.getElements("//*[@id='" + id_SplitBillSectionGrid + "']//thead//tr//th[not(contains(@style,'display: none;'))]", "get web elements");
+		List<WebElement> webList = byXpath.getElements("//*[@id='"+id_NewBillAddItemsSection+"']//table//thead//th", "get web elements");
+		
+			for (WebElement webElement : webList) {
+			String getHeaderLabel = webElement.getText()/*.trim()*/;
+			HeaderLabel.add(getHeaderLabel);
+		}
+		System.out.println(HeaderLabel);
+		String getAmountHeader = HeaderLabel.get(3);
+		int getIndex = getAmountHeader.indexOf("(");
+		getAmountHeader = getAmountHeader.substring(0, getIndex);
+		HeaderLabel.remove(3);
+		HeaderLabel.add(3, getAmountHeader);
+		System.out.println(HeaderLabel);
+		List<String> actualHeader = VendorPortalCommons.AddMultipleValuesInList(value_SplitBillGridHeaders);
+		Assert.assertTrue(actualHeader.equals(HeaderLabel), "Header might be added or deleted");
+		extentTest.log(LogStatus.INFO,
+				"*H7 : Verified, that when user fill all 'Add Items' Section and click anywhere the 'List of Properties' grid should be displayed with following columns");
+	}
+	
+	//Functiomality has been removed for this Test script
+	/*@Test(priority = 30, enabled = true, groups = { "Smoke", "Harinder"})
+	public void VNDR_P2M5_283() throws InterruptedException {
+		
+		extentTest = extentReport.startTest("VNDR_P2M5_283",
+				"*H7 : Verify Property name should be displayed in 'Add Items' Section");
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		setLogs.info("Go to New Bill from Fill 'Add Items' Section");
+		byId.click(id_ManageBillNewBillButton, "Click on 'New Bill' button");
+		String refNo = utility.uniqueNo();
+		byId.clearThenSetText(id_NewBillAmount, value_Amount, " Enter Amount in Amount field");
+		byId.clearThenSetText(id_NewBillReference, refNo, "Enter Reference# in 'Referecne#' field");
+		byId.selectByVisibleText(id_NewBillPortfolio, arr[1], "Select Portfolio");
+		byId.clearThenSetText(id_NewBillSplitBillProperty, arr[0],"Enter Property from Property DDL in 'Add Items' Section");
+		//getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ARROW_DOWN);
+		Thread.sleep(2000);
+		getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ARROW_DOWN);
+		getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ENTER);
+		byId.selectByIndex(id_AddItemsSectionBuildingDDL, 1, "Select Building");
+		String getUnitNum = byId.getFirstSelectedOption(id_NewBillAddItemsUnit, "Get Selected unit No");
+		if (getUnitNum.equals("Select")) {
+			byId.click(id_NewBillAddItemsUnit, "Click on Unit DDL");
+			byXpath.click("//*[@class='" + class_NewBillUnitPopupUnitsCheckBox + "'][1]//input",
+					"Check the checkbox to select Unit");
+			byId.click("btnInvoiceUnitSave", "Click on Save button");
+		}
+		byId.selectByIndex(id_NewBillAddItemsAccount, 1, "Select Account by Index");
+		String getAccountName = byId.getFirstSelectedOption(id_NewBillAddItemsAccount, "Get Selected Account");
+		byId.clearThenSetText(id_NewBillAddItemsAmount, value_Amount, "Enter Amount in 'Add Items' Section");
+		String getAmount = byId.getText(id_NewBillAddItemsAmount, "get Amount from 'Add Items' Section");
+		Actions act = new Actions(getDriver());
+		act.moveToElement(getDriver().findElement(By.id(id_NewBillAddItemsDescription))).click().perform();
+
+		List<String> tableData = new ArrayList<>();
+		List<WebElement> webList = byXpath.getElements(
+				"//*[@id='" + id_SplitBillSectionGrid + "']//tbody//tr[2]//td[not(contains(@style,'display:none'))]",
+				"get web elements");
+		for (WebElement webElement : webList) {
+			String getData = webElement.getText();
+			tableData.add(getData);
+		}
+		System.out.println(tableData);
+		
+		 * String getAmountHeader = tableData.get(3); int getIndex =
+		 * getAmountHeader.indexOf("("); if(getIndex>0) getAmountHeader =
+		 * getAmountHeader.substring(0, getIndex); tableData.remove(3);
+		 * tableData.add(3, getAmountHeader); System.out.println(tableData);
+		 
+
+		Assert.assertTrue(tableData.get(0).equals(arr[0]), "Property name is not displaying in 'Add Items' Section");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, Property name should be displayed in 'Add Items' Section");
+	}
+
+	//Functiomality has been removed for this Test script
+	@Test(priority = 31, enabled = true, groups = { "Smoke", "Harinder"})
+	public void VNDR_P2M5_284() throws InterruptedException {
+		
+		extentTest = extentReport.startTest("VNDR_P2M5_284", "*H7 : Verify Number if Units should be displayed");
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		setLogs.info("Go to New Bill from Fill 'Add Items' Section");
+		byId.click(id_ManageBillNewBillButton, "Click on 'New Bill' button");
+		refNo = utility.uniqueNo();
+		byId.clearThenSetText(id_NewBillAmount, value_Amount, " Enter Amount in Amount field");
+		byId.clearThenSetText(id_NewBillReference, refNo, "Enter Reference# in 'Referecne#' field");
+		byId.selectByVisibleText(id_NewBillPortfolio, arr[1], "Select Portfolio");
+		byId.clearThenSetText(id_NewBillSplitBillProperty, arr[0],
+				"Enter Property from Property DDL in 'Add Items' Section");
+		//getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ARROW_DOWN);
+		Thread.sleep(2000);
+		getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ARROW_DOWN);
+		getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ENTER);
+		byId.selectByIndex(id_AddItemsSectionBuildingDDL, 1, "Select Building");
+		String getUnitNum = byId.getFirstSelectedOption(id_NewBillAddItemsUnit, "Get Selected unit No");
+		if (getUnitNum.equals("Select")) {
+			byId.click(id_NewBillAddItemsUnit, "Click on Unit DDL");
+			byXpath.click("//*[@class='" + class_NewBillUnitPopupUnitsCheckBox + "'][1]//input",
+					"Check the checkbox to select Unit");
+			byId.click("btnInvoiceUnitSave", "Click on Save button");
+			getUnitNum = byId.getFirstSelectedOption(id_NewBillAddItemsUnit, "Get Selected unit No");
+		}
+		byId.selectByIndex(id_NewBillAddItemsAccount, 1, "Select Account by Index");
+		String getAccountName = byId.getFirstSelectedOption(id_NewBillAddItemsAccount, "Get Selected Account");
+		byId.clearThenSetText(id_NewBillAddItemsAmount, value_Amount, "Enter Amount in 'Add Items' Section");
+		String getAmount = byId.getText(id_NewBillAddItemsAmount, "get Amount from 'Add Items' Section");
+		Actions act = new Actions(getDriver());
+		act.moveToElement(getDriver().findElement(By.id(id_NewBillAddItemsDescription))).click().perform();
+
+		List<String> tableData = new ArrayList<>();
+		List<WebElement> webList = byXpath.getElements(
+				"//*[@id='" + id_SplitBillSectionGrid + "']//tbody//tr[2]//td[not(contains(@style,'display:none'))]",
+				"get web elements");
+		for (WebElement webElement : webList) {
+			String getData = webElement.getText().trim();
+			tableData.add(getData);
+		}
+		System.out.println(tableData);
+		
+		 * String getAmountHeader = tableData.get(3); int getIndex =
+		 * getAmountHeader.indexOf("("); getAmountHeader =
+		 * getAmountHeader.substring(0, getIndex); tableData.remove(3);
+		 * tableData.add(3, getAmountHeader); System.out.println(tableData);
+		 
+		Assert.assertTrue(tableData.get(1).equals(getUnitNum), "Unit Number is not displaying in 'Add Items' Section");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, Units Number is displayed");
+	}
+
+	//Functiomality has been removed for this Test script
+	@Test(priority = 32, enabled = true, groups = { "Smoke", "Harinder"})
+	public void VNDR_P2M5_285() throws InterruptedException {
+	
+		extentTest = extentReport.startTest("VNDR_P2M5_285", "*H7 : Verify Account Type should be displayed");
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		setLogs.info("Go to New Bill from Fill 'Add Items' Section");
+		byId.click(id_ManageBillNewBillButton, "Click on 'New Bill' button");
+		refNo = utility.uniqueNo();
+		byId.clearThenSetText(id_NewBillAmount, value_Amount, " Enter Amount in Amount field");
+		byId.clearThenSetText(id_NewBillReference, refNo, "Enter Reference# in 'Referecne#' field");
+		byId.selectByVisibleText(id_NewBillPortfolio, arr[1], "Select Portfolio");
+		byId.clearThenSetText(id_NewBillSplitBillProperty, arr[0],
+				"Enter Property from Property DDL in 'Add Items' Section");
+		//getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ARROW_DOWN);
+		Thread.sleep(2000);
+		getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ARROW_DOWN);
+		getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ENTER);
+		byId.selectByIndex(id_AddItemsSectionBuildingDDL, 1, "Select Building");
+		String getUnitNum = byId.getFirstSelectedOption(id_NewBillAddItemsUnit, "Get Selected unit No");
+		if (getUnitNum.equals("Select")) {
+			byId.click(id_NewBillAddItemsUnit, "Click on Unit DDL");
+			byXpath.click("//*[@class='" + class_NewBillUnitPopupUnitsCheckBox + "'][1]//input",
+					"Check the checkbox to select Unit");
+			byId.click("btnInvoiceUnitSave", "Click on Save button");
+			getUnitNum = byId.getFirstSelectedOption(id_NewBillAddItemsUnit, "Get Selected unit No");
+		}
+		byId.selectByIndex(id_NewBillAddItemsAccount, 1, "Select Account by Index");
+		String getAccountName = byId.getFirstSelectedOption(id_NewBillAddItemsAccount, "Get Selected Account");
+		byId.clearThenSetText(id_NewBillAddItemsAmount, value_Amount, "Enter Amount in 'Add Items' Section");
+		String getAmount = byId.getText(id_NewBillAddItemsAmount, "get Amount from 'Add Items' Section");
+		Actions act = new Actions(getDriver());
+		act.moveToElement(getDriver().findElement(By.id(id_NewBillAddItemsDescription))).click().perform();
+
+		List<String> tableData = new ArrayList<>();
+		List<WebElement> webList = byXpath.getElements(
+				"//*[@id='" + id_SplitBillSectionGrid + "']//tbody//tr[2]//td[not(contains(@style,'display:none'))]",
+				"get web elements");
+		for (WebElement webElement : webList) {
+			String getData = webElement.getText().trim();
+			tableData.add(getData);
+		}
+		System.out.println(tableData);
+		
+		 * String getAmountHeader = tableData.get(3); int getIndex =
+		 * getAmountHeader.indexOf("("); getAmountHeader =
+		 * getAmountHeader.substring(0, getIndex); tableData.remove(3);
+		 * tableData.add(3, getAmountHeader); System.out.println(tableData);
+		 
+
+		Assert.assertTrue(tableData.get(2).equals(getAccountName),
+				"Selected Account Name is not displaying in 'Add Items' Section");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, Account Type should be displayed");
+	}*/
+
+	//Functiomality has been removed for this Test script
+/*	@Test(priority = 33, enabled = true, groups = { "Smoke", "Harinder"})
+	public void VNDR_P2M5_286() throws InterruptedException {
+		
+		extentTest = extentReport.startTest("VNDR_P2M5_286", "*H7 : Verify Property Amount should be displayed");
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		setLogs.info("Go to New Bill from Fill 'Add Items' Section");
+		byId.click(id_ManageBillNewBillButton, "Click on 'New Bill' button");
+		String refNo = utility.uniqueNo();
+		byId.clearThenSetText(id_NewBillAmount, value_Amount, " Enter Amount in Amount field");
+		byId.clearThenSetText(id_NewBillReference, refNo, "Enter Reference# in 'Referecne#' field");
+		byId.selectByVisibleText(id_NewBillPortfolio, arr[1], "Select Portfolio");
+		byId.clearThenSetText(id_NewBillSplitBillProperty, arr[0],
+				"Enter Property from Property DDL in 'Add Items' Section");
+		getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ARROW_DOWN);
+		getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ARROW_DOWN);
+		getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ENTER);
+		String getUnitNum = byId.getFirstSelectedOption(id_NewBillAddItemsUnit, "Get Selected unit No");
+		if (getUnitNum.equals("Select")) {
+			byId.click(id_NewBillAddItemsUnit, "Click on Unit DDL");
+			byXpath.click("//*[@class='" + class_NewBillUnitPopupUnitsCheckBox + "'][1]//input",
+					"Check the checkbox to select Unit");
+			byId.click("btnInvoiceUnitSave", "Click on Save button");
+			getUnitNum = byId.getFirstSelectedOption(id_NewBillAddItemsUnit, "Get Selected unit No");
+		}
+		byId.selectByIndex(id_NewBillAddItemsAccount, 1, "Select Account by Index");
+		String getAccountName = byId.getFirstSelectedOption(id_NewBillAddItemsAccount, "Get Selected Account");
+		byId.clearThenSetText(id_NewBillAddItemsAmount, value_Amount, "Enter Amount in 'Add Items' Section");
+		// String getAmount = byId.getAttribute(id_NewBillAddItemsAmount,
+		// "value", "get Amount from 'Add Items' Section");
+		Actions act = new Actions(getDriver());
+		act.moveToElement(getDriver().findElement(By.id(id_NewBillAddItemsDescription))).click().perform();
+
+		List<String> tableData = new ArrayList<>();
+		List<WebElement> webList = byXpath.getElements(
+				"//*[@id='" + id_SplitBillSectionGrid + "']//tbody//tr[2]//td[not(contains(@style,'display:none'))]",
+				"get web elements");
+		for (WebElement webElement : webList) {
+			String getData = webElement.getText().trim();
+			tableData.add(getData);
+		}
+		System.out.println(tableData);*/
+		/*
+		 * String getAmountHeader = tableData.get(3); int getIndex =
+		 * getAmountHeader.indexOf("("); getAmountHeader =
+		 * getAmountHeader.substring(0, getIndex); tableData.remove(3);
+		 * tableData.add(3, getAmountHeader); System.out.println(tableData);
+		 */
+
+	/*	Assert.assertTrue(tableData.get(3).equals(value_Amount + ".00"),
+				"Amount is not displaying in 'Add Items' Section");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, Property Amount should be displayed");
+	}*/
+
+	//Functiomality has been removed for this Test script
+	/*@Test(priority = 34, enabled = true, groups = { "Smoke", "Harinder"})
+	public void VNDR_P2M5_287() throws InterruptedException {
+	
+		extentTest = extentReport.startTest("VNDR_P2M5_287", "*H7 : Verify Description should be displayed");
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		setLogs.info("Go to New Bill from Fill 'Add Items' Section");
+		byId.click(id_ManageBillNewBillButton, "Click on 'New Bill' button");
+		String refNo = utility.uniqueNo();
+		byId.clearThenSetText(id_NewBillAmount, value_Amount, " Enter Amount in Amount field");
+		byId.clearThenSetText(id_NewBillReference, refNo, "Enter Reference# in 'Referecne#' field");
+		byId.selectByVisibleText(id_NewBillPortfolio, arr[1], "Select Portfolio");
+		byId.clearThenSetText(id_NewBillSplitBillProperty, arr[0],
+				"Enter Property from Property DDL in 'Add Items' Section");
+		getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ARROW_DOWN);
+		getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ARROW_DOWN);
+		getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ENTER);
+		String getUnitNum = byId.getFirstSelectedOption(id_NewBillAddItemsUnit, "Get Selected unit No");
+		if (getUnitNum.equals("Select")) {
+			byId.click(id_NewBillAddItemsUnit, "Click on Unit DDL");
+			byXpath.click("//*[@class='" + class_NewBillUnitPopupUnitsCheckBox + "'][1]//input",
+					"Check the checkbox to select Unit");
+			byId.click("btnInvoiceUnitSave", "Click on Save button");
+			getUnitNum = byId.getFirstSelectedOption(id_NewBillAddItemsUnit, "Get Selected unit No");
+		}
+		byId.selectByIndex(id_NewBillAddItemsAccount, 1, "Select Account by Index");
+		String getAccountName = byId.getFirstSelectedOption(id_NewBillAddItemsAccount, "Get Selected Account");
+		byId.clearThenSetText(id_NewBillAddItemsAmount, value_Amount, "Enter Amount in 'Add Items' Section");
+		String getAmount = byId.getText(id_NewBillAddItemsAmount, "get Amount from 'Add Items' Section");
+		Actions act = new Actions(getDriver());
+		act.moveToElement(getDriver().findElement(By.id(id_NewBillAddItemsDescription))).click().perform();
+
+		List<String> tableData = new ArrayList<>();
+		List<WebElement> webList = byXpath.getElements(
+				"//*[@id='" + id_SplitBillSectionGrid + "']//tbody//tr[2]//td[not(contains(@style,'display:none'))]",
+				"get web elements");
+		for (WebElement webElement : webList) {
+			String getData = webElement.getText().trim();
+			tableData.add(getData);
+		}
+		System.out.println(tableData);
+		
+		 * String getAmountHeader = tableData.get(3); int getIndex =
+		 * getAmountHeader.indexOf("("); getAmountHeader =
+		 * getAmountHeader.substring(0, getIndex); tableData.remove(3);
+		 * tableData.add(3, getAmountHeader); System.out.println(tableData);
+		 
+
+		Assert.assertTrue("X".equals("Y"), "Functionality is not working Properly");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, Description should be displayed");
+	}*/
+
+	//Functiomality has been removed for this Test script
+	/*@Test(priority = 35, enabled = true, groups = { "Smoke", "Harinder"})
+	public void VNDR_P2M5_288() throws InterruptedException {
+	
+		extentTest = extentReport.startTest("VNDR_P2M5_288", "*H7 : Verify Charges should be displayed");
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		setLogs.info("Go to New Bill from Fill 'Add Items' Section");
+		byId.click(id_ManageBillNewBillButton, "Click on 'New Bill' button");
+		String refNo = utility.uniqueNo();
+		byId.clearThenSetText(id_NewBillAmount, value_Amount, " Enter Amount in Amount field");
+		byId.clearThenSetText(id_NewBillReference, refNo, "Enter Reference# in 'Referecne#' field");
+		byId.selectByVisibleText(id_NewBillPortfolio, arr[1], "Select Portfolio");
+		byId.clearThenSetText(id_NewBillSplitBillProperty, arr[0],
+				"Enter Property from Property DDL in 'Add Items' Section");
+		getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ARROW_DOWN);
+		getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ARROW_DOWN);
+		getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ENTER);
+		String getUnitNum = byId.getFirstSelectedOption(id_NewBillAddItemsUnit, "Get Selected unit No");
+		if (getUnitNum.equals("Select")) {
+			byId.click(id_NewBillAddItemsUnit, "Click on Unit DDL");
+			byXpath.click("//*[@class='" + class_NewBillUnitPopupUnitsCheckBox + "'][1]//input",
+					"Check the checkbox to select Unit");
+			byId.click("btnInvoiceUnitSave", "Click on Save button");
+			getUnitNum = byId.getFirstSelectedOption(id_NewBillAddItemsUnit, "Get Selected unit No");
+		}
+		byId.selectByIndex(id_NewBillAddItemsAccount, 1, "Select Account by Index");
+		String getAccountName = byId.getFirstSelectedOption(id_NewBillAddItemsAccount, "Get Selected Account");
+		byId.clearThenSetText(id_NewBillAddItemsAmount, value_Amount, "Enter Amount in 'Add Items' Section");
+		String getAmount = byId.getText(id_NewBillAddItemsAmount, "get Amount from 'Add Items' Section");
+		Actions act = new Actions(getDriver());
+		act.moveToElement(getDriver().findElement(By.id(id_NewBillAddItemsDescription))).click().perform();
+
+		List<String> tableData = new ArrayList<>();
+		List<WebElement> webList = byXpath.getElements(
+				"//*[@id='" + id_SplitBillSectionGrid + "']//tbody//tr[2]//td[not(contains(@style,'display:none'))]",
+				"get web elements");
+		for (WebElement webElement : webList) {
+			String getData = webElement.getText().trim();
+			tableData.add(getData);
+		}
+		System.out.println(tableData);
+		
+		 * String getAmountHeader = tableData.get(3); int getIndex =
+		 * getAmountHeader.indexOf("("); getAmountHeader =
+		 * getAmountHeader.substring(0, getIndex); tableData.remove(3);
+		 * tableData.add(3, getAmountHeader); System.out.println(tableData);
+		 
+		Assert.assertTrue("X".equals("Y"), "Functionality is not working Properly");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, Charges should be displayed");
+	}*/
+
+	@Test(priority = 34, enabled = true, groups = { "Smoke", "Harinder"})
+	public void VNDR_P2M5_289() throws InterruptedException {
+	
+		extentTest = extentReport.startTest("VNDR_P2M5_289", "*H7 : User should be able to add more property if sum of amount is less in already added property");
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		setLogs.info("Go to New Bill from Fill 'Add Items' Section");
+		byId.click(id_ManageBillNewBillButton, "Click on 'New Bill' button");
+		String refNo = utility.uniqueNo();
+		byId.clearThenSetText(id_NewBillAmount, value_Amount, " Enter Amount in Amount field");
+		byId.clearThenSetText(id_NewBillReference, refNo, "Enter Reference# in 'Referecne#' field");
+		byId.selectByVisibleText(id_NewBillPortfolio, arr[1], "Select Portfolio");
+		byId.clearThenSetText(id_NewBillSplitBillProperty, arr[0],
+				"Enter Property from Property DDL in 'Add Items' Section");
+		//getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ARROW_DOWN);
+		Thread.sleep(2000);
+		getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ARROW_DOWN);
+		getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ARROW_DOWN);
+		getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ENTER);
+		byId.selectByVisibleText(id_AddItemsSectionBuildingDDL, building.get(0), "Select Building");
+		String getUnitNum = byId.getFirstSelectedOption(id_NewBillAddItemsUnit, "Get Selected unit No");
+		if (getUnitNum.equals("Select")) {
+			byId.selectByIndex(id_NewBillAddItemsUnit, 1, "Select Unit by Index");
+		}
+		getUnitNum = byId.getFirstSelectedOption(id_NewBillAddItemsUnit, "Get Selected unit No");
+		byId.selectByIndex(id_NewBillAddItemsAccount, 1, "Select Account by Index");
+		String getAccountName = byId.getFirstSelectedOption(id_NewBillAddItemsAccount, "Get Selected Account");
+		byId.clearThenSetText(id_NewBillAddItemsAmount, "50", "Enter Amount in 'Add Items' Section");
+		String getAmount = byId.getText(id_NewBillAddItemsAmount, "get Amount from 'Add Items' Section");
+		byId.clearThenSetText(id_NewBillAddItemsDescription, "First Property description", "Enter First Property description in 'Add Items' Section");
+		byId.click(id_NewBillAddItemsAddButton, "Click on Add Item button.");
+		List<WebElement> getEle = byXpath.getElements("//*[@id='"+id_NewBillAddItemsSection+"']//table//tbody//tr", "get Row Count in 'Add Items' section");
+		int eleCount = getEle.size();
+		Assert.assertTrue(eleCount==2, "New is not exits to add more properties.");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, User should be able to add more property if sum of amount is less in already added property");
+	}
+	
+	
+	@Test(priority = 34, enabled = true, groups = { "Smoke", "Harinder"})
+	public void VNDR_P2M5_290() throws InterruptedException {
+	
+		extentTest = extentReport.startTest("VNDR_P2M5_290", "*H7 : User should not be able to add more property if sum of amount is equal to  already added property and confirmation message 'Total amount can not be greater than Bill Amount' should be displayed");
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		setLogs.info("Go to New Bill from Fill 'Add Items' Section");
+		byId.click(id_ManageBillNewBillButton, "Click on 'New Bill' button");
+		String refNo = utility.uniqueNo();
+		byId.clearThenSetText(id_NewBillAmount, value_Amount, " Enter Amount in Amount field");
+		byId.clearThenSetText(id_NewBillReference, refNo, "Enter Reference# in 'Referecne#' field");
+		byId.selectByVisibleText(id_NewBillPortfolio, arr[1], "Select Portfolio");
+		byId.clearThenSetText(id_NewBillSplitBillProperty, arr[0],
+				"Enter Property from Property DDL in 'Add Items' Section");
+		Thread.sleep(2000);
+		getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ARROW_DOWN);
+		getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ARROW_DOWN);
+		getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ENTER);
+		byId.selectByVisibleText(id_AddItemsSectionBuildingDDL, building.get(0), "Select Building");
+		String getUnitNum = byId.getFirstSelectedOption(id_NewBillAddItemsUnit, "Get Selected unit No");
+		if (getUnitNum.equals("Select")) {
+			byId.selectByIndex(id_NewBillAddItemsUnit, 1, "Select Unit by Index");
+		}
+		getUnitNum = byId.getFirstSelectedOption(id_NewBillAddItemsUnit, "Get Selected unit No");
+		byId.selectByIndex(id_NewBillAddItemsAccount, 1, "Select Account by Index");
+		String getAccountName = byId.getFirstSelectedOption(id_NewBillAddItemsAccount, "Get Selected Account");
+		byId.clearThenSetText(id_NewBillAddItemsAmount, value_Amount, "Enter Amount in 'Add Items' Section");
+		String getAmount = byId.getText(id_NewBillAddItemsAmount, "get Amount from 'Add Items' Section");
+		byId.clearThenSetText(id_NewBillAddItemsDescription, "First Property description", "Enter First Property description in 'Add Items' Section");
+		byId.click(id_NewBillAddItemsAddButton, "Click on Add Item button.");
+		
+		byId.selectByIndex(id_AddItemsSectionBuildingDDL2, 1, "Select Building");
+		byId.selectByIndex(id_NewBillAddItemsUnit2, 1, "Select Unit");
+		byId.selectByIndex(id_NewBillAddItemsAccount2, 1, "Select Account");
+		byId.clearThenSetText(id_NewBillAddItemsAmount2, value_Amount, "Enter Amount for 2nd row in 'Add Items' section.");
+		Actions act = new Actions(getDriver());
+		act.moveToElement(getDriver().findElement(By.id(id_NewBillAddItemsDescription2))).click().perform();
+		String getPopupText = byXpath.getText("//*[contains(@class,'toast-type-warning')]//p", "get Popup text");
+		Assert.assertEquals(getPopupText, value_AddItemsPopupText, "Popup Text has been changed.");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, User is not able to add more property if sum of amount is equal to  already added property and confirmation message 'Total amount can not be greater than Bill Amount' should be displayed");
+	}
+	
+	@Test(priority = 36, enabled = true, groups = { "Smoke", "Harinder"})
+	public void VNDR_P2M5_315() throws InterruptedException {
+		
+		List<String> actualData = new ArrayList<>();
+		extentTest = extentReport.startTest("VNDR_P2M5_315",
+				"*H7 : Verify Ensure that bill should be displayed in the grid 'List of Bills'");
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		setLogs.info("Create New Bill");
+		refNo = utility.uniqueNo();
+		values = VendorPortalCommons.NewBill(value_Amount, "", refNo, arr[1], "", arr[0],"","", "", "", "", value_Amount, "", "");
+		int getSize = byXpath.getSize(
+				"//*[@id='" + id_ManageBillGridListingTable + "']//tbody//tr//td[contains(text(),'" + refNo + "')]",
+				" get Size if record exits in 'List of Bills' Grid");
+		Assert.assertTrue(getSize == 1, "Record is not exits in 'List of Bill' grid");
+		extentTest.log(LogStatus.INFO,
+				"*H7 : Verified, Ensure that bill should be displayed in the grid 'List of Bills'");
+	}
+
+	@Test(priority = 37, enabled = true, groups = { "Smoke", "Harinder"})
+	public void VNDR_P2M5_316() throws InterruptedException {
+		
+		extentTest = extentReport.startTest("VNDR_P2M5_316",
+				"*H7 : Verify New Bill Form >> Click on Save Button >> Validation message should be fired and user stay on that page.");
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		byId.click(id_ManageBillNewBillButton, "Click on 'New Bill' button");
+		setLogs.info("Click on Save Button without filling fields");
+		byId.click(id_NewBillSaveButton, "Click on Save Button");
+		int errorMsgSize = byClassName.getSize(class_MandatoryfieldErrorMessage, "get Count of Required Fields");
+		Assert.assertTrue(errorMsgSize == 5,
+				"User is able to Save Blank Page, user should not be allowed to save Blank Page.");
+		extentTest.log(LogStatus.INFO,
+				"*H7 : Verified, New Bill Form >> Click on Save Button >> Validation message is fired and user stay on that page.");
+	}
+
+	@Test(priority = 38, enabled = true, groups = { "Smoke", "Harinder"})
+	public void VNDR_P2M5_317() throws InterruptedException {
+		
+		extentTest = extentReport.startTest("VNDR_P2M5_317",
+				"*H7 : Verify Click on Cancel button >> Confirmation message 'Do you want to Cancel this action now?' should be displayed.");
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		byId.click(id_ManageBillNewBillButton, "Click on 'New Bill' button");
+		setLogs.info("Click on Cancel Button places at the bottom of page");
+		byId.click(id_NewBillCancelButton, "Click on Cancel Button");
+		String getText = byClassName.getText(class_ConfirmPopupContent, " Get Message from Confirm Popup");
+		Assert.assertTrue(getText.equals(value_ConfirmPopupContent),
+				"Message Content on 'Confirm' Popup has been changed.");
+		getDriver().navigate().refresh();
+		extentTest.log(LogStatus.INFO,
+				"*H7 : Verified, Click on Cancel button >> Confirmation message 'Do you want to Cancel this action now?' is displayed.");
+	}
+
+	@Test(priority = 39, enabled = true, groups = { "Smoke", "Harinder"})
+	public void VNDR_P2M5_318() throws InterruptedException {
+		extentTest = extentReport.startTest("VNDR_P2M5_318",
+				"*H7 : Verify Click on Cancel button >> Click on YES >> User should redirects to Manage Bill tab");
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		byId.click(id_ManageBillNewBillButton, "Click on 'New Bill' button");
+		setLogs.info("Click on Cancel Button places at the bottom of page and Click on 'Yes'");
+		byId.click(id_NewBillCancelButton, "Click on Cancel Button");
+		byName.click("Yes", "Click on 'Yes' button on Confirm Popup");
+		Thread.sleep(3000);
+		int getSize = getDriver().findElements(By.xpath("//*[@id='" + id_ManageBillNewBillButton + "'][@style='0px']"))
+				.size();
+		Assert.assertTrue(getSize == 0, "Cancel Button is not working");
+		extentTest.log(LogStatus.INFO,
+				"*H7 : Verified, Click on Cancel button >> Click on YES >> User should redirects to Manage Bill tab");
+	}
+
+	@Test(priority = 40, enabled = true, groups = { "Smoke", "Harinder"})
+	public void VNDR_P2M5_319() throws InterruptedException {
+		
+		extentTest = extentReport.startTest("VNDR_P2M5_319",
+				"*H7 : Verify Click on Cancel button >> Click on NO >> User should be stay on New Bill screen.");
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		byId.click(id_ManageBillNewBillButton, "Click on 'New Bill' button");
+		setLogs.info("Click on Cancel Button places at the bottom of page and Click on 'NO'");
+		byId.click(id_NewBillCancelButton, "Click on Cancel Button");
+		byName.click("No", "Click on 'NO' button on Confirm Popup");
+		int getSize = getDriver().findElements(By.xpath("//*[@id='" + id_ManageBillNewBillButton + "'][@style='0px']"))
+				.size();
+		Assert.assertTrue(getSize == 1,
+				"Clicking on No, User is redirecting on Manage Bill Listing Page, it should stay on New bill page.");
+		extentTest.log(LogStatus.INFO,
+				"*H7 : Verified, Click on Cancel button >> Click on NO >> User should be stay on New Bill screen.");
+	}
+
+	@Test(priority = 41, enabled = true, groups = { "Smoke", "Harinder"})
+	public void VNDR_P2M5_320() throws InterruptedException {
+		
+		extentTest = extentReport.startTest("VNDR_P2M5_320",
+				"*H7 : Verify Click on Back Link >> When user click on Back Button it should be redirects on Manage bill tab");
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		byId.click(id_ManageBillNewBillButton, "Click on 'New Bill' button");
+		setLogs.info("Click on 'Back' Link");
+		byId.click(id_NewBillFormBackLink, "Click on 'Back' Link");
+		Thread.sleep(3000);
+		int getSize = getDriver().findElements(By.xpath("//*[@id='" + id_ManageBillNewBillButton + "'][@style='0px']"))
+				.size();
+		Assert.assertTrue(getSize == 0, "'Back' Link is not working");
+		extentTest.log(LogStatus.INFO,
+				"*H7 : Verified, Click on Back Link >> When user click on Back Button it is redirected on Manage bill tab");
+	}
+
+	@Test(priority = 42, enabled = true, groups = { "Smoke", "Harinder"})
+	public void VNDR_P2M5_321() throws InterruptedException {
+		
+		List<String> values;
+		List<String> HeadersName = new ArrayList<>();
+		extentTest = extentReport.startTest("VNDR_P2M5_321",
+				"*H7 : Verify that grid 'List of Bills' should be displayed with Required Columns");
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		values = VendorPortalCommons.AddMultipleValuesInList(value_NewBillGridHeaders);
+		List<WebElement> listWe = byXpath.getElements(
+				"//*[@id='" + id_ManageBillGridListing + "']//th[not(contains(@style,'display: none;'))]",
+				"Get all the Bill columns Header in list");
+		for (WebElement getWenElement : listWe) {
+			String getHeadersText = getWenElement.getText().trim();
+			HeadersName.add(getHeadersText);
+		}
+		System.out.println(HeadersName);
+		System.out.println(values);
+		Assert.assertEquals(HeadersName, values, "Header might be deleted or added");
+		extentTest.log(LogStatus.INFO,
+				"*H7 : Verified, that grid 'List of Bills' should be displayed with Required Columns");
+	}
+
+	@Test(priority = 43, enabled = true, groups = { "Smoke", "Harinder"})
+	public void VNDR_P2M5_330_1() throws InterruptedException, IOException {
+		
+		List<String> actualOptions = new ArrayList<>();
+		extentTest = extentReport.startTest("VNDR_P2M5_330_1",
+				"*H7 : Verify Status of the Bill should be 'Due' in 'List of Bills' grid ");
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		setLogs.info("Create New Bill");
+		refNo = utility.uniqueNo();
+		values = VendorPortalCommons.NewBill(value_Amount, "", refNo, arr[1], "", arr[0],"","", "", "", "", value_Amount, "", "");
+		String getStatus = byXpath
+				.getText("//*[@id='" + id_ManageBillGridListingTable + "']//tbody//tr//td[contains(text(),'" + refNo
+						+ "')]/following-sibling::td[contains(@aria-describedby,'" + id_ManageBillGridListingTable
+						+ "_Status') and not(contains(@style,'display: none'))]", "Get Status for newly created bill");
+		Assert.assertEquals(getStatus, "Due", "Status Column is displaying blank or status should be 'Due'.");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, Status of the Bill should be 'Due' in 'List of Bills' grid.");
+	}
+
+	@Test(priority = 44, enabled = true, groups = { "Smoke", "Harinder"})
+	public void VNDR_P2M5_330_2() throws InterruptedException, IOException {
+		
+		List<String> actualOptions = new ArrayList<>();
+		List<Object> list = new ArrayList<>();
+		extentTest = extentReport.startTest("VNDR_P2M5_330_2",
+				"*H7 : Verify Status of the Bill should be 'Paid' in 'List of Bills' grid ");
+
+		setLogs.info("Get Vendor Name from My Account Tab");
+		byId.click(id_MyAccountTab, " Click on My Account Tab");
+		String VendorName = byId.getText(id_MyAccountTabVendorName, "Get Full Vendor Name");
+		int getIndex = VendorName.indexOf(" ");
+		if (getIndex > 0)
+			VendorName = VendorName.substring(0, getIndex);
+		System.out.println("Vendor Name is = " + VendorName);
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		setLogs.info("Create New Bill");
+		refNo = utility.uniqueNo();
+		values = VendorPortalCommons.NewBill(value_Amount, value_SelectTermDDLValue, refNo, arr[1], "", arr[0],"","", "", "", "",
+				value_Amount, "", "");
+		setLogs.info("Pay Bill from Admin Portal");
+		privateBrowser();
+		login("", adminEmail, password);
+		list = ApexCommon.PayVendorBill(VendorName, refNo, "", "", "", "");
+		driverClose();
+		getDriver().navigate().refresh();
+		String getStatus = byXpath
+				.getText("//*[@id='" + id_ManageBillGridListingTable + "']//tbody//tr//td[contains(text(),'" + refNo
+						+ "')]/following-sibling::td[contains(@aria-describedby,'" + id_ManageBillGridListingTable
+						+ "_Status') and not(contains(@style,'display: none'))]", "Get Status for newly created bill");
+		Assert.assertEquals(getStatus, "Paid", "Status Column is displaying blank or status should be 'Paid'.");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, Status of the Bill should be 'Paid' in 'List of Bills' grid.");
+	}
+
+	@Test(priority = 45, enabled = true, groups = { "Smoke", "Harinder"})
+	public void VNDR_P2M5_330_3() throws InterruptedException, IOException {
+		
+		List<String> actualOptions = new ArrayList<>();
+		extentTest = extentReport.startTest("VNDR_P2M5_330_3",
+				"*H7 : Verify Status of the Bill should be 'OnHold' in 'List of Bills' grid ");
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		setLogs.info("Create New Bill");
+		refNo = utility.uniqueNo();
+		values = VendorPortalCommons.NewBill(value_Amount, "", refNo, arr[1], "", arr[0],"","", "", "", "", value_Amount, "", "");
+		Thread.sleep(3000);
+		byXpath.selectByVisibleText(
+				"//*[@id='" + id_ManageBillGridListingTable + "']//tbody//tr//td[contains(text(),'" + refNo
+						+ "')]/following-sibling::td//select",
+				"OnHold", "Select 'OnHold' option in action Column's DDL");
+		byName.click("Yes", "Click on 'Yes' button on Confirm Popup");
+		Thread.sleep(3000);
+		getDriver().navigate().refresh();
+		String getStatus = byXpath.getText("//*[@id='" + id_ManageBillGridListingTable + "']//tbody//tr//td[contains(text(),'" + refNo+ "')]/following-sibling::td[contains(@aria-describedby,'tblVendorInvoiceRegisterPO_Status') and not(contains(@style,'display: none'))]", "Get Status for newly created bill");
+		Assert.assertEquals(getStatus, "OnHold", "Status Column is displaying blank or status should be 'OnHold'.");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, Status of the Bill should be 'Due' in 'List of Bills' grid.");
+	}
+
+	@Test(priority = 46, enabled = true, groups = { "Smoke", "Harinder"})
+	public void VNDR_P2M5_332() throws InterruptedException, IOException {
+		
+		List<String> actualOptions = new ArrayList<>();
+		extentTest = extentReport.startTest("VNDR_P2M5_332",
+				"*H7 : Verify that Manage Bill Listing Grid -> these options should be displayed in Action DDL");
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		setLogs.info("Create New Bill");
+		refNo = utility.uniqueNo();
+		values = VendorPortalCommons.NewBill(value_Amount, "", refNo, arr[1], "", arr[0],"","", "", "", "", value_Amount, "", "");
+		List<WebElement> webEle = byXpath
+				.getElements(
+						"//*[@id='" + id_ManageBillGridListingTable + "']//tbody//tr//td[contains(text(),'" + refNo
+								+ "')]/following-sibling::td//select/option",
+						"Get all the options in action Column's DDL");
+		for (WebElement getEle : webEle) {
+			String getOption = getEle.getText();
+			actualOptions.add(getOption);
+		}
+		List<String> expectedOptions = VendorPortalCommons
+				.AddMultipleValuesInList(value_NewBillGridActionColumnOptions);
+		Assert.assertEquals(actualOptions, expectedOptions, "Action columns options might be deleted or added");
+		extentTest.log(LogStatus.INFO,
+				"*H7 : Verified, that Manage Bill Listing Grid -> these options are displayed in Action DDL");
+	}
+
+	@Test(priority = 47, enabled = true, groups = { "Smoke", "Harinder"})
+	public void VNDR_P2M5_333() throws InterruptedException, IOException {
+		
+		extentTest = extentReport.startTest("VNDR_P2M5_333",
+				"*H7 : Verify that Edit bill screen should be displayed and user is able to Edit the fields");
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		/*
+		 * setLogs.info("Create New Bill"); String refNo = utility.uniqueNo();
+		 * values = VendorPortalCommons.NewBill(value_Amount, "", refNo, arr[1],
+		 * "", arr[0],"","", "", "", "", value_Amount, "", "");
+		 */
+		byXpath.selectByVisibleText("//*[@id='" + id_ManageBillGridListingTable + "']//tbody//tr//td[contains(text(),'"
+				+ refNo + "')]/following-sibling::td//select", "Edit", "Select 'Edit' option in action Column's DDL");
+		byId.clearThenSetText(id_NewBillAmount, "200", " Enter Amount in Amount field");
+		String getValue = byId.getAttribute(id_NewBillAmount, "value", "get New value from Amount field");
+		Assert.assertEquals(getValue, "200", "Amount field is not editable");
+		extentTest.log(LogStatus.INFO,
+				"*H7 : Verified, that Edit bill screen should be displayed and user is able to Edit the fields");
+	}
+
+	@Test(priority = 48, enabled = true, groups = { "Smoke", "Harinder"})
+	public void VNDR_P2M5_334() throws InterruptedException, IOException {
+		
+		extentTest = extentReport.startTest("VNDR_P2M5_334",
+				"*H7 : Verify The message 'Record updated successfully' should displayed and user redirects to Manage Bill tab");
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		/*
+		 * setLogs.info("Create New Bill"); String refNo = utility.uniqueNo();
+		 * values = VendorPortalCommons.NewBill(value_Amount, "", refNo, arr[1],
+		 * "", arr[0],"","", "", "", "", value_Amount, "", ""); setLogs.info("Edit Bill");
+		 */
+		byXpath.selectByVisibleText("//*[@id='" + id_ManageBillGridListingTable + "']//tbody//tr//td[contains(text(),'"+refNo+"')]/following-sibling::td//select", "Edit", "Select 'Edit' option in action Column's DDL");
+		byId.clearThenSetText(id_NewBillAmount, "200", " Enter Amount in Amount field");
+		//byClassName.click(class_SplitBillGridAmountTD, "Click on Amount TD in split bill Grid");
+		byId.clearThenSetText(id_NewBillAddItemsAmount, "200", "Change Amount in split bill grid");
+		//byId.click(id_SplitBillEditRecordPopupSubmitButton, "Click on Submit button");
+		byId.click(id_NewBillSaveButton, "Click on Save Button");
+		String getPopupText = getDriver().findElement(By.cssSelector(".toast-item.toast-type-success")).getText();
+		//String getPopupText = byXpath.getText("//p//p", "get Popup Text");
+		//getDriver().navigate().refresh();
+		Assert.assertEquals(getPopupText, "The record updated successfully.", "Amount field is not editable");
+		extentTest.log(LogStatus.INFO,
+				"*H7 : Verified, The message 'Record updated successfully' should displayed and user redirects to Manage Bill tab");
+	}
+
+	@Test(priority = 49, enabled = true, groups = { "Smoke", "Harinder"})
+	public void VNDR_P2M5_335() throws InterruptedException, IOException {
+		
+		extentTest = extentReport.startTest("VNDR_P2M5_335",
+				"*H7 : Verify Edit Bill> Cancel button >> Confirmation message 'Do you want to Cancel this action now?' should be displayed.");
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		/*
+		 * setLogs.info("Create New Bill"); String refNo = utility.uniqueNo();
+		 * values = VendorPortalCommons.NewBill(value_Amount, "", refNo, arr[1],
+		 * "", arr[0],"","", "", "", "", value_Amount, "", "");
+		 */
+		setLogs.info("Edit Bill");
+		byXpath.selectByVisibleText("//*[@id='" + id_ManageBillGridListingTable + "']//tbody//tr//td[contains(text(),'"
+				+ refNo + "')]/following-sibling::td//select", "Edit", "Select 'Edit' option in action Column's DDL");
+		byId.click(id_NewBillCancelButton, "Click on Cancel Button");
+		String getPopupText = byClassName.getText(class_ConfirmPopupContent, " Get Message from Confirm Popup");
+		Assert.assertTrue(getPopupText.equals(value_ConfirmPopupContent),
+				"Message Content on 'Confirm' Popup has been changed.");
+		getDriver().navigate().refresh();
+		extentTest.log(LogStatus.INFO,
+				"*H7 : Verified, Edit Bill> Cancel button >> Confirmation message 'Do you want to Cancel this action now?' should be displayed.");
+	}
+
+	@Test(priority = 50, enabled = true, groups = { "Smoke", "Harinder"})
+	public void VNDR_P2M5_339() throws InterruptedException, IOException {
+		
+		extentTest = extentReport.startTest("VNDR_P2M5_339",
+				"*H7 : Verify The bill status should be changed to OnHold and in Action DDL the Onhold option replace with Due status");
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		
+	/*	 setLogs.info("Create New Bill"); 
+		 String refNo = utility.uniqueNo();
+		 values = VendorPortalCommons.NewBill(value_Amount, "", refNo, arr[1],"", arr[0],"","", "", "", "", value_Amount, "", "");*/
+		 
+		setLogs.info("Select 'OnHold' option from Action column");
+		byXpath.selectByVisibleText(
+				"//*[@id='" + id_ManageBillGridListingTable + "']//tbody//tr//td[contains(text(),'" + refNo
+						+ "')]/following-sibling::td//select",
+				value_NewBillGridActionColumnOptionOnHold, "Select 'OnHold' option in action Column's DDL");
+		byName.click("Yes", "Click on 'Yes' Button");
+		int getSize = byXpath.getSize("//*[@id='" + id_ManageBillGridListingTable + "']//tbody//tr//td[contains(.,'"
+				+ refNo + "')]/following-sibling::td[contains(text(),'" + value_NewBillGridActionColumnOptionOnHold
+				+ "')]", "Get size after Selecing 'OnHold' from action column");
+		Assert.assertEquals(getSize, 1, "Status not getting changed to 'OnHold'");
+		extentTest.log(LogStatus.INFO,
+				"*H7 : Verified, The bill status should be changed to OnHold and in Action DDL the Onhold option replace with Due status");
+	}
+
+	@Test(priority = 51, enabled = true, groups = { "Smoke", "Harinder"})
+	public void VNDR_P2M5_340() throws InterruptedException, IOException {
+		
+		List<String> headers = new ArrayList<String>();
+		extentTest = extentReport.startTest("VNDR_P2M5_340",
+				"*H7 : Verify Select View Details from action column >>  Bill should be displayed in following Sections: Bill Information, Split Bill, Notes and File Library");
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		/*
+		 * setLogs.info("Create New Bill"); String refNo = utility.uniqueNo();
+		 * values = VendorPortalCommons.NewBill(value_Amount, "", refNo, arr[1],
+		 * "", arr[0],"","", "", "", "", value_Amount, "", "");
+		 */
+		setLogs.info("Select 'View Details' option from Action column");
+		byXpath.selectByVisibleText(
+				"//*[@id='" + id_ManageBillGridListingTable + "']//tbody//tr//td[contains(text(),'" + refNo
+						+ "')]/following-sibling::td//select",
+				value_NewBillGridActionColumnOptionViewDetails, "Select 'View Details' option in action Column's DDL");
+		Thread.sleep(2000);
+		List<WebElement> webList = byXpath.getElements("//*[@class='content']//div[@id='tab1']/div/div[1]",
+				"get All Headers");
+		for (WebElement webElement : webList) {
+			String getHeader = webElement.getText();
+			int index = getHeader.indexOf("<");
+			if (index > 0)
+				getHeader = getHeader.substring(0, index - 1);
+			System.out.println(getHeader);
+			headers.add(getHeader);
+		}
+		System.out.println(headers);
+		List<String> actualHeaders = VendorPortalCommons.AddMultipleValuesInList(value_BillViewModeHeaders);
+		Assert.assertEquals(actualHeaders, headers, "Bill View Form >> Sections might be added or deleted");
+		extentTest.log(LogStatus.INFO,
+				"*H7 : Verified, Select View Details from action column >>  Bill should be displayed in following Sections: Bill Information, Split Bill, Notes and File Librar");
+	}
+
+	@Test(priority = 52, enabled = true, groups = { "Smoke", "Harinder"})
+	public void VNDR_P2M5_341() throws InterruptedException, IOException {
+		
+		extentTest = extentReport.startTest("VNDR_P2M5_341",
+				"*H6 : Vendor Portal >> Manage Bill - List of Bills Grid - Action DDL - View Details - Bill Information");
+		setLogs.startTest("VNDR_P2M5_341");
+
+		setLogs.info("Create New Bill");
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		String refNo = utility.uniqueNo();
+		VendorPortalCommons.NewBill("100", "", refNo, arr[1], "", arr[0],"","", "", "", "", "100", "", "");
+		Thread.sleep(3000);
+		byId.click(id_NewBillGridAction, "Click on select button");
+
+		byXpath.click(xpath_NewBillGridActionViewDetails, "Click on view details option");
+
+		String nameField1 = byXpath.getText(xpath_BillInformationVendorNameLabel,
+				"getting text of vendor name field's label");
+		String nameField2 = byXpath.getText(xpath_BillInformationBillDateLabel, "getting text of date field's label");
+		String nameField3 = byXpath.getText(xpath_BillInformationAmountLabel, "getting text of amount field's label");
+		String nameField4 = byXpath.getText(xpath_BillInformationTermsLabel, "getting text of terms field's label");
+		String nameField5 = byXpath.getText(xpath_BillInformationBillRecurrenceLabel,
+				"getting text of bill recuurence field's label");
+		String nameField6 = byXpath.getText(xpath_BillInformationDueDateLabel,
+				"getting text of due date field's label");
+		String nameField7 = byXpath.getText(xpath_BillInformationMemoLabel, "getting text of memo field's label");
+		String nameField8 = byXpath.getText(xpath_BillInformationReferenceLabel,
+				"getting text of reference field's label");
+
+		Assert.assertTrue(
+				nameField1.equals(value_BillInformationVendorNameLabel)
+						&& nameField2.equals(value_BillInformationBillDateLabel)
+						&& nameField3.equals(value_BillInformationAmountLabel)
+						&& nameField4.equals(value_BillInformationTermsLabel)
+						&& nameField5.equals(value_BillInformationBillRecurrenceLabel)
+						&& nameField6.equals(value_BillInformationDueDateLabel)
+						&& nameField7.equals(value_BillInformationMemoLabel)
+						&& nameField8.equals(value_BillInformationReferenceLabel),
+				"required fields not dispalyed in Bill Information:");
+		setLogs.endTest("VNDR_P2M5_341");
+		extentTest.log(LogStatus.INFO, "*H6 : Verified that rerquired fields dispalyed in Bill Information");
+	}
+
+	@Test(priority = 53, enabled = true, groups = { "Smoke", "Harinder"})
+	public void VNDR_P2M5_342() throws InterruptedException, IOException {
+		
+		extentTest = extentReport.startTest("VNDR_P2M5_342",
+				"*H6 : Vendor Portal >>Manage Bill - List of Bills Grid - Action DDL - View Details - Bill Information - Edit");
+		setLogs.startTest("VNDR_P2M5_342");
+
+		setLogs.info("Create New Bill");
+		setLogs.startTest("VNDR_P2M5_342");
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		String refNo = utility.uniqueNo();
+		VendorPortalCommons.NewBill("100", "", refNo, arr[1], "", arr[0],"","", "", "", "", "100", "", "");
+		Thread.sleep(3000);
+		byId.click(id_NewBillGridAction, "Click on select button");
+		byXpath.click(xpath_NewBillGridActionViewDetails, "Click on view details option");
+		byId.click(id_NewBillBillInformationEdit, "Click on edit button");
+		int valueSymbol = byXpath.getSize(xpath_NewBillBillInformationEditModeAsteriskSymbol,
+				"getting size of asterisk symbol");
+		Assert.assertTrue(valueSymbol == 1, "required fields not displayed in Bill Information:");
+		setLogs.endTest("VNDR_P2M5_342");
+		extentTest.log(LogStatus.INFO, "*H6 : Verified that user redirects to Edit Bill to edit Bill Information");
+	}
+
+	@Test(priority = 54, enabled = true, groups = { "Smoke", "Harinder"})
+	public void VNDR_P2M5_343() throws InterruptedException, IOException {
+		
+		extentTest = extentReport.startTest("VNDR_P2M5_343",
+				"*H6 : Vendor Portal >>Manage Bill - List of Bills Grid - Action DDL - View Details - Bill Information - Edit - Update");
+		setLogs.startTest("VNDR_P2M5_343");
+
+		setLogs.info("Create New Bill");
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		String refNo = utility.uniqueNo();
+		VendorPortalCommons.NewBill("100", "", refNo, arr[1], "", arr[0],"","", "", "", "", "100", "", "");
+		Thread.sleep(3000);
+		byId.click(id_NewBillGridAction, "Click on select button");
+
+		byXpath.click(xpath_NewBillGridActionViewDetails, "Click on view details option");
+		byId.click(id_NewBillBillInformationEdit, "Click on edit button");
+		byId.click(id_NewBillBillInformationUpdateButton, "Click on update button");
+		int valueTitle = byXpath.getSize(xpath_ManageBillGridTitle, "getting size of manage bill grid");
+		Assert.assertTrue(valueTitle == 1, "User do not redirects to Manage Bill tab");
+		setLogs.endTest("VNDR_P2M5_343");
+		extentTest.log(LogStatus.INFO, "*H6 : Verified that user redirects to Manage Bill tab");
+	}
+
+	@Test(priority = 55, enabled = true, groups = { "Smoke", "Harinder"})
+	public void VNDR_P2M5_344() throws InterruptedException, IOException {
+		
+		extentTest = extentReport.startTest("VNDR_P2M5_344",
+				"*H6 : Vendor Portal >>Manage Bill - List of Bills Grid - Action DDL - View Details - Split Bill - Edit");
+		setLogs.startTest("VNDR_P2M5_344");
+		setLogs.info("Create New Bill");
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		String refNo = utility.uniqueNo();
+		VendorPortalCommons.NewBill("100", "", refNo, arr[1], "", arr[0],"","", "", "", "", "100", "", "");
+		Thread.sleep(3000);
+		byId.click(id_NewBillGridAction, "Click on select button");
+		byXpath.click(xpath_NewBillGridActionViewDetails, "Click on view details option");
+		byId.click(id_NewBillSplitBillEdit, "Click on edit button");
+		int getHeader = byId.getSize(id_EditBillFormHeaderName, "getting size of 'Edit Page header name'");
+		Assert.assertTrue(getHeader == 1, "User is not redirecting on 'Edit Bill' Page.");
+		setLogs.endTest("VNDR_P2M5_344");
+		extentTest.log(LogStatus.INFO, "*H6 : Verified that user redirects to Edit Bill to edit Split Bill");
+	}
+
+	@Test(priority = 56, enabled = true, groups = { "Smoke", "Harinder"})
+	public void VNDR_P2M5_345() throws InterruptedException, IOException {
+	
+		extentTest = extentReport.startTest("VNDR_P2M5_345",
+				"*H6 : Vendor Portal >>Manage Bill - List of Bills Grid - Action DDL - View Details - Split Bill -  Edit - Update");
+		setLogs.startTest("VNDR_P2M5_345");
+		setLogs.info("Create New Bill");
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		String refNo = utility.uniqueNo();
+		VendorPortalCommons.NewBill("100", "", refNo, arr[1], "", arr[0],"","", "", "", "", "100", "", "");
+		Thread.sleep(3000);
+		byId.click(id_NewBillGridAction, "Click on select button");
+		byXpath.click(xpath_NewBillGridActionViewDetails, "Click on view details option");
+		byId.click(id_NewBillSplitBillEdit, "Click on edit button");
+		byId.click(id_NewBillBillInformationUpdateButton, "Click on update button");
+		int valueTitle = byXpath.getSize(xpath_ManageBillGridTitle, "getting size of manage bill grid");
+		Assert.assertTrue(valueTitle == 1, "User do not redirects to Manage Bill tab");
+		setLogs.endTest("VNDR_P2M5_345");
+		extentTest.log(LogStatus.INFO, "*H6 : Verified that user redirects to Manage Bill tab");
+	}
+
+	@Test(priority = 57, enabled = true, groups = { "Smoke", "Harinder"})
+	public void VNDR_P2M5_261() throws InterruptedException, IOException {
+		
+		extentTest = extentReport.startTest("VNDR_P2M5_261",
+				"*H6 :Vendor Portal >>Manage Bill - New Bill - Split Bill - Property");
+		setLogs.startTest("VNDR_P2M5_261");
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		byId.click(id_ManageBillNewBillButton, "Click on 'New Bill' button");
+		byId.selectByVisibleText(id_NewBillPortfolio, arr[1], "Select Portfolio");
+		Thread.sleep(2000);
+		byId.click(id_NewBillSplitBillProperty, "Click on property ddl");
+		int valueOptionsListing = byXpath.getSize(xpath_NewBillPropertyddlOptions,
+				"get size of listing of property ddl");
+		Assert.assertTrue(valueOptionsListing > 1, "property ddl not showing list of Properties");
+		setLogs.endTest("VNDR_P2M5_261");
+		extentTest.log(LogStatus.INFO, "*H6 : Verified that property ddl showing list of Properties");
+	}
+
+	// Functionality has been removed for this Test Cases
+	/*@Test(priority = 58, enabled = true, groups = { "Smoke", "Harinder"})
+	public void VNDR_P2M5_263() throws InterruptedException, IOException {
+		
+		extentTest = extentReport.startTest("VNDR_P2M5_263",
+				"*H6 :Vendor Portal >>Manage Bill - New Bill - Split Bill - Unit");
+		setLogs.startTest("VNDR_P2M5_263");
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		byId.click(id_ManageBillNewBillButton, "Click on 'New Bill' button");
+		byId.selectByVisibleText(id_NewBillPortfolio, arr[1], "Select Portfolio");
+		Thread.sleep(2000);
+		byId.click(id_NewBillAddItemsUnit, "Click on Unit DDL");
+		int valueUnitSelectAll = byId.getSize(id_NewBillUnitSelectAll, "get size of elem 1 of unit popup");
+		int valueUnitsListing = byXpath.getSize(xpath_NewBillUnitAllUnitsListing, "get size of elem 2 of unit popup");
+		int valueUnitsSaveButton = byId.getSize(id_NewBillUnitPopupSaveButton, "get size of elem 3 of unit popup");
+		int valueUnitsCancelutton = byId.getSize(id_NewBillUnitPopupCancelButton, "get size of elem 4 of unit popup");
+		Assert.assertTrue(valueUnitSelectAll == 1 && valueUnitsListing > 0 && valueUnitsSaveButton == 1
+				&& valueUnitsCancelutton == 1, "unit popup not showing all required elements");
+		byId.click(id_NewBillUnitPopupCloseButton, "Click on cross popup icon");
+		setLogs.endTest("VNDR_P2M5_263");
+		extentTest.log(LogStatus.INFO, "*H6 : Verified that unit popup have all required elements");
+	}*/
+	// Functionality has been removed for this Test Cases
+	/*@Test(priority = 59, enabled = true, groups = { "Smoke", "Harinder"})
+	public void VNDR_P2M5_264() throws InterruptedException, IOException {
+		
+		extentTest = extentReport.startTest("VNDR_P2M5_264",
+				"*H6 :Vendor Portal >>Manage Bill - New Bill - Split Bill - Unit - Unit Popup - Select All");
+		setLogs.startTest("VNDR_P2M5_264");
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		byId.click(id_ManageBillNewBillButton, "Click on 'New Bill' button");
+		byId.selectByVisibleText(id_NewBillPortfolio, arr[1], "Select Portfolio");
+		byId.click(id_NewBillAddItemsUnit, "Click on Unit DDL");
+		byXpath.click(xpath_NewBillUnitPopupUnitCheckbox, "Click on checkbox of unit to deselect it");
+		byId.click(id_NewBillUnitSelectAll, "Click on select all Units option");
+		boolean elm = byXpath.isSelected(xpath_NewBillUnitPopupUnitCheckbox,
+				"check if unit get selected on clicking select all");
+		Assert.assertTrue(elm == true, "unit is not selected");
+		byId.click(id_NewBillUnitPopupCloseButton, "Click on cross popup icon");
+		setLogs.endTest("VNDR_P2M5_264");
+		extentTest.log(LogStatus.INFO,
+				"*H6 : Verified that all units get selected when user click on 'Select All' checkbox.");
+	}
+*/
+	// Functionality has been removed for this Test Cases
+	/*@Test(priority = 60, enabled = true, groups = { "Smoke", "Harinder"})
+	public void VNDR_P2M5_265() throws InterruptedException, IOException {
+		
+		extentTest = extentReport.startTest("VNDR_P2M5_265",
+				"*H6 :Vendor Portal >>Manage Bill - New Bill - Split Bill - Unit - Unit Popup - Units Checkbox");
+		setLogs.startTest("VNDR_P2M5_265");
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		byId.click(id_ManageBillNewBillButton, "Click on 'New Bill' button");
+		byId.selectByVisibleText(id_NewBillPortfolio, arr[1], "Select Portfolio");
+		byId.click(id_NewBillAddItemsUnit, "Click on Unit DDL");
+		byXpath.click(xpath_NewBillUnitPopupUnitCheckbox, "Click on checkbox of unit to deselect it");
+		byId.click(id_NewBillUnitSelectAll, "Click on select all Units option");
+		boolean elm = byXpath.isSelected(xpath_NewBillUnitPopupUnitCheckbox,
+				"check if unit get selected on clicking select all");
+		Assert.assertTrue(elm == true, "unit is not selected");
+		byId.click(id_NewBillUnitPopupCloseButton, "Click on cross popup icon");
+		setLogs.endTest("VNDR_P2M5_265");
+		extentTest.log(LogStatus.INFO, "*H6 : Verified that select all allow vendors select single or multiple units.");
+	}
+*/
+	
+	// Functionality has been removed for this Test Cases
+	/*@Test(priority = 61, enabled = true, groups = { "Smoke", "Harinder"})
+	public void VNDR_P2M5_266() throws InterruptedException, IOException {
+		
+		extentTest = extentReport.startTest("VNDR_P2M5_266",
+				"*H6 :Vendor Portal >>Manage Bill - New Bill - Split Bill - Unit - Unit Popup - Save");
+		setLogs.startTest("VNDR_P2M5_266");
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		byId.click(id_ManageBillNewBillButton, "Click on 'New Bill' button");
+		byId.selectByVisibleText(id_NewBillPortfolio, arr[1], "Select Portfolio");
+		byId.click(id_NewBillAddItemsUnit, "Click on Unit DDL");
+		String selectedUnit = byXpath.getText(xpath_NewBillUnitAllUnitsListing, "get selected unit name");
+		byId.click(id_NewBillUnitPopupSaveButton, "Click on save button");
+		String savedUnit = byId.getAttribute(id_NewBillAddItemsUnit, "value", "get saved unit name");
+		Assert.assertEquals(selectedUnit, savedUnit);
+		setLogs.endTest("VNDR_P2M5_266");
+		extentTest.log(LogStatus.INFO, "*H6 : Verified that selected units displayed in Unit field.");
+	}*/
+
+	// Functionality has been removed for this Test Cases
+	/*@Test(priority = 62, enabled = true, groups = { "Smoke", "Harinder"})
+	public void VNDR_P2M5_267() throws InterruptedException, IOException {
+		
+		extentTest = extentReport.startTest("VNDR_P2M5_267",
+				"*H6 :Vendor Portal >>Manage Bill - New Bill - Split Bill - Unit - Unit Popup - Cancel");
+		setLogs.startTest("VNDR_P2M5_267");
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		byId.click(id_ManageBillNewBillButton, "Click on 'New Bill' button");
+		byId.selectByVisibleText(id_NewBillPortfolio, arr[1], "Select Portfolio");
+		byId.click(id_NewBillAddItemsUnit, "Click on Unit DDL");
+		byId.click(id_NewBillUnitPopupCancelButton, "Click on cancel button");
+		int valueElm = byId.getSize(id_NewBillPortfolio, "getting size of a elm on new bill page.");
+		Assert.assertTrue(valueElm == 1, "user do not redirects on New Bill screen");
+		getDriver().navigate().refresh();
+		setLogs.endTest("VNDR_P2M5_267");
+		extentTest.log(LogStatus.INFO, "*H6 : Verified that user redirects on New Bill screen.");
+	}*/
+	
+	
+	
+	/*@Test(priority = 63, enabled = true, groups = { "Smoke", "Harinder"})
+	public void VNDR_P2M5_292() throws InterruptedException, IOException, AWTException {
+		extentTest = extentReport.startTest("VNDR_P2M5_292",
+				"*H7 : Manage Bill >> Verify that When check to Tenant checkbox, mentainence charge is reflected in particlar tenant charges tab.");
+		privateBrowser();
+		login("", adminEmail, password);
+		byId.click(id_AdminPortalPeopleTab, "Click on People Tab");
+		VendorPortalCommons.newTenant_SelectPropertyTab(arr[0], building.get(0),"", value_TenantFirstName, value_TenantLastName,tenantName+value_DomainName , value_PhoneNumber);
+		VendorPortalCommons.newTenant_LeaseDetailsTab("", "", "", "", "", "");
+		VendorPortalCommons.newTenant_ChargesAndMoveInTabWithoutParams();
+		driverFlag = true;
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		setLogs.info("Create New Bill");
+		refNo = utility.uniqueNo();
+		tenantName = value_TenantFirstName+utility.uniqueString();
+		values = VendorPortalCommons.NewBill(value_Amount, value_SelectTermDDLValue, refNo, arr[1], "",arr[0], "Tenant", tenantName, building.get(0), "", "", value_Amount, "", "");
+		driverFlag = false;
+		byXpath.selectByVisibleText(xpath_tenantGridActioDdl_1+arr[0]+xpath_tenantGridActioDdl_2, "CAM Charge", "Select CAM Charge option from Action column in Tenant Grid");
+		int getSize = byXpath.getSize(".//*[@id='"+id_TenantViewChargeTabChargesGrid+"']//tr//td[contains(.,'"+value_MaintenanceAndRepairCharge+"')]", "get Maintenance and repair charge");
+		Assert.assertEquals(getSize, 0, "Maintenacne and repair charge is not reflected in charges tab in Tenant tab of admin portal");
+		extentTest.log(LogStatus.INFO,
+				"*H7 : Verified, Verify that When check to Tenant checkbox, mentainence charge is reflected in particlar tenant charges tab.");
+		}*/
+	
+	@Test(priority = 63, enabled = true, groups = { "Smoke", "Harinder"})
+	public void VNDR_P2M5_293() throws InterruptedException, IOException, AWTException {
+		extentTest = extentReport.startTest("VNDR_P2M5_293",
+				"*H7 : Manage Bill >> Verify that  If user select other checkbox then just simple text box is opened to enter any name and It will not reflect anywhere.");
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		setLogs.info("Create New Bill");
+		refNo = utility.uniqueNo();
+		byId.click(id_ManageBillNewBillButton, "Click on 'New Bill' button");
+		byId.clearThenSetText(id_NewBillAmount, value_Amount, " Enter Amount in Amount field");
+		byId.selectByVisibleText(id_NewBillSelectTerm, value_SelectTermDDLValue, "Select 'Term' from 'Select Term' DDL");
+		byId.clearThenSetText(id_NewBillReference, refNo, "Enter Reference# in 'Referecne#' field");
+		Thread.sleep(2000);
+		JavascriptExecutor jse = (JavascriptExecutor) getDriver();
+		byId.selectByVisibleText(id_NewBillPortfolio, arr[1], "Select Portfolio");
+		Thread.sleep(2000);
+		byId.clearThenSetText(id_NewBillSplitBillProperty, arr[0], "Enter Property from Property DDL in 'Add Items' Section");
+		Thread.sleep(2000);
+		getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ARROW_DOWN);
+		getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ARROW_DOWN);
+		getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ENTER);
+		byId.click(id_NewBillChargeToOthersCheckbox, "Check 'Others' CheckBox");
+		byId.clearThenSetText(id_NewBillChargeToOthersTextBox, "'Other' textbox is displaying", "Enter data in Others Textbox");
+		String getOtherText = byId.getAttribute(id_NewBillChargeToOthersTextBox, "value", "get Entered text from 'Other field'");
+		int getlength = getOtherText.length();
+		Assert.assertTrue(getlength>0, "Other Text field is not exits/ unable to enter text in the 'Other' field");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, Verify that If user select other checkbox then just simple text box is opened to enter any name and It is not reflected anywhere.");
+		}
+	
+	@Test(priority = 63, enabled = true, groups = { "Smoke", "Harinder"})
+	public void VNDR_P2M5_294() throws InterruptedException, IOException, AWTException {
+		extentTest = extentReport.startTest("VNDR_P2M5_294",
+				"*H7 : Manage Bill >> Verify Verify Add items section is added instead of split bill.");
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		setLogs.info("Create New Bill");
+		byId.click(id_ManageBillNewBillButton, "Click on 'New Bill' button");
+		String getHeaderName = byXpath.getText("//*[@id='"+id_NewBillAddItemsSection+"']/div[@class='form-hdr']", "get 'Add Items' header name");
+		System.out.println("Header Name is = " +getHeaderName);
+		Assert.assertEquals(getHeaderName, "Add Items", "not get Header Name/'Add Items' Hearder name is missing");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, Verify Add items section is added instead of split bill.");
+		}
+	
+	@Test(priority = 63, enabled = true, groups = { "Smoke", "Harinder"})
+	public void VNDR_P2M5_295() throws InterruptedException, IOException, AWTException {
+		extentTest = extentReport.startTest("VNDR_P2M5_295",
+				"*H7 : Manage Bill >> user can select only single unit in 'Add Items' section");
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		setLogs.info("Create New Bill");
+		byId.click(id_ManageBillNewBillButton, "Click on 'New Bill' button");
+		byId.selectByVisibleText(id_NewBillPortfolio, arr[1], "Select Portfolio");
+		Thread.sleep(2000);
+		byId.clearThenSetText(id_NewBillSplitBillProperty, arr[0], "Enter Property from Property DDL in 'Add Items' Section");
+		Thread.sleep(2000);
+		getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ARROW_DOWN);
+		getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ARROW_DOWN);
+		getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ENTER);
+		byId.selectByVisibleText(id_AddItemsSectionBuildingDDL, building.get(0), "Select Building name");
+		String getTagName = byId.getTagName(id_NewBillAddItemsUnit, "Get Tag name for the unit DDL in 'Add Items' section");
+		Assert.assertEquals(getTagName, "select", "Unit field is not a DDL");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, user can select only single unit in 'Add Items' section");
+		}
+	
+	
+	//********************************Manage Bill >> New functionality *****************************************/
+	
+	@Test(priority = 64, enabled = true, groups = {"Harinder"})
+	public void VNDR_P2M5_NewFunc_001_282() throws InterruptedException, IOException, AWTException {
+		extentTest = extentReport.startTest("*hk7: VNDR_P2M5_NewFunc_001",
+				"*H7 : Manage Bill >> New bill >> Ensure that add items grid contains fields: Buildng, Unit, Account, Amount, Description, Action");
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		List<String> HeaderLabel = new ArrayList<>();
+		setLogs.info("New Bill");
+		byId.click(id_ManageBillNewBillButton, "Click on 'New Bill' button");
+		
+		List<WebElement> getWebEle = byXpath.getElements("//*[@id='"+id_NewBillAddItemsSection+"']//thead//tr//th", "Get 'Add Items' Grid header name");
+		for (WebElement webEle : getWebEle) {
+			String getAddItemHeader = webEle.getText();
+			HeaderLabel.add(getAddItemHeader);
+		}
+		
+		System.out.println(HeaderLabel);
+		String getAmountHeader = HeaderLabel.get(3);
+		int getIndex = getAmountHeader.indexOf("(");
+		getAmountHeader = getAmountHeader.substring(0, getIndex);
+		HeaderLabel.remove(3);
+		HeaderLabel.add(3, getAmountHeader);
+		System.out.println(HeaderLabel);
+		List<String> actualHeader = VendorPortalCommons.AddMultipleValuesInList(value_SplitBillGridHeaders);
+		Assert.assertTrue(actualHeader.equals(HeaderLabel), "Header might be added or deleted");
+		extentTest.log(LogStatus.INFO, "Verified, Manage Bill >> New bill >> Ensure that add items grid contains fields: Buildng, Unit, Account, Amount, Description, Action");
+		}
+	
+	@Test(priority = 65, enabled = true, groups = {"Harinder"})
+	public void VNDR_P2M5_NewFunc_002() throws InterruptedException {
+		
+		extentTest = extentReport.startTest("VNDR_P2M5_NewFunc_002",
+				"*H7 : Manage Bill >> New Bill >> Portfolio DDL >> Ensure that user is able to select portfolio and selected portfolio populates");
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		byId.click(id_ManageBillNewBillButton, "Click on 'New Bill' button");
+		byId.selectByVisibleText(id_NewBillPortfolio, arr[1], "Select Portfolio");
+		String getPortfolio = byId.getFirstSelectedOption(id_NewBillPortfolio, "Get selected value from Portfolio DDL");
+		Assert.assertTrue(getPortfolio.equals(arr[1]), "Portfolio is not the same as selected");
+		extentTest.log(LogStatus.INFO, "Verified, Manage Bill >> New Bill >> Portfolio DDL >> Ensure that user is able to select portfolio and selected portfolio populates");
+	}
+	
+	@Test(priority = 66, enabled = true, groups = {"Harinder"})
+	public void VNDR_P2M5_NewFunc_003() throws InterruptedException {
+		
+		extentTest = extentReport.startTest("VNDR_P2M5_NewFunc_003",
+				"*H7 : Manage Bill >> New Bill >> Ensure that it's a mandatory field and property DDL contains, only list of properties those belongs to selected portfolio .");
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		byId.click(id_ManageBillNewBillButton, "Click on 'New Bill' button");
+		String getAsterik = byXpath.getText("//*[@id='"+id_NewBillSplitBillProperty+"']//parent::span//preceding-sibling::label//span", "get Asterik Sign for Property DDL");
+		byId.selectByVisibleText(id_NewBillPortfolio, arr[1], "Select Portfolio");
+		byId.clearThenSetText(id_NewBillSplitBillProperty, arr[0], "Enter Property from Property DDL in 'Add Items' Section");
+		Thread.sleep(2000);
+		getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ARROW_DOWN);
+		getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ARROW_DOWN);
+		getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ENTER);
+		String getSelectedProperty = byId.getAttribute(id_NewBillSplitBillProperty, "value", "Get Selected PropertyName Name");
+		Assert.assertTrue(getAsterik.equals("*") && getSelectedProperty.equals(arr[0]), "Property ddl is not the mandatory field/ Property is not binded with the resp. Portfolio");
+		extentTest.log(LogStatus.INFO, "Verified, that it's a mandatory field and property DDL contains, only list of properties those belongs to selected portfolio .");
+	}
+	
+	@Test(priority = 67, enabled = true, groups = { "Harinder"})
+	public void VNDR_P2M5_NewFunc_005_1() throws InterruptedException {
+		extentTest = extentReport.startTest("VNDR_P2M5_NewFunc_005_1",
+				"*H7 : Manage Bill >> Change to checkbox >> The checkboxs are not mandatory.");
+		int getSize = byXpath.getSize("//label[contains(text(),'"+label_NewBillChangeTo+"')]//span", "get asterik sign if exists");
+		Assert.assertEquals(getSize, 0, "'Change to' should not be mandatory, but displaying a mandatory field.");
+		extentTest.log(LogStatus.INFO,
+				"*H7 : Verified, Manage Bill >> Change to checkbox >> The checkboxs are not mandatory.");
+		}
+	
+	@Test(priority = 68, enabled = true, groups = {"Harinder"})
+	public void VNDR_P2M5_NewFunc_005_2() throws InterruptedException {
+		extentTest = extentReport.startTest("VNDR_P2M5_NewFunc_005_2",
+				"*H7 : Manage Bill >> New Bill >> Ensure that field is not mandatory, user can create bill without specifying tenant or other name.");
+		values.clear();
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		setLogs.info("Create 'New Bill' without filling 'Charge to' field");
+		refNo = utility.uniqueNo();
+		values = VendorPortalCommons.NewBill(value_Amount, value_SelectTermDDLValue, refNo, arr[1], "",arr[0], "", "", "", "", "", value_Amount, "", "");
+		int getSize = byXpath.getSize("//*[@id='"+id_ManageBillGridListingTable+"']//tbody//tr[contains(.,'"+refNo+"')]", "Get size if record exists");
+		Assert.assertTrue(getSize==1, "Bill is not created.");
+		extentTest.log(LogStatus.INFO, "Verified, that field is not mandatory, user can create bill without specifying tenant or other name.");
+	}
+	
+	@Test(priority = 69, enabled = true, groups = {"Harinder"})
+	public void VNDR_P2M5_NewFunc_006() throws InterruptedException {
+		extentTest = extentReport.startTest("VNDR_P2M5_NewFunc_006",
+				"*H7 : Manage Bill >> New Bill >> Ensure that field is not mandatory, user can create bill without specifying tenant or other name.");
+		values.clear();
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		byId.click(id_ManageBillNewBillButton, "Click on 'New Bill' button");
+		byId.click(id_NewBillChargeToTenantCheckBox, "Click on 'Tenant' Checkbox");
+		String getPlaceHolder = byId.getAttribute(id_NewBillChargeToTenantTextBox,"placeholder", "Get placeholder from 'Tenant Name' TextBox.");
+		Assert.assertEquals(getPlaceHolder, "Tenant Name", "PlaceHolder is missing or Has been changed");
+		extentTest.log(LogStatus.INFO, "Verified, that field is not mandatory, user can create bill without specifying tenant or other name.");
+	}
+
+	
+	@Test(priority = 70, enabled = true, groups = { "Smoke", "Harinder"})
+	public void VNDR_P2M5_NewFunc_007() throws InterruptedException, IOException, AWTException {
+		extentTest = extentReport.startTest("VNDR_P2M5_NewFunc_007",
+				"*H7 : Manage Bill >> New Bill >> Ensure that grid is displayed with all the tenants present in company and contains fields: Tenant name, Email, Property, Building and Unit");
+		List<String> headersName = new ArrayList<>();
+		privateBrowser();
+		login("", adminEmail, password);
+		byId.click(id_AdminPortalPeopleTab, "Click on People Tab");
+		tenantName = value_TenantFirstName+utility.uniqueString();
+		VendorPortalCommons.newTenant_SelectPropertyTab(arr[0], building.get(0),"", tenantName, value_TenantLastName,tenantName+value_DomainName , value_PhoneNumber);
+		VendorPortalCommons.newTenant_LeaseDetailsTab("", "", "", "", "", "");
+		VendorPortalCommons.newTenant_ChargesAndMoveInTabWithoutParams();
+		driverClose();
+		driverFlag = true;
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		setLogs.info("Create New Bill");
+		refNo = utility.uniqueNo();
+		//tenantName = value_TenantFirstName+utility.uniqueString();
+		//values = VendorPortalCommons.NewBill(value_Amount, value_SelectTermDDLValue, refNo, arr[1], "",arr[0], "Tenant", tenantName, building.get(0), "", "", value_Amount, "", "");
+		byId.click(id_ManageBillNewBillButton, "Click on 'New Bill' button");
+		byId.clearThenSetText(id_NewBillAmount, value_Amount, " Enter Amount in Amount field");
+		byId.clearThenSetText(id_NewBillReference, refNo, "Enter Reference# in 'Referecne#' field");
+		Thread.sleep(2000);
+		JavascriptExecutor jse = (JavascriptExecutor) getDriver();
+		byId.selectByVisibleText(id_NewBillPortfolio, arr[1], "Select Portfolio");
+		Thread.sleep(2000);
+		byId.setText(id_NewBillSplitBillProperty,arr[0], "Enter Property from Property DDL in 'Add Items' Section");
+		Thread.sleep(2000);
+		getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ARROW_DOWN);
+		getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ARROW_DOWN);
+		getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ENTER);
+		Actions act = new Actions(getDriver());
+		act.moveToElement(getDriver().findElement(By.id(id_NewBillChargeToTenantCheckBox))).perform();
+		byId.click(id_NewBillChargeToTenantCheckBox, "Check 'Tenant' CheckBox");
+		byId.clearThenSetText(id_NewBillChargeToTenantTextBox, tenantName, "Enter Tenant name");
+		List<WebElement> getLabels = byXpath.getElements("//*[@id='cg-divHeader']//div[not(contains(@style,'display:none;'))]//label", "get Headers for tenant info");
+		for (WebElement webElement : getLabels) {
+		String getheaderName = webElement.getText();
+		headersName.add(getheaderName);
+		}
+		System.out.println("headersName = " +headersName);
+		List<String> values = VendorPortalCommons.AddMultipleValuesInList(ids_tenantHeaderName);
+		Assert.assertEquals(headersName, values);
+		extentTest.log(LogStatus.INFO,
+				"*H7 : Verified, that grid is displayed with all the tenants present in company and contains fields: Tenant name, Email, Property, Building and Unit");
+		}
+	
+	@Test(priority = 71, enabled = true, groups = { "Smoke", "Harinder"})
+	public void VNDR_P2M5_NewFunc_008() throws InterruptedException, IOException, AWTException {
+		extentTest = extentReport.startTest("VNDR_P2M5_NewFunc_008", "*H7 : Manage Bill >> New Bill >> Ensure selected tenant populates in the field");
+		List<String> headersName = new ArrayList<>();
+		privateBrowser();
+		login("", adminEmail, password);
+		byId.click(id_AdminPortalPeopleTab, "Click on People Tab");
+		tenantName = value_TenantFirstName+utility.uniqueString();
+		VendorPortalCommons.newTenant_SelectPropertyTab(arr[0], building.get(0),"", tenantName, value_TenantLastName,tenantName+value_DomainName , value_PhoneNumber);
+		VendorPortalCommons.newTenant_LeaseDetailsTab("", "", "", "", "", "");
+		VendorPortalCommons.newTenant_ChargesAndMoveInTabWithoutParams();
+		driverClose();
+		driverFlag = true;
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		setLogs.info("Create New Bill");
+		refNo = utility.uniqueNo();
+		//tenantName = value_TenantFirstName+utility.uniqueString();
+		//values = VendorPortalCommons.NewBill(value_Amount, value_SelectTermDDLValue, refNo, arr[1], "",arr[0], "Tenant", tenantName, building.get(0), "", "", value_Amount, "", "");
+		byId.click(id_ManageBillNewBillButton, "Click on 'New Bill' button");
+		byId.clearThenSetText(id_NewBillAmount, value_Amount, " Enter Amount in Amount field");
+		byId.clearThenSetText(id_NewBillReference, refNo, "Enter Reference# in 'Referecne#' field");
+		Thread.sleep(2000);
+		JavascriptExecutor jse = (JavascriptExecutor) getDriver();
+		byId.selectByVisibleText(id_NewBillPortfolio, arr[1], "Select Portfolio");
+		Thread.sleep(2000);
+		byId.setText(id_NewBillSplitBillProperty,arr[0], "Enter Property from Property DDL in 'Add Items' Section");
+		Thread.sleep(2000);
+		getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ARROW_DOWN);
+		getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ARROW_DOWN);
+		getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ENTER);
+		Actions act = new Actions(getDriver());
+		act.moveToElement(getDriver().findElement(By.id(id_NewBillChargeToTenantCheckBox))).perform();
+		byId.click(id_NewBillChargeToTenantCheckBox, "Check 'Tenant' CheckBox");
+		byId.clearThenSetText(id_NewBillChargeToTenantTextBox, tenantName, "Enter Tenant name");
+		Thread.sleep(2000);
+		getDriver().findElement(By.id(id_NewBillChargeToTenantTextBox)).sendKeys(Keys.ARROW_DOWN);
+		getDriver().findElement(By.id(id_NewBillChargeToTenantTextBox)).sendKeys(Keys.ARROW_DOWN);
+		getDriver().findElement(By.id(id_NewBillChargeToTenantTextBox)).sendKeys(Keys.ENTER);
+		String getTenantName = byId.getAttribute(id_NewBillChargeToTenantTextBox, "value", "Get selected tenant name from textbox");
+		Assert.assertEquals(getTenantName, tenantName+ " "+value_TenantLastName, "Tenant is not selected");
+		extentTest.log(LogStatus.INFO,"*H7 : Verified, that selected tenant populates in the field");
+		}
+	
+	@Test(priority = 72, enabled = true, groups = { "Smoke", "Harinder"})
+	public void VNDR_P2M5_NewFunc_009() throws InterruptedException, IOException, AWTException {
+		extentTest = extentReport.startTest("VNDR_P2M5_NewFunc_009",
+				"*H7 : Manage Bill >> New Bill >> Ensure that other checkbox is selected and text field is displayed with other contentpalceholder");
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		setLogs.info("Create New Bill");
+		refNo = utility.uniqueNo();
+		byId.click(id_ManageBillNewBillButton, "Click on 'New Bill' button");
+		byId.clearThenSetText(id_NewBillAmount, value_Amount, " Enter Amount in Amount field");
+		byId.selectByVisibleText(id_NewBillSelectTerm, value_SelectTermDDLValue, "Select 'Term' from 'Select Term' DDL");
+		byId.clearThenSetText(id_NewBillReference, refNo, "Enter Reference# in 'Referecne#' field");
+		Thread.sleep(2000);
+		JavascriptExecutor jse = (JavascriptExecutor) getDriver();
+		byId.selectByVisibleText(id_NewBillPortfolio, arr[1], "Select Portfolio");
+		Thread.sleep(2000);
+		byId.clearThenSetText(id_NewBillSplitBillProperty, arr[0], "Enter Property from Property DDL in 'Add Items' Section");
+		Thread.sleep(2000);
+		getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ARROW_DOWN);
+		getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ARROW_DOWN);
+		getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ENTER);
+		byId.click(id_NewBillChargeToOthersCheckbox, "Check 'Others' CheckBox");
+		String getPlaceHolder = byId.getAttribute(id_NewBillChargeToOthersTextBox, "placeholder", "Get place holder for 'other' textbox");
+		/*
+		byId.clearThenSetText(id_NewBillChargeToOthersTextBox, "'Other' textbox is displaying", "Enter data in Others Textbox");
+		String getOtherText = byId.getAttribute(id_NewBillChargeToOthersTextBox, "value", "get Entered text from 'Other field'");
+		int getlength = getOtherText.length();*/
+		Assert.assertTrue(getPlaceHolder.equals("Other"), "Other Text field is not exits/ 'Other' place holder is missing");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that other checkbox is selected and text field is displayed with other contentpalceholder");
+		}
+	
+	@Test(priority = 73, enabled = true, groups = { "Smoke", "Harinder"})
+	public void VNDR_P2M5_NewFunc_011() throws InterruptedException, IOException, AWTException {
+		extentTest = extentReport.startTest("VNDR_P2M5_NewFunc_011",
+				"*H7 : Manage Bill >> New Bill >> Ensure that User should be able to enter numeric data");
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		setLogs.info("Create New Bill");
+		refNo = utility.uniqueNo();
+		byId.click(id_ManageBillNewBillButton, "Click on 'New Bill' button");
+		byId.clearThenSetText(id_NewBillAmount, value_Amount, " Enter Amount in Amount field");
+		byId.selectByVisibleText(id_NewBillSelectTerm, value_SelectTermDDLValue, "Select 'Term' from 'Select Term' DDL");
+		byId.clearThenSetText(id_NewBillReference, refNo, "Enter Reference# in 'Referecne#' field");
+		Thread.sleep(2000);
+		JavascriptExecutor jse = (JavascriptExecutor) getDriver();
+		byId.selectByVisibleText(id_NewBillPortfolio, arr[1], "Select Portfolio");
+		Thread.sleep(2000);
+		byId.clearThenSetText(id_NewBillSplitBillProperty, arr[0], "Enter Property from Property DDL in 'Add Items' Section");
+		Thread.sleep(2000);
+		getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ARROW_DOWN);
+		getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ARROW_DOWN);
+		getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ENTER);
+		byId.click(id_NewBillChargeToOthersCheckbox, "Check 'Others' CheckBox");
+		byId.clearThenSetText(id_NewBillChargeToOthersTextBox, value_Amount, "Enter Numeric data in others field");
+		String getEnteredData = byId.getAttribute(id_NewBillChargeToOthersTextBox, "value", "Get place holder for 'other' textbox");
+		/*
+		byId.clearThenSetText(id_NewBillChargeToOthersTextBox, "'Other' textbox is displaying", "Enter data in Others Textbox");
+		String getOtherText = byId.getAttribute(id_NewBillChargeToOthersTextBox, "value", "get Entered text from 'Other field'");
+		int getlength = getOtherText.length();*/
+		Assert.assertTrue(getEnteredData.equals(value_Amount), "Unable to enter data in Other text field.");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that User should be able to enter numeric data");
+		}
+	
+	@Test(priority = 74, enabled = true, groups = {"Harinder"})
+	public void VNDR_P2M5_NewFunc_012() throws InterruptedException, IOException, AWTException {
+		extentTest = extentReport.startTest("VNDR_P2M5_NewFunc_012",
+				"*H7 : Manage Bill >> New Bill >> User should be able to enter Alphabets");
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		setLogs.info("Create New Bill");
+		refNo = utility.uniqueNo();
+		byId.click(id_ManageBillNewBillButton, "Click on 'New Bill' button");
+		byId.clearThenSetText(id_NewBillAmount, value_Amount, " Enter Amount in Amount field");
+		byId.selectByVisibleText(id_NewBillSelectTerm, value_SelectTermDDLValue, "Select 'Term' from 'Select Term' DDL");
+		byId.clearThenSetText(id_NewBillReference, refNo, "Enter Reference# in 'Referecne#' field");
+		Thread.sleep(2000);
+		JavascriptExecutor jse = (JavascriptExecutor) getDriver();
+		byId.selectByVisibleText(id_NewBillPortfolio, arr[1], "Select Portfolio");
+		Thread.sleep(2000);
+		byId.clearThenSetText(id_NewBillSplitBillProperty, arr[0], "Enter Property from Property DDL in 'Add Items' Section");
+		Thread.sleep(2000);
+		getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ARROW_DOWN);
+		getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ARROW_DOWN);
+		getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ENTER);
+		byId.click(id_NewBillChargeToOthersCheckbox, "Check 'Others' CheckBox");
+		byId.clearThenSetText(id_NewBillChargeToOthersTextBox, value_TenantFirstName, "Enter Numeric data in others field");
+		String getEnteredData = byId.getAttribute(id_NewBillChargeToOthersTextBox, "value", "Get place holder for 'other' textbox");
+		/*
+		byId.clearThenSetText(id_NewBillChargeToOthersTextBox, "'Other' textbox is displaying", "Enter data in Others Textbox");
+		String getOtherText = byId.getAttribute(id_NewBillChargeToOthersTextBox, "value", "get Entered text from 'Other field'");
+		int getlength = getOtherText.length();*/
+		Assert.assertTrue(getEnteredData.equals(value_TenantFirstName), "Unable to enter data in Other text field.");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that User should be able to enter Alphabets");
+		}
+	
+	@Test(priority = 75, enabled = true, groups = {"Harinder"})
+	public void VNDR_P2M5_NewFunc_013_1() throws InterruptedException, IOException, AWTException {
+		extentTest = extentReport.startTest("VNDR_P2M5_NewFunc_013_1",
+				"*H7 : Manage Bill >> New Bill >> Ensure that 'Building' DDL field is mandatory");
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		setLogs.info("Create New Bill");
+		refNo = utility.uniqueNo();
+		byId.click(id_ManageBillNewBillButton, "Click on 'New Bill' button");
+		byId.clearThenSetText(id_NewBillAmount, value_Amount, " Enter Amount in Amount field");
+		byId.selectByVisibleText(id_NewBillSelectTerm, value_SelectTermDDLValue, "Select 'Term' from 'Select Term' DDL");
+		byId.clearThenSetText(id_NewBillReference, refNo, "Enter Reference# in 'Referecne#' field");
+		Thread.sleep(2000);
+		JavascriptExecutor jse = (JavascriptExecutor) getDriver();
+		byId.selectByVisibleText(id_NewBillPortfolio, arr[1], "Select Portfolio");
+		Thread.sleep(2000);
+		byId.clearThenSetText(id_NewBillSplitBillProperty, arr[0], "Enter Property from Property DDL in 'Add Items' Section");
+		Thread.sleep(2000);
+		getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ARROW_DOWN);
+		getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ARROW_DOWN);
+		getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ENTER);
+		byId.click(id_AddItemsSectionBuildingDDL, "Click on 'Building' DDL in 'Add Items' Section");
+		Actions act = new Actions(getDriver());
+		act.moveToElement(getDriver().findElement(By.id(id_NewBillAddItemsUnit))).click().perform();
+		String getErrorText = byClassName.getText(class_MandatoryfieldErrorMessage,
+				"get Error msg for 'Building' DDL");
+		Assert.assertTrue(getErrorText.equals(value_MandatoryfieldsMessage), "No error message is displaying.");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that 'Building' DDL field is mandatory");
+		}
+	
+	@Test(priority = 75, enabled = true, groups = {"Harinder"})
+	public void VNDR_P2M5_NewFunc_013_2() throws InterruptedException, IOException, AWTException {
+		extentTest = extentReport.startTest("VNDR_P2M5_NewFunc_013_2",
+				"*H7 : Manage Bill >> New Bill >> Ensure that DDL contains only list of buildings, associated to the selected property.");
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		setLogs.info("Create New Bill");
+		refNo = utility.uniqueNo();
+		byId.click(id_ManageBillNewBillButton, "Click on 'New Bill' button");
+		byId.clearThenSetText(id_NewBillAmount, value_Amount, " Enter Amount in Amount field");
+		byId.selectByVisibleText(id_NewBillSelectTerm, value_SelectTermDDLValue, "Select 'Term' from 'Select Term' DDL");
+		byId.clearThenSetText(id_NewBillReference, refNo, "Enter Reference# in 'Referecne#' field");
+		Thread.sleep(2000);
+		JavascriptExecutor jse = (JavascriptExecutor) getDriver();
+		byId.selectByVisibleText(id_NewBillPortfolio, arr[1], "Select Portfolio");
+		Thread.sleep(2000);
+		byId.clearThenSetText(id_NewBillSplitBillProperty, arr[0], "Enter Property from Property DDL in 'Add Items' Section");
+		Thread.sleep(2000);
+		getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ARROW_DOWN);
+		getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ARROW_DOWN);
+		getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ENTER);
+		List<WebElement> buildingOption = byXpath.getElements("//*[@id='"+id_AddItemsSectionBuildingDDL+"']//option", "Get all options from Building ddl");
+		int count = buildingOption.size();
+		Assert.assertTrue(count>=2, "'Building' ddl doesn't show all the building associated to the selected property");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that DDL contains only list of buildings, associated to the selected property.");
+		}
+	
+	@Test(priority = 76, enabled = true, groups = {"Harinder"})
+	public void VNDR_P2M5_NewFunc_015_2() throws InterruptedException, IOException, AWTException {
+		extentTest = extentReport.startTest("VNDR_P2M5_NewFunc_015_2",
+				"*H7 : Manage Bill >> New Bill >> Ensure that Account DDL contains list of all the chart of accounts added in company setup");
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		setLogs.info("Create New Bill");
+		refNo = utility.uniqueNo();
+		byId.click(id_ManageBillNewBillButton, "Click on 'New Bill' button");
+		byId.clearThenSetText(id_NewBillAmount, value_Amount, " Enter Amount in Amount field");
+		byId.selectByVisibleText(id_NewBillSelectTerm, value_SelectTermDDLValue, "Select 'Term' from 'Select Term' DDL");
+		byId.clearThenSetText(id_NewBillReference, refNo, "Enter Reference# in 'Referecne#' field");
+		Thread.sleep(2000);
+		JavascriptExecutor jse = (JavascriptExecutor) getDriver();
+		byId.selectByVisibleText(id_NewBillPortfolio, arr[1], "Select Portfolio");
+		Thread.sleep(2000);
+		byId.clearThenSetText(id_NewBillSplitBillProperty, arr[0], "Enter Property from Property DDL in 'Add Items' Section");
+		Thread.sleep(2000);
+		getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ARROW_DOWN);
+		getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ARROW_DOWN);
+		getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ENTER);
+		List<WebElement> buildingOption = byXpath.getElements("//*[@id='"+id_AddItemsSectionBuildingDDL+"']//option", "Get all options from Building ddl");
+		int count = buildingOption.size();
+		Assert.assertTrue(count>=2, "'Building' ddl doesn't show all the building associated to the selected property");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that Account DDL contains list of all the chart of accounts added in company setup");
+		}
+	
+	@Test(priority = 76, enabled = true, groups = {"Harinder"})
+	public void VNDR_P2M5_NewFunc_019() throws InterruptedException, IOException, AWTException {
+		extentTest = extentReport.startTest("VNDR_P2M5_NewFunc_019",
+				"*H7 : Manage Bill >> New Bill >> Amount field in Add Item >> Ensure that should display error message 'property total amount cannot be greater than bill amount'");
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		setLogs.info("to New Bill from Fill 'Add Items' Section");
+		byId.click(id_ManageBillNewBillButton, "Click on 'New Bill' button");
+		refNo = utility.uniqueNo();
+		byId.clearThenSetText(id_NewBillAmount, value_Amount, " Enter Amount in Amount field");
+		byId.clearThenSetText(id_NewBillReference, refNo, "Enter Reference# in 'Referecne#' field");
+		byId.selectByVisibleText(id_NewBillPortfolio, arr[1], "Select Portfolio");
+		byId.clearThenSetText(id_NewBillSplitBillProperty, arr[0], "Enter Property from Property DDL in 'Add Items' Section");
+		//getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ARROW_DOWN);
+		Thread.sleep(2000);
+		getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ARROW_DOWN);
+		getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ARROW_DOWN);
+		getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ENTER);
+		byId.selectByVisibleText(id_AddItemsSectionBuildingDDL, building.get(0), "Select Building");
+		String getUnitNum = byId.getFirstSelectedOption(id_NewBillAddItemsUnit, "Get Selected unit No");
+		if (getUnitNum.equals("Select")) {
+			byId.selectByIndex(id_NewBillAddItemsUnit, 1, "Click on Unit DDL");
+		}
+		byId.selectByIndex(id_NewBillAddItemsAccount, 1, "Select Account by Index");
+		int amount = Integer.parseInt(value_Amount)+10;
+		byId.clearThenSetText(id_NewBillAddItemsAmount, Integer.toString(amount), "Enter Amount in 'Add Items' Section");
+		Actions act = new Actions(getDriver());
+		act.moveToElement(getDriver().findElement(By.id(id_NewBillAddItemsDescription))).click().perform();
+		String getPopupText = byXpath.getText("//*[contains(@class,'toast-type-warning')]//p", "get Popup text");
+		Assert.assertEquals(getPopupText, value_AddItemsPopupText, "Popup Text has been changed/Popup is not displayed.");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that should display error message 'property total amount cannot be greater than bill amount'");
+		}
+	
+	@Test(priority = 77, enabled = true, groups = {"Harinder"})
+	public void VNDR_P2M5_NewFunc_020() throws InterruptedException, IOException, AWTException {
+		extentTest = extentReport.startTest("VNDR_P2M5_NewFunc_020",
+				"*H7 : Manage Bill >> New Bill >> Amount field in Add Item >>Enter amount less than bill amount and click on save button>> Ensure that It should display error message 'property total amount cannot be less than bill amount'");
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		setLogs.info("to New Bill from Fill 'Add Items' Section");
+		byId.click(id_ManageBillNewBillButton, "Click on 'New Bill' button");
+		refNo = utility.uniqueNo();
+		byId.clearThenSetText(id_NewBillAmount, value_Amount, " Enter Amount in Amount field");
+		byId.clearThenSetText(id_NewBillReference, refNo, "Enter Reference# in 'Referecne#' field");
+		byId.selectByVisibleText(id_NewBillPortfolio, arr[1], "Select Portfolio");
+		byId.clearThenSetText(id_NewBillSplitBillProperty, arr[0], "Enter Property from Property DDL in 'Add Items' Section");
+		//getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ARROW_DOWN);
+		Thread.sleep(2000);
+		getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ARROW_DOWN);
+		getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ARROW_DOWN);
+		getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ENTER);
+		byId.selectByVisibleText(id_AddItemsSectionBuildingDDL, building.get(0), "Select Building");
+		String getUnitNum = byId.getFirstSelectedOption(id_NewBillAddItemsUnit, "Get Selected unit No");
+		if (getUnitNum.equals("Select")) {
+			byId.selectByIndex(id_NewBillAddItemsUnit, 1, "Click on Unit DDL");
+		}
+		byId.selectByIndex(id_NewBillAddItemsAccount, 1, "Select Account by Index");
+		int amount = Integer.parseInt(value_Amount)-10;
+		byId.clearThenSetText(id_NewBillAddItemsAmount, Integer.toString(amount), "Enter Amount in 'Add Items' Section");
+		/*Actions act = new Actions(getDriver());
+		act.moveToElement(getDriver().findElement(By.id(id_NewBillAddItemsDescription))).click().perform();*/
+		byId.click(id_NewBillSaveButton, "Click on Save Button");
+		String getPopupText = byXpath.getText("//*[contains(@class,'toast-type-warning')]//p", "get Popup text");
+		Assert.assertEquals(getPopupText, value_AddItemsPopupTextLessAmount, "Popup Text has been changed/Popup is not displayed.");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that Entering amount less than bill amount and click on save button It displayed error message 'property total amount cannot be less than bill amount'");
+		}
+	
+	@Test(priority = 78, enabled = true, groups = { "Harinder"})
+	public void VNDR_P2M5_NewFunc_021() throws InterruptedException {
+		
+		extentTest = extentReport.startTest("VNDR_P2M5_NewFunc_021",
+				"*H7 : Verify that user should not able to enter Alphabets in amount field in Add items grid");
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		byId.click(id_ManageBillNewBillButton, "Click on 'New Bill' button");
+		setLogs.info("Enter Alphabets in amount field in Add items grid");
+		byId.clearThenSetText(id_NewBillAddItemsAmount, "New Bill", "Enter Alphabets in amount field in Add items grid");
+		setLogs.info("Get text from amount field in Add items grid");
+		String getText = byId.getAttribute(id_NewBillAddItemsAmount,"value", "get value from 'Due Date' field");
+		Assert.assertTrue(getText.equals(""), "User should not be able to enter Albhabets in amount field in Add items grid");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that user is not able to enter Alphabets in amount field in Add items grid");
+	}
+
+	@Test(priority = 79, enabled = true, groups = { "Harinder"})
+	public void VNDR_P2M5_NewFunc_022() throws InterruptedException 
+	{
+		extentTest = extentReport.startTest("VNDR_P2M5_NewFunc_021",
+				"*H7 : Verify that  Enter special Characters in amount field in Add items grid >> amount field should accept only decimal");
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		byId.click(id_ManageBillNewBillButton, "Click on 'New Bill' button");
+		setLogs.info("Enter Special characters in amount field in Add items grid");
+		byId.clearThenSetText(id_NewBillAddItemsAmount, "10@12", "Enter Special characters in amount field in Add items grid");
+		setLogs.info("Get text from amount field in Add items grid");
+		String getAmountWithSpeChar = byId.getAttribute(id_NewBillAddItemsAmount,"value", "get value from 'Due Date' field");
+		byId.clearThenSetText(id_NewBillAddItemsAmount, "10.12", "Enter dot with amount in amount field in Add items grid");
+		String getAmountWithDot = byId.getAttribute(id_NewBillAddItemsAmount,"value", "get value from 'Due Date' field");
+		Assert.assertTrue(getAmountWithSpeChar.equals("1012") && getAmountWithDot.equals("10.12"), "User should not be able to enter Albhabets in amount field in Add items grid");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that amount field is accepting only decimal in Add items grid");
+	}
+	
+	@Test(priority = 80, enabled = true, groups = { "Harinder"})
+	public void VNDR_P2M5_NewFunc_024() throws InterruptedException 
+	{
+		extentTest = extentReport.startTest("VNDR_P2M5_NewFunc_024",
+				"*H7 : Verify that Description field is not mandatory and it is clickable");
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		byId.click(id_ManageBillNewBillButton, "Click on 'New Bill' button");
+		setLogs.info("Click in Description field in Add items grid");
+		byId.click(id_NewBillAddItemsDescription, "Click in Description field in Add Items grid");
+		Actions action = new Actions(getDriver());
+		action.moveToElement(getDriver().findElement(By.id(id_NewBillAddItemsAmount))).click().perform();
+		int getSize = byXpath.getSize("//*[@id='"+id_NewBillAddItemsDescription+"']//parent::td//div", "Get size of error message for descrption field");
+		Assert.assertEquals(getSize, 0 , "Description field in Add items grid is mandatory field");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that Description field is not mandatory and it is clickable");
+	}
+	
+	@Test(priority = 81, enabled = true, groups = { "Harinder"})
+	public void VNDR_P2M5_NewFunc_025() throws InterruptedException 
+	{
+		extentTest = extentReport.startTest("VNDR_P2M5_NewFunc_025",
+				"*H7 : Verify that User should be able to enter numerals in Description field in Add Items grid");
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		byId.click(id_ManageBillNewBillButton, "Click on 'New Bill' button");
+		setLogs.info("Enter numerals in Description field in Add items grid");
+		byId.clearThenSetText(id_NewBillAddItemsDescription, value_Amount ,"Enter numerals in Description field in Add Items grid");
+		String getValue = byId.getAttribute(id_NewBillAddItemsDescription, "value" ,"Get Enter Numbers in Description field in Add Items grid");
+		Assert.assertEquals(getValue, value_Amount , "Description field in Add items grid is not Accepting numerals");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that User should be able to enter numerals in Description field in Add Items grid");
+	}
+	
+	@Test(priority = 82, enabled = true, groups = { "Harinder"})
+	public void VNDR_P2M5_NewFunc_026() throws InterruptedException 
+	{
+		extentTest = extentReport.startTest("VNDR_P2M5_NewFunc_026",
+				"*H7 : Verify that User should be able to enter Alphabets in Description field in Add Items grid");
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		byId.click(id_ManageBillNewBillButton, "Click on 'New Bill' button");
+		setLogs.info("Enter Alphabets in Description field in Add items grid");
+		byId.clearThenSetText(id_NewBillAddItemsDescription, "New Bill" ,"Enter Alphabets in Description field in Add Items grid");
+		String getValue = byId.getAttribute(id_NewBillAddItemsDescription, "value" ,"Get Entered Alphabets in Description field in Add Items grid");
+		Assert.assertEquals(getValue, "New Bill" , "Description field in Add items grid is not Accepting Alphabets");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that User should be able to enter Alphabets in Description field in Add Items grid");
+	}
+	
+	@Test(priority = 83, enabled = true, groups = {"Harinder"})
+	public void VNDR_P2M5_NewFunc_027() throws InterruptedException 
+	{
+		extentTest = extentReport.startTest("VNDR_P2M5_NewFunc_027",
+				"*H7 : Verify that User should be able to enter special Characters in Description field in Add Items grid");
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		byId.click(id_ManageBillNewBillButton, "Click on 'New Bill' button");
+		setLogs.info("Enter special Characters in Description field in Add items grid");
+		byId.clearThenSetText(id_NewBillAddItemsDescription, "!@#$%^" ,"Enter special Characters in Description field in Add Items grid");
+		String getValue = byId.getAttribute(id_NewBillAddItemsDescription, "value" ,"Get Entered special Characters in Description field in Add Items grid");
+		Assert.assertEquals(getValue, "!@#$%^" , "Description field in Add items grid is not Accepting special Characters");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that User should be able to enter special Characters in Description field in Add Items grid");
+	}
+	
+	@Test(priority = 84, enabled = true, groups = {"Harinder"})
+	public void VNDR_P2M5_NewFunc_028() throws InterruptedException 
+	{
+		extentTest = extentReport.startTest("VNDR_P2M5_NewFunc_028",
+				"*H7 : Verify that User should be able to enter combination of numerals , alphabets and Special Characters in Description field in Add Items grid");
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		byId.click(id_ManageBillNewBillButton, "Click on 'New Bill' button");
+		setLogs.info("Enter combination of numerals , alphabets and Special Characters in Description field in Add items grid");
+		byId.clearThenSetText(id_NewBillAddItemsDescription, "@123NewBill" ,"Enter combination of numerals , alphabets and Special Characters in Description field in Add Items grid");
+		String getValue = byId.getAttribute(id_NewBillAddItemsDescription, "value" ,"Get Entered Data in Description field in Add Items grid");
+		Assert.assertEquals(getValue, "@123NewBill" , "Description field in Add items grid is not Accepting combination of numerals , alphabets and Special Characters");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that User should be able to enter combination of numerals , alphabets and Special Characters in Description field in Add Items grid");
+	}
+	
+	@Test(priority = 85, enabled = true, groups = {"Harinder"})
+	public void VNDR_P2M5_NewFunc_029() throws InterruptedException 
+	{
+		extentTest = extentReport.startTest("VNDR_P2M5_NewFunc_029",
+				"*H7 : Verify that clicking on cross sign of any added item in Add Items grid, Particular item should be deleted");
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		byId.click(id_ManageBillNewBillButton, "Click on 'New Bill' button");
+		String refNo = utility.uniqueNo();
+		byId.clearThenSetText(id_NewBillAmount, value_Amount, " Enter Amount in Amount field");
+		byId.clearThenSetText(id_NewBillReference, refNo, "Enter Reference# in 'Referecne#' field");
+		byId.selectByVisibleText(id_NewBillPortfolio, arr[1], "Select Portfolio");
+		byId.clearThenSetText(id_NewBillSplitBillProperty, arr[0],
+				"Enter Property from Property DDL in 'Add Items' Section");
+		Thread.sleep(2000);
+		getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ARROW_DOWN);
+		getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ARROW_DOWN);
+		getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ENTER);
+		byId.selectByIndex(id_AddItemsSectionBuildingDDL, 1, "Select Building");
+		String getUnitNum = byId.getFirstSelectedOption(id_NewBillAddItemsUnit, "Get Selected unit No");
+		if (getUnitNum.equals("Select")) {
+			byId.selectByIndex(id_NewBillAddItemsUnit, 1, "Click on Unit DDL");
+		/*	byXpath.click("//*[@class='" + class_NewBillUnitPopupUnitsCheckBox + "'][1]//input",
+					"Check the checkbox to select Unit");
+			byId.click("btnInvoiceUnitSave", "Click on Save button");*/
+			getUnitNum = byId.getFirstSelectedOption(id_NewBillAddItemsUnit, "Get Selected unit No");
+		}
+		byId.selectByIndex(id_NewBillAddItemsAccount, 1, "Select Account by Index");
+		String getAccountName = byId.getFirstSelectedOption(id_NewBillAddItemsAccount, "Get Selected Account");
+		int amount = Integer.parseInt(value_Amount)/2;
+		byId.clearThenSetText(id_NewBillAddItemsAmount, Integer.toString(amount), "Enter Amount in 'Add Items' Section");
+		String getAmount = byId.getText(id_NewBillAddItemsAmount, "get Amount from 'Add Items' Section");
+		byId.clearThenSetText(id_NewBillAddItemsDescription, "First Property description", "Enter First Property description in 'Add Items' Section");
+		byId.click(id_NewBillAddItemsAddButton, "Click on Add Item button.");
+		
+		byId.selectByIndex(id_AddItemsSectionBuildingDDL2, 1, "Select Building ");
+		byId.selectByIndex(id_NewBillAddItemsUnit2, 1, "Select Unit");
+		byId.selectByIndex(id_NewBillAddItemsAccount2, 1, "Select Account");
+		byId.clearThenSetText(id_NewBillAddItemsAmount2, Integer.toString(amount), "Enter Amount for 2nd row in 'Add Items' section.");
+		byId.clearThenSetText(id_NewBillAddItemsDescription2, "Second Property description", "Enter second Property description in 'Add Items' Section");
+		List<WebElement> getEle = byXpath.getElements("//*[@id='"+id_NewBillAddItemsSection+"']//table//tbody//tr", "get Row Count in 'Add Items' section");
+		int eleCount = getEle.size();
+		byXpath.click("//*[@id='"+id_NewBillAddItemsSection+"']//table//tbody//tr[2]//td[last()]/img", "Click on Cross icon for Second row");
+		int getRowCount = byXpath.getSize("//*[@id='"+id_NewBillAddItemsSection+"']//table//tbody//tr", "get Row Count in 'Add Items' section after deleting a record");
+		Assert.assertTrue(eleCount>getRowCount , "Record is not being deleted");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that clicking on cross sign of any added item in Add Items grid, Particular item is deleted");
+	}
+	
+	@Test(priority = 86, enabled = true, groups = {"Harinder"})
+	public void VNDR_P2M5_NewFunc_030() throws InterruptedException 
+	{
+		extentTest = extentReport.startTest("VNDR_P2M5_NewFunc_030",
+				"*H7 : Verify that clicking on Add Button,New row should be added in the Add Item grid to add new item and user should be able to add multiple");
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		byId.click(id_ManageBillNewBillButton, "Click on 'New Bill' button");
+		String refNo = utility.uniqueNo();
+		byId.clearThenSetText(id_NewBillAmount, value_Amount, " Enter Amount in Amount field");
+		byId.clearThenSetText(id_NewBillReference, refNo, "Enter Reference# in 'Referecne#' field");
+		byId.selectByVisibleText(id_NewBillPortfolio, arr[1], "Select Portfolio");
+		byId.clearThenSetText(id_NewBillSplitBillProperty, arr[0],
+				"Enter Property from Property DDL in 'Add Items' Section");
+		Thread.sleep(2000);
+		getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ARROW_DOWN);
+		getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ARROW_DOWN);
+		getDriver().findElement(By.id(id_NewBillSplitBillProperty)).sendKeys(Keys.ENTER);
+		byId.selectByIndex(id_AddItemsSectionBuildingDDL, 1, "Select Building");
+		String getUnitNum = byId.getFirstSelectedOption(id_NewBillAddItemsUnit, "Get Selected unit No");
+		if (getUnitNum.equals("Select")) {
+			byId.selectByIndex(id_NewBillAddItemsUnit, 1, "Click on Unit DDL");
+		/*	byXpath.click("//*[@class='" + class_NewBillUnitPopupUnitsCheckBox + "'][1]//input",
+					"Check the checkbox to select Unit");
+			byId.click("btnInvoiceUnitSave", "Click on Save button");*/
+			getUnitNum = byId.getFirstSelectedOption(id_NewBillAddItemsUnit, "Get Selected unit No");
+		}
+		byId.selectByIndex(id_NewBillAddItemsAccount, 1, "Select Account by Index");
+		String getAccountName = byId.getFirstSelectedOption(id_NewBillAddItemsAccount, "Get Selected Account");
+		int amount = Integer.parseInt(value_Amount)/2;
+		byId.clearThenSetText(id_NewBillAddItemsAmount, Integer.toString(amount), "Enter Amount in 'Add Items' Section");
+		String getAmount = byId.getText(id_NewBillAddItemsAmount, "get Amount from 'Add Items' Section");
+		byId.clearThenSetText(id_NewBillAddItemsDescription, "First Property description", "Enter First Property description in 'Add Items' Section");
+		byId.click(id_NewBillAddItemsAddButton, "Click on Add Item button.");
+		
+		byId.selectByIndex(id_AddItemsSectionBuildingDDL2, 1, "Select Building ");
+		byId.selectByIndex(id_NewBillAddItemsUnit2, 1, "Select Unit");
+		byId.selectByIndex(id_NewBillAddItemsAccount2, 1, "Select Account");
+		byId.clearThenSetText(id_NewBillAddItemsAmount2, Integer.toString(amount), "Enter Amount for 2nd row in 'Add Items' section.");
+		byId.clearThenSetText(id_NewBillAddItemsDescription2, "Second Property description", "Enter second Property description in 'Add Items' Section");
+		List<WebElement> getEle = byXpath.getElements("//*[@id='"+id_NewBillAddItemsSection+"']//table//tbody//tr", "get Row Count in 'Add Items' section");
+		int eleCount = getEle.size();
+		Assert.assertEquals(eleCount, 2 , "Record is not being Added");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that clicking on Add Button, New row is added in the Add Item grid to add new item and user should be able to add multiple");
+	}
+	
+	@Test(priority = 87, enabled = true, groups = {"Harinder"})
+	public void VNDR_P2M5_NewFunc_031() throws InterruptedException, IOException 
+	{
+		extentTest = extentReport.startTest("VNDR_P2M5_NewFunc_031",
+				"*H7 : Verify that In admin and vendor portal status of bill should be changed from due/overdue to paid");
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		List<Object> list = new ArrayList<>();
+		setLogs.info("Get Vendor Name from My Account Tab");
+		byId.click(id_MyAccountTab, " Click on My Account Tab");
+		String VendorName = byId.getText(id_MyAccountTabVendorName, "Get Full Vendor Name");
+		int getIndex = VendorName.indexOf(" ");
+		if (getIndex > 0)
+			VendorName = VendorName.substring(0, getIndex);
+		System.out.println("Vendor Name is = " + VendorName);
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		setLogs.info("Create New Bill");
+		refNo = utility.uniqueNo();
+		values = VendorPortalCommons.NewBill(value_Amount, value_SelectTermDDLValue, refNo, arr[1]/*"HxYgtg"*/, "",arr[0]/*"Apex145114"*/, "", "", "", "", "", value_Amount, "", "");
+		setLogs.info("Pay Bill from Admin Portal");
+		privateBrowser();
+		login("", adminEmail, password);
+		list = ApexCommon.PayVendorBill(VendorName, refNo, "", "", "", "");
+		byId.click(id_AccountingTabRNP, "Click on Right Navigation Panal arrow.");
+		JavascriptExecutor jse = (JavascriptExecutor) getDriver();
+		jse.executeScript("arguments[0].click();", getDriver().findElement(By.xpath("//*[@id='links']//div//ul//li//a[contains(.,'Bill Register')]")));
+		//byXpath.click("//*[@id='links']//div//ul//li//a[contains(.,'Bill Register')]", "Click on 'Bill Register' option in Right Navigation Panel");
+	/*	byId.clearThenSetText(id_BillRegisterSearchVendorTB, VendorName, "Enter vendor name");
+		Thread.sleep(3000);
+		getDriver().findElement(By.id(id_BillRegisterSearchVendorTB)).sendKeys(Keys.ENTER);*/
+		Thread.sleep(2000);
+		String getStatus = byXpath.getText("//*[@id='"+id_ManageBillGridListingTable+"']//tbody//tr[2]//td[contains(text(),'"+refNo+"')]//following-sibling::td[contains(@aria-describedby,'tblVendorInvoiceRegisterPO_Status') and not(contains(@style,'display: none;'))]", "get Status after paying bill");
+		driverClose();
+		getDriver().navigate().refresh();
+		String getPaidAmount = byXpath.getText("//*[@id='"+id_ManageBillGridListingTable+"']//tbody//tr//td[contains(text(),'"+refNo+"')]//following-sibling::td[contains(@aria-describedby,'tblVendorInvoiceRegisterPO_Status') and not(contains(@style,'display: none;'))]",
+				"Get Paid Amount for the Reference No '" + refNo + "' from List of Bills Grid");
+		Assert.assertTrue(getStatus.equals("Paid") && getPaidAmount.equals("Paid"), "Status is not changed");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that In admin and vendor portal status of bill should be changed from due/overdue to paid");
+	}
+	
+	@Test(priority = 88, enabled = true, groups = {"Harinder"})
+	public void VNDR_P2M5_NewFunc_032() throws InterruptedException, IOException 
+	{
+		extentTest = extentReport.startTest("VNDR_P2M5_NewFunc_032",
+				"*H7 : Verify that The following options should be displayed in Action DDL: View Details and Print for bill whose status is Paid");
+		List<String> actionOptions = new ArrayList<>();
+		List<String> actionValues = new ArrayList<>();
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		List<Object> list = new ArrayList<>();
+		setLogs.info("Get Vendor Name from My Account Tab");
+		byId.click(id_MyAccountTab, " Click on My Account Tab");
+		String VendorName = byId.getText(id_MyAccountTabVendorName, "Get Full Vendor Name");
+		int getIndex = VendorName.indexOf(" ");
+		if (getIndex > 0)
+			VendorName = VendorName.substring(0, getIndex);
+		System.out.println("Vendor Name is = " + VendorName);
+		byId.click(id_ManageBill, "Click on 'Manage Bill' Tab");
+		setLogs.info("Create New Bill");
+		refNo = utility.uniqueNo();
+		values = VendorPortalCommons.NewBill(value_Amount, value_SelectTermDDLValue, refNo, arr[1]/*"HxYgtg"*/, "",arr[0]/*"Apex145114"*/, "", "", "", "", "", value_Amount, "", "");
+		setLogs.info("Pay Bill from Admin Portal");
+		privateBrowser();
+		login("", adminEmail, password);
+		list = ApexCommon.PayVendorBill(VendorName, refNo, "", "", "", "");
+		driverClose();
+		getDriver().navigate().refresh();
+		List<WebElement> getOptionEle = byXpath.getElements("//*[@id='"+id_ManageBillGridListingTable+"']//tbody//tr//td[contains(text(),'"+refNo+"')]//following-sibling::td[contains(@aria-describedby,'tblVendorInvoiceRegisterPO_Status') and not(contains(@style,'display: none;'))]//following-sibling::td//select//option", "get Action column option against bill whose status is paid");
+		for (WebElement webElement : getOptionEle) {
+			String getOption = webElement.getText();
+			actionOptions.add(getOption);
+		}
+		actionValues = VendorPortalCommons.AddMultipleValuesInList(value_NewBillGridActionColumnOptionsForPaidBill);
+		Assert.assertEquals(actionOptions, actionValues, "Options are increased or Decreased");
+		extentTest.log(LogStatus.INFO, "*H7 : Verified, that The following options should be displayed in Action DDL: View Details and Print for bill whose status is Paid");
+	}
+	
+}

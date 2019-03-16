@@ -1,0 +1,142 @@
+package objectRepository;
+
+public interface ApexLinkGlobalComponents {
+	String URL_VendorLogin = "VendorPortal";
+	String URL_AddProperty = "Property/AddProperty";
+	String URL_AddWorkOrder = "WorkOrder/WorkOrder";
+	String URL_AddPortfolio = "MasterData/AddPortfolio";
+	String URL_WorkOrders = "WorkOrder/WorkOrders";
+	String URL_AddVendor ="Vendor/AddVendor";
+	String URL_SettingDefaultSetting = "Setting/Settings/";
+	
+	String id_vendorLoginPageEmailIdTextBox = "txtUsername";
+	String id_vendorLoginPagePasswordTextBox = "txtPassword";
+	String id_vendorLoginPageLoginButton = "btnLogin";
+	String id_DefaultSettingsDefaultDateAndClockSettings = "sevens";
+	String id_DefaultDateAndClockSettingsTabDeafultDateFormatDDL = "ddlDateformat";
+	String id_DefaultDateAndClockSettingsTabDateFormatDDL = "ddlDefaultDateformat";
+	String id_DefaultDateAndClockSettingsTabSaveButton = "btnSettingsSave";
+	String id_DefaultSettingsCurrencyDDL = "ddlCurrency";
+	String value_DefaultCurrency = "US Dollar(US$)";
+	String value_DefaultDateFormat = "MONTH DAY YEAR";
+	String value_DateFormat = "MM/DD/YYYY (Day)";
+	
+	//Used in Add New Property Function
+	String []id_ArrayPropertyMenuNewProperty = {"PropertyAddress1","PropertyAddress2","PropertyPrice",
+			"PropertyTypeID","PropertyStyleID","PropertySubTypeID","PropertyTotalSquareFootage"};
+	String []value_ArrayPropertyMenuNewProperty = {"Phase 8", "Mohali",
+			"100", "Residential", "5 Level Split", "Amit2016740110", "100"};
+	
+	String id_PropertiesTab = "lnk0Properties";
+	String id_NewPropertyBTN = "btnNewProperty";
+	String id_PropertyNameAddProperty = "PropertyName";
+	String id_PortfolioAddProperty = "PortfolioID";
+	String id_AddPorfolioBTNAddProperty = "btnPortfolioPlus";
+	String id_PortfolioNameAddPorfolio = "txtPortfolioName";
+	String id_SavePortfolioBTNAddPorfolio = "btnPortfolioSave";
+	String id_PropertyYearAddProperty = "PropertyYear";
+	String id_MaxBuildingsAddProperty = "PropertyMaxNoofBuildings";
+	String id_MaxUnitsAddProperty = "PropertyMaxNoofUnits";
+	String id_SaveBTNAddProperty = "btnAddProperty";
+	String id_BuildingNameAddBuilding = "BuildingName";
+	String id_MaxUnitsAddBuilding = "BuildingMaxNoofUnits";
+	String id_BuildingAddressAddBuilding = "BuildingAddress1";
+	String id_BuildingIdAddBuilding = "BuildingID_AG";
+	String id_SaveBTNAddBuilding = "btnSave";
+	String id_GroupIndividualRadioBTNAddUnit = "rdbGroup";
+	String id_IndividualRadioBTNAddUnit = "rdbIndividual";	
+	String id_GrpSelectBuildingDDLAddUnit = "ddlBuilding1";
+	String id_GrpFloorNoAddUnit = "txtFloor1";
+	String id_GrpUnitPrefixAddUnit = "txtPrefix1";
+	String id_GrpFromAddUnit = "txtFrom1";
+	String id_GrpToAddUnit = "txtTo1";
+	String id_IndiSelectBuildingDDLAddUnit = "ddlBuildings";
+	String id_IndiFloorNoAddUnit = "txtFloors";
+	String id_IndiUnitPrefixAddUnit = "txtPrefix";
+	String id_IndiUnitNoAddUnit = "txtUnitNumber";
+	String id_UnitTypeDDLAddUnit = "ddlUnitType";
+	String id_SqFtAddUnit = "txtTotalSqFootage";
+	String id_BedroomDDLAddUnit = "ddlBedRoom";
+	String id_BathRoomDDLAddUnit = "ddlBathRoom";
+	String id_BaseRentAddUnit = "txtBaseRent";
+	String id_MarketRentAddUnit = "txtMarketRent";
+	String id_SecurityDepositAddUnit = "txtSecurityDeposit";
+	String id_StatusDDLAddUnit = "ddlStatus";
+	String id_SaveBTNAddUnit = "btnAddUnit";
+	String id_NoBuildingUnitChkBoxAddProperty = "chkDefaultBuildUnit";
+	
+	String class_ManagerNameDDLAddProperty = "placeholder";
+	String class_AlertMessage = "toast-item-wrapper";
+
+	
+	//Work Order variables
+	String id_OneTimeRadioBTNNewWorkOrder = "rdoWorkOrderOneTime";
+	String id_RecurringRadioBTNNewWorkOrder = "rdoWorkOrderRecurring";
+	String id_PropertyNameNewWorkOrder = "txtWorkOrderProperty1";
+	String id_WorkOrderNoNewWorkOrder = "txtWorkOrderNumber";
+	String id_VendorPortalChkBoxNewWorkOrder = "chkWorkOrderVendorPortal";
+	String id_VendorNameNewWorkOrder = "txtWorkOrderVendor";
+	String id_SaveBTNNewWorkOrder = "btnWorkOrderSave";
+	String id_ListingFrequencyDDLNewWorkOrder = "ddlWorkOrderFrequency";
+	String id_StatusDDLNewWorkOrder = "ddlWorkOrderStatus";
+	String id_PriorityDDLNewWorkOrder = "ddlWrkOrderPriority";
+	String id_RequestedByCheckBoxNewWorkOrder = "chkAskRequestedBy";
+	String id_RequestedByDDLNewWorkOrder = "ddlWorkOrderRequestedBy";
+	String id_EstimatedCostNewWorkOrder = "txtWorkOrderEstimatedCost";
+	
+	String xpath_EmailColumnnVendorList = "html/body/div[22]/div//div[5]";	
+
+	String class_PopupYesButton = "Yes";	
+	
+	String value_PropertyName = "Apex"; 
+	String value_Address = "#123 Apex";
+	String value_RentAmount = "200";
+	/******************Accounting_Payables**********************/
+
+
+	//String id_AccountingTab = "lnk0Accounting";
+	String id_PayablesSubTab = "tablinkPayable";
+	String id_SelectVendorDDLList = "txtWorkOrderVendor";
+	String id_TableofBills = "tblPayableBody";
+	String id_TableofBillsSelectAllCheckBox = "checkAllVendorPayable";
+	String id_PayablesDateField = "txtVendorPayableDate";
+	String id_PayablesBankDDL = "ddlBankAccount";
+	String id_PayablesPaymentTypeDDL = "ddlPaymentType";
+	String id_PayablesReferenceNoTB = "txtVendorPayableCheckNumber";
+	String id_PayablesAmountField = "txtVendorPayableTotalAmount";
+	String id_SaveVendorPayableButton = "btnSaveVendorPayable";
+	
+	/*********************AddPortfolio**************************/
+	
+	String id_PortfolioButtonAddPotfolio = "btnAddPortfolio";
+	String id_PortfolioTBPotfolioName = "PortfolioName";
+	String id_PortfolioButtonSave ="btnSavePortfolio";
+	String id_PortfolioCustomField="customfields_1";
+	
+	/********************Add Bank Account*********************/
+	String URL_MasterSetupBankAccount = "MasterData/BankAccount";
+	String id_MasterSetupAddBankAccountBtn = "btnAddBankAccount";
+	String id_BankAccountPortfolio = "ddlPortfolio";
+	String id_BankAccountBankName = "BankName";
+	String id_BankAccountBankAccountNo = "BankAccountNo";
+	String id_BankAccountFDINo = "FDINo";
+	String id_BankAccountBranchCode = "BranchCode";
+	String id_BankAccountInitialAmount = "InitialAmount";
+	String id_BankAccountLastUsedCheckNo = "LastUsedCheckNumber";
+	String id_BankAccountStatus = "BankAccountStatus";
+	String id_BankAccountSetDefaultCheckBox = "IsDefaultBankAccount";
+	String id_BankAccountSaveBtn = "btnSaveBankAccount";
+	
+	String value_BankName = "ICICI";
+	String value_BankIntialAmount = "5000";
+	
+	
+	
+	/********************Admin_Accounting*********************/
+    String id_adminLoginPageEmailIdTextBox = "txtUsername";
+	String id_adminLoginPagePasswordTextBox = "txtPassword";
+	String id_adminLoginPageLoginButton = "btnLogin";
+	String URL_AdminLogin = "";
+
+	
+}
