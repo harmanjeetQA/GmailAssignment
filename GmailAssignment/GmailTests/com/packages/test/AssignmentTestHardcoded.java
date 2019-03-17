@@ -43,17 +43,17 @@ public class AssignmentTestHardcoded {
 		    driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS); 
 
 		    WebElement email_phone = driver.findElement(By.xpath("//input[@id='identifierId']"));
-		    email_phone.sendKeys("harmanjeet.kaur77@gmail.com");
+		    email_phone.sendKeys("******@gmail.com");
 		    driver.findElement(By.id("identifierNext")).click();
 		    WebElement password = driver.findElement(By.xpath("//input[@name='password']"));
 		    WebDriverWait wait = new WebDriverWait(driver, 30);
 		    wait.until(ExpectedConditions.elementToBeClickable(password));
-		    password.sendKeys("Chiku@gmail7@");                     
+		    password.sendKeys("testpwd");                     
 		   password.sendKeys(Keys.ENTER);
 		    driver.manage().timeouts().implicitlyWait(20, TimeUnit.SECONDS); 
 		    WebElement composeMail= wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//div[contains(text(),'Compose')]")));
 		    composeMail.click();
-           driver.findElement(By.xpath("//*[text()='To']/../../..//textarea")).sendKeys("saddamsingh@gmail.com");
+           driver.findElement(By.xpath("//*[text()='To']/../../..//textarea")).sendKeys("******@gmail.com");
            driver.findElement(By.name("subjectbox")).sendKeys("subject");
            driver.findElement(By.xpath("//*[@class='btC']/td[5]/div[1]/div[1]/div[1]/div[2]")).click();
 		    driver.findElement(By.xpath("//div[@id=':r2']")).click();
