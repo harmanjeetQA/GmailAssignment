@@ -20,10 +20,10 @@ public interface GmailElements {
 	public String xpath_SentMailSubject = "//h2[@class='hP']";
 	public String xpath_SentMailLabel = "//*[@class='hN']";
 
-	public String value_Username = "harmanjeet.kaur77@gmail.com";
-	public String value_Password = "Chiku@gmail7@";
+	public String value_Username = "testmail@gmail.com";
+	public String value_Password = "testpassword";
 	
-	public String value_ToRecipient = "saddamsingh@gmail.com";
+	public String value_ToRecipient = "*******@gmail.com";
 	public String value_EnterLabelNameToAdd = "Labeltest";
 
 
